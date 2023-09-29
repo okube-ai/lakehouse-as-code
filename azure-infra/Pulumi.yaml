@@ -1,4 +1,4 @@
-name: cloud-infra
+name: azure-infra
 runtime:
   name: python
   options:
