@@ -1,5 +1,5 @@
 config:
   databricks:account_id:
-    secure: AAABABjITAuoj9zIub4vLoVgc65UTNNJCnmUoePKcaS5i3WHi2tBM2frdoWT6lBT6umNJssyJoErLfwQAG5KE3fni9s=
+    secure: AAABAILnrm6NEoHjR1fTSifmTBBOiGJHc2/D3X/LpUWoYXtkqNyLym41DuECwzlyPO7O349bxtvXZEkZygcotme0/H4=
   databricks:auth_type: azure-cli
   databricks:host: https://accounts.azuredatabricks.net

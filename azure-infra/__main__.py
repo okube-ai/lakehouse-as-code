@@ -194,7 +194,9 @@ class Service:
             managed_resource_group_id=f"/subscriptions/{self.subscription_id}/resourceGroups/{self.org}-rg-dbksws-{self.service}-{self.env}",
             resource_group_name=self.rg.name,
         )
+        pulumi.export("dbks-ws-name", self.workspace.name)
         pulumi.export("dbks-ws-host", self.workspace.workspace_url)
+        pulumi.export("dbks-ws-id", self.workspace.workspace_id)
         secret = self._set_secret("databricks-host", self.workspace.workspace_url)
 
     def set_databricks_connector(self):

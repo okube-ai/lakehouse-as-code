@@ -1,8 +1,8 @@
 import json
-import pulumi
 from dataclasses import dataclass
 from dataclasses import field
-
+import pulumi
+from pulumi import Output
 import pulumi_databricks as databricks
 
 
@@ -41,8 +41,14 @@ class ServicePrincipal:
 
 class Service:
     def __init__(self):
+        self.org = "o3"
+        self.service = "lakehouse"
         self.pulumi_config = pulumi.Config()
         self.env = pulumi.get_stack()
+        self.infra_stack = {
+            "dev": pulumi.StackReference(f"okube/azure-infra/dev"),
+            # "prod": pulumi.StackReference(f"okube/azure-infra/prod"),
+        }
 
         # Resources
         self.groups = None
@@ -78,7 +84,7 @@ class Service:
 
             ServicePrincipal(
                 "neptune-dev",
-                application_id="9a64bd51-03f1-4925-a99b-de48797c78f0",
+                application_id=self.infra_stack["dev"].get_output("neptune-client-id").apply(lambda x: f"{x}"),
                 groups=[
                     "role-store-admins",
                     "role-consumers",
@@ -143,17 +149,42 @@ class Service:
 
     def set_metastore(self):
 
+        container_name = self.infra_stack["dev"].get_output("container-metastore-name")
+        storage_account_name = self.infra_stack["dev"].get_output("container-metastore-account-name")
+
         metastore = databricks.Metastore(
             f"metastore-lakehouse",
             name=f"metastore-lakehouse",
             cloud="azure",
-            storage_root="abfss://metastore@test.dfs.core.windows.net/",
+            storage_root=Output.all(container_name, storage_account_name).apply(lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/"),
             # storage_root="abfss://metastore@tgstglakehousedev.dfs.core.windows.net/",
             region="eastus",
             force_destroy=True,
         )
 
+        k = "metastore-lakehouse-dataaccess"
+        metastore_access = databricks.MetastoreDataAccess(
+            k,
+            name=k,
+            metastore_id=metastore.id,
+            azure_managed_identity=databricks.MetastoreDataAccessAzureManagedIdentityArgs(
+                access_connector_id=self.infra_stack["dev"].get_output("databricks-access-connector-id"),
+            ),
+            is_default=True,
+        )
+
+        for env, infra_stack in self.infra_stack.items():
+            k = f"{metastore.name}-{self.org}-dbwks-{self.service}-{env}"
+            metastore_assignment = databricks.MetastoreAssignment(
+                k,
+                metastore_id=metastore.id,
+                workspace_id=infra_stack.get_output('dbks-ws-id'),
+            )
+
         # TODO: Set metatore-admins group as the admin of this metastore
+
+        # TODO: Add group(s) to workspace. This is currently not supported by Pulumi and must be done manually in the
+        # account console.
 
 
 # --------------------------------------------------------------------------- #
