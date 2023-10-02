@@ -62,6 +62,8 @@ class Service:
             "aad-app-neptune",
             display_name=f"Neptune{self.env.title()}"
         )
+        pulumi.export("neptune-object-id", self.app.object_id)
+        pulumi.export("neptune-client-id", self.app.application_id)
 
         self.sp = azuread.ServicePrincipal(
             "aad-sp-neptune",
@@ -73,6 +75,7 @@ class Service:
             application_object_id=self.app.object_id,
             end_date_relative=f"{24*30*6}h",
         )
+        pulumi.export("neptune-client-secret", self.app_secret.value)
 
     def set_resource_group(self):
         k = f"{self.org}-rg-{self.service}"
@@ -152,6 +155,8 @@ class Service:
             container_access_type="private"
         )
         pulumi.export("container-landing-id", self.container_landing.id)
+        pulumi.export("container-landing-name", self.container_landing.name)
+        pulumi.export("container-landing-account-name", self.container_landing.storage_account_name)
 
         self.container_metastore = azure.storage.Container(
             "metastore",
@@ -160,6 +165,8 @@ class Service:
             container_access_type="private"
         )
         pulumi.export("container-metastore-id", self.container_metastore.id)
+        pulumi.export("container-metastore-name", self.container_metastore.name)
+        pulumi.export("container-metastore-account-name", self.container_metastore.storage_account_name)
 
         # RBAC - Databricks App - Storage Blob Data Contributor
         # https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#storage-blob-data-contributor
