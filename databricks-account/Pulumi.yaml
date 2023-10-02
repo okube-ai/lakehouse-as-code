@@ -1,4 +1,4 @@
 name: databricks-account
 runtime:
   name: python
-description: A minimal Python Pulumi program
+description: Lakehouse - Databricks account
