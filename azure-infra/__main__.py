@@ -151,6 +151,7 @@ class Service:
             storage_account_name=self.storage_account.name,
             container_access_type="private"
         )
+        pulumi.export("container-landing-id", self.container_landing.id)
 
         self.container_metastore = azure.storage.Container(
             "metastore",
@@ -158,6 +159,7 @@ class Service:
             storage_account_name=self.storage_account.name,
             container_access_type="private"
         )
+        pulumi.export("container-metastore-id", self.container_metastore.id)
 
         # RBAC - Databricks App - Storage Blob Data Contributor
         # https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#storage-blob-data-contributor
@@ -201,6 +203,7 @@ class Service:
                 type="SystemAssigned",
             ),
         )
+        pulumi.export("databricks-access-connector-id", connector.id)
 
         # RBAC - Workspace Connector - Storage Account Contributor
         # https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#storage-blob-data-contributor
