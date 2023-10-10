@@ -65,7 +65,7 @@ class Service:
         self.set_databricks_secrets()
 
         # Databricks mounts
-        self.set_databricks_mount()
+        # self.set_databricks_mount()
 
     def set_service_principal(self):
 
@@ -124,7 +124,8 @@ class Service:
         # RBAC - Olivier - Key Vault Administrator
         # https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#key-vault-administrator
         self._set_rbac(
-            "00482a5a-887f-4fb3-b363-3b7fe8e74483",
+            name="rbac-87073600-2bce-41d9-ae65-15eda3e6f858-keyvault",
+            role_id="00482a5a-887f-4fb3-b363-3b7fe8e74483",
             principal_id="87073600-2bce-41d9-ae65-15eda3e6f858",
             principal_type="User",
             scope=self.keyvault.id,
@@ -133,7 +134,8 @@ class Service:
         # RBAC - Databricks - Key Vault Reader
         # https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#key-vault-reader
         self._set_rbac(
-            "00482a5a-887f-4fb3-b363-3b7fe8e74483",
+            name="rbac-neptune-keyvault",
+            role_id="00482a5a-887f-4fb3-b363-3b7fe8e74483",
             principal_id=self.sp.object_id,
             scope=self.keyvault.id,
         )
@@ -174,8 +176,9 @@ class Service:
         # RBAC - Databricks App - Storage Blob Data Contributor
         # https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#storage-blob-data-contributor
         self._set_rbac(
-            "ba92f5b4-2d11-453d-a403-e96b0029c9fe",
-            self.sp.object_id,
+            name="rbac-neptune-storage",
+            role_id="ba92f5b4-2d11-453d-a403-e96b0029c9fe",
+            principal_id=self.sp.object_id,
             scope=self.storage_account.id,
         )
 
@@ -215,8 +218,9 @@ class Service:
         # RBAC - Workspace Connector - Storage Account Contributor
         # https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#storage-blob-data-contributor
         self._set_rbac(
-            "ba92f5b4-2d11-453d-a403-e96b0029c9fe",
-            connector.identity.principal_id,
+            name="rbac-databricks-connector-storage",
+            role_id="ba92f5b4-2d11-453d-a403-e96b0029c9fe",
+            principal_id=connector.identity.principal_id,
             scope=self.storage_account.id,
         )
 
@@ -265,7 +269,7 @@ class Service:
         databricks.Secret(
             "dbks-secret-client-id",
             key="client-id",
-            string_value=self.pulumi_config.get("neptune_client_id"),
+            string_value=self.app.application_id,
             scope=app.id,
             opts=pulumi.ResourceOptions(provider=self.databricks_workspace_provider),
         )
@@ -273,7 +277,7 @@ class Service:
         databricks.Secret(
             "dbks-secret-client-secret",
             key="client-secret",
-            string_value=self.pulumi_config.get_secret("neptune_client_secret"),
+            string_value=self.app_secret.value,
             scope=app.id,
             opts=pulumi.ResourceOptions(provider=self.databricks_workspace_provider),
         )
@@ -315,14 +319,15 @@ class Service:
             ),
         )
 
-    def _set_rbac(self, role_id, principal_id, scope, principal_type="ServicePrincipal"):
-        k = f"rbac-{principal_id}-{role_id}-{scope}-{self.env}"
+    def _set_rbac(self, name, role_id, principal_id, scope, principal_type="ServicePrincipal"):
+        name = name + f"-{role_id}-{self.env}"
 
         return azure_native.authorization.RoleAssignment(
-            k,
+            name,
             principal_id=principal_id,
             principal_type=principal_type,
-            role_assignment_name=str(uuid.uuid5(uuid.UUID(role_id), name=k)),  # random but static user-provided UUID
+            role_assignment_name=str(uuid.uuid5(uuid.UUID(role_id), name=name)),  # random but static user-provided UUID
+            # role_assignment_name=str(uuid.uuid4()),  # random but static user-provided UUID
             role_definition_id=f"/subscriptions/{self.subscription_id}/providers/Microsoft.Authorization/roleDefinitions/{role_id}",
             scope=scope,
             opts=pulumi.ResourceOptions(
