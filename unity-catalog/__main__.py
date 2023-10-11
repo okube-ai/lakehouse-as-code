@@ -6,6 +6,7 @@ import pulumi_databricks as databricks
 import pulumi_azure_native as azure_native
 from laktory import models
 
+
 # --------------------------------------------------------------------------- #
 # Service                                                                     #
 # --------------------------------------------------------------------------- #
@@ -20,9 +21,19 @@ class Service:
             "dev": pulumi.StackReference(f"okube/azure-infra/dev"),
             # "prod": pulumi.StackReference(f"okube/azure-infra/prod"),
         }
+        self.metastore_name = "metastore-lakehouse"
+
+        # Providers
+        self.workspace_provider = databricks.Provider(
+            "provider-workspace-neptune",
+            host=self.infra_stacks["dev"].get_output("dbks-ws-host"),
+            # token="dapi7ba60c234d4b572363dc5e65b2091cd0-3"
+            azure_client_id=self.infra_stacks["dev"].get_output("neptune-client-id"),
+            azure_client_secret=self.infra_stacks["dev"].get_output("neptune-client-secret"),
+            azure_tenant_id="ab09b389-116f-42c5-9826-3505f22a906b",
+        )
 
         # Resources
-        self.workspace_provider = None
         self.groups = None
         self.metastore = None
         self.catalogs = {}
@@ -30,10 +41,9 @@ class Service:
     def run(self):
         self.set_users_and_groups()
         self.set_metastore()
-        self.set_workspace_provider()
         self.set_data_access()
-        self.set_catalogs()
-        self.set_init_scripts()
+        # self.set_catalogs()
+        # self.set_init_scripts()
 
     # ----------------------------------------------------------------------- #
     # Users                                                                   #
@@ -89,30 +99,40 @@ class Service:
         storage_account_name = self.infra_stacks["dev"].get_output("container-metastore-account-name")
 
         self.metastore = databricks.Metastore(
-            f"metastore-lakehouse",
+            self.metastore_name,
             name=f"metastore-lakehouse",
             cloud="azure",
             storage_root=pulumi.Output.all(container_name, storage_account_name).apply(lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/"),
             region="eastus",
             force_destroy=True,
+            owner="role-metastore-admins",
         )
 
         # Workspaces assignment
         for env, infra_stack in self.infra_stacks.items():
-            k = f"{self.metastore.name}-{self.org}-dbwks-{self.service}-{env}"
+            k = f"{self.metastore_name}-{self.org}-dbwks-{self.service}-{env}"
             databricks.MetastoreAssignment(
                 k,
                 metastore_id=self.metastore.id,
                 workspace_id=infra_stack.get_output('dbks-ws-id'),
             )
 
-    def set_workspace_provider(self):
-        self.workspace_provider = databricks.Provider(
-            "provider-token-workspace",
-            host=self.infra_stacks["dev"].get_output("dbks-ws-host"),
-            azure_client_id=self.infra_stacks["dev"].get_output("neptune-client-id"),
-            azure_client_secret=self.infra_stacks["dev"].get_output("neptune-client-secret"),
-            azure_tenant_id="116d943c-dc1b-4d82-8cce-2580fc572603",
+        # TODO: Add group(s) to workspace. This is currently not supported by
+        #       Pulumi and must be done manually in the account console.
+        #       Until done, the grant below might not be assigned.
+
+        # TODO: Figure out why this is not authorized
+        databricks.Grants(
+            f"grants-{self.metastore_name}",
+            metastore=self.metastore.id,
+            grants=[
+                databricks.GrantsGrantArgs(
+                    principal="role-metastore-admins", privileges=[
+                        "CREATE_CATALOG",
+                    ]
+                ),
+            ],
+            opts=pulumi.ResourceOptions(provider=self.workspace_provider)
         )
 
     def set_data_access(self):
@@ -150,11 +170,6 @@ class Service:
                     opts=pulumi.ResourceOptions(provider=self.workspace_provider),
                 )
 
-        # TODO: Set role-store-admins group as the admin of this metastore
-
-        # TODO: Add group(s) to workspace. This is currently not supported by Pulumi and must be done manually in the
-        #       account console.
-
     # ----------------------------------------------------------------------- #
     # Catalogs                                                                #
     # ----------------------------------------------------------------------- #
@@ -166,7 +181,7 @@ class Service:
 
         for catalog in catalogs:
 
-            if catalog.name == "prod":
+            if catalog.name == "prod" and "prod" in self.infra_stacks:
                 container_name = self.infra_stacks["prod"].get_output("container-metastore-name")
                 storage_account_name = self.infra_stacks["prod"].get_output("container-metastore-account-name")
                 catalog.storage_root = pulumi.Output.all(container_name, storage_account_name).apply(
@@ -187,7 +202,7 @@ class Service:
         resource_group_name = self.infra_stacks["dev"].get_output("resource-group-name")
         container_name = self.infra_stacks["dev"].get_output("container-metastore-name")
         storage_account_name = self.infra_stacks["dev"].get_output("container-metastore-account-name")
-        volume = self.catalogs["libraries"].schemas[0].volumes[1].resources.volume
+        volume = self.catalogs["libraries"].schemas[0].volumes[0].resources.volume
 
         for filename in os.listdir(root_dir):
             key = filename.split(".")[0].replace("_", "-")
