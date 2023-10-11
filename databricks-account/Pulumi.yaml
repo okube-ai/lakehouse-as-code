@@ -1,4 +1,0 @@
-name: databricks-account
-runtime:
-  name: python
-description: Lakehouse - Databricks account
