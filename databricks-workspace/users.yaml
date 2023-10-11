@@ -1,0 +1,16 @@
+- user_name: olivier.soucy@okube.ai
+  groups:
+    - role-store-admins
+  roles:
+    - account_admin
+
+- user_name: data.analyst@okube.ai
+  groups:
+  - role-analysts
+  - domain-finance
+  - domain-backend
+
+- user_name: data.engineer@okube.ai
+  groups:
+  - role-engineers
+  - domain-backend
