@@ -27,7 +27,6 @@ class Service:
         self.workspace_provider = databricks.Provider(
             "provider-workspace-neptune",
             host=self.infra_stacks["dev"].get_output("dbks-ws-host"),
-            # token="dapi7ba60c234d4b572363dc5e65b2091cd0-3"
             azure_client_id=self.infra_stacks["dev"].get_output("neptune-client-id"),
             azure_client_secret=self.infra_stacks["dev"].get_output("neptune-client-secret"),
             azure_tenant_id="ab09b389-116f-42c5-9826-3505f22a906b",
