@@ -58,15 +58,6 @@ class Service:
         # Databricks connector
         self.set_databricks_connector()
 
-        # Databricks token
-        self.set_databricks_token()
-
-        # Databricks mounts
-        self.set_databricks_secrets()
-
-        # Databricks mounts
-        # self.set_databricks_mount()
-
     def set_service_principal(self):
 
         self.app = azuread.Application(
@@ -222,101 +213,6 @@ class Service:
             role_id="ba92f5b4-2d11-453d-a403-e96b0029c9fe",
             principal_id=connector.identity.principal_id,
             scope=self.storage_account.id,
-        )
-
-    def set_databricks_token(self):
-
-        self.databricks_workspace_provider = databricks.Provider(
-            "azure-workspace-provider",
-            host=self.workspace.workspace_url,
-            azure_client_id=self.pulumi_config.get("neptune_client_id"),
-            azure_client_secret=self.pulumi_config.get_secret("neptune_client_secret"),
-            azure_tenant_id=self.tenant_id,
-        )
-
-        # Service Principal Token (will be used to manage workspace jobs and workflows)
-        token = databricks.Token(
-            "dbks-workspace-neptune-token",
-            comment="pulumi-ci-cd",
-            lifetime_seconds=3600 * 24 * 364,
-            opts=pulumi.ResourceOptions(
-                provider=self.databricks_workspace_provider,
-            ),
-        )
-        pulumi.export(f"dbks-ws-neptune-token", token.token_value)
-        secret = self._set_secret("databricks-neptune-token", token.token_value)
-
-    def set_databricks_secrets(self):
-
-        app = self._set_secrets_scope("azure")
-
-        databricks.Secret(
-            "dbks-secret-keyvault-url",
-            key="keyvault-url",
-            string_value=self.keyvault.properties.vault_uri,
-            scope=app.id,
-            opts=pulumi.ResourceOptions(provider=self.databricks_workspace_provider),
-        )
-
-        databricks.Secret(
-            "dbks-secret-tenant-id",
-            key="tenant-id",
-            string_value=self.tenant_id,
-            scope=app.id,
-            opts=pulumi.ResourceOptions(provider=self.databricks_workspace_provider),
-        )
-
-        databricks.Secret(
-            "dbks-secret-client-id",
-            key="client-id",
-            string_value=self.app.application_id,
-            scope=app.id,
-            opts=pulumi.ResourceOptions(provider=self.databricks_workspace_provider),
-        )
-
-        databricks.Secret(
-            "dbks-secret-client-secret",
-            key="client-secret",
-            string_value=self.app_secret.value,
-            scope=app.id,
-            opts=pulumi.ResourceOptions(provider=self.databricks_workspace_provider),
-        )
-
-    def _set_secrets_scope(self, name):
-        # TODO: Create a Laktory component
-        app = databricks.SecretScope(
-            f"dbks-secret-scope-{name}",
-            name=name,
-            opts=pulumi.ResourceOptions(provider=self.databricks_workspace_provider),
-        )
-        databricks.SecretAcl(
-            f"dbks-secret-scope-acl-{name}",
-            permission="READ",
-            principal="role-store-admins",
-            scope=app.name,
-            opts=pulumi.ResourceOptions(provider=self.databricks_workspace_provider),
-        )
-        return app
-
-    def set_databricks_mount(self):
-        # TODO: REPLACE WITH VOLUME
-        mount = databricks.Mount(
-            "landing-mount",
-            name="landing/",
-            uri=Output.all(container=self.container_landing.name, account=self.storage_account.name).apply(
-                lambda args: f"abfss://{args['container']}@{args['account']}.dfs.core.windows.net/"),
-            extra_configs={
-                "fs.azure.account.auth.type": "OAuth",
-                "fs.azure.account.oauth.provider.type": "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider",
-                "fs.azure.account.oauth2.client.id": self.pulumi_config.get("neptune_client_id"),
-                "fs.azure.account.oauth2.client.secret": self.pulumi_config.get_secret("neptune_client_secret"),
-                "fs.azure.account.oauth2.client.endpoint": f"https://login.microsoftonline.com/{self.tenant_id}/oauth2/token",
-            },
-            opts=pulumi.ResourceOptions(
-                provider=self.databricks_workspace_provider,
-                replace_on_changes=["*"],
-                delete_before_replace=True,
-            ),
         )
 
     def _set_rbac(self, name, role_id, principal_id, scope, principal_type="ServicePrincipal"):
