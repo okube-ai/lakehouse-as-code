@@ -9,18 +9,15 @@
       privileges:
         - USE_CATALOG
         - USE_SCHEMA
-    - principal: domain-all
-      privileges:
-        - SELECT
   schemas:
     - name: finance
       grants:
         - principal: domain-finance
           privileges:
             - SELECT
-    - name: backend
+    - name: engineering
       grants:
-        - principal: domain-backend
+        - principal: domain-engineering
           privileges:
             - SELECT
     - name: sandbox
@@ -50,18 +47,15 @@
       privileges:
         - USE_CATALOG
         - USE_SCHEMA
-    - principal: domain-all
-      privileges:
-        - SELECT
   schemas:
     - name: finance
       grants:
         - principal: domain-finance
           privileges:
             - SELECT
-    - name: backend
+    - name: engineering
       grants:
-        - principal: domain-backend
+        - principal: domain-engineering
           privileges:
             - SELECT
     - name: sandbox
@@ -114,7 +108,7 @@
         - USE_CATALOG
         - USE_SCHEMA
         - READ_VOLUME
-    - principal: role-store-admins
+    - principal: role-metastore-admins
       privileges:
         - WRITE_VOLUME
   schemas:
