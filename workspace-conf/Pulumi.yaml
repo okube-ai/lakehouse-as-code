@@ -1,0 +1,4 @@
+name: workspace-conf
+runtime:
+  name: python
+description: Lakehouse Workspace Configuration
