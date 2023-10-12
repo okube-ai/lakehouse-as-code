@@ -145,7 +145,7 @@ class Service:
                 k = f"permission-workspace-{env}-group-{group_name}"
 
                 permission = "USER"
-                if "workspaceadmin" in group_name:
+                if "workspace-admins" in group_name:
                     permission = "ADMIN"
 
                 self.workspace_groups += [databricks.MwsPermissionAssignment(
