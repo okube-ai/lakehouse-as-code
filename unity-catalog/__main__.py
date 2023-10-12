@@ -41,8 +41,8 @@ class Service:
         self.set_users_and_groups()
         self.set_metastore()
         self.set_data_access()
-        # self.set_catalogs()
-        # self.set_init_scripts()
+        self.set_catalogs()
+        self.set_init_scripts()
 
     # ----------------------------------------------------------------------- #
     # Users                                                                   #
@@ -120,7 +120,6 @@ class Service:
         #       Pulumi and must be done manually in the account console.
         #       Until done, the grant below might not be assigned.
 
-        # TODO: Figure out why this is not authorized
         databricks.Grants(
             f"grants-{self.metastore_name}",
             metastore=self.metastore.id,
@@ -209,7 +208,6 @@ class Service:
 
             blob_name = pulumi.Output.all(volume.storage_location, filename).apply(lambda args:
                 f"{args[0].split('windows.net')[-1]}/{args[1]}"
-                # f"{args[0].split('windows.net')[-1].replace('%2F', '/')}/{filename}"
             )
 
             blob = azure_native.storage.Blob(
