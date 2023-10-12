@@ -62,7 +62,7 @@ import pulumi
         databricks.SecretAcl(
             f"dbks-secret-scope-acl-{name}",
             permission="READ",
-            principal="role-store-admins",
+            principal="role-metastore-admins",
             scope=app.name,
             opts=pulumi.ResourceOptions(provider=self.databricks_workspace_provider),
         )
