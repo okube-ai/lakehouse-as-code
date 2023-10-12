@@ -24,25 +24,28 @@ class Service:
         self.metastore_name = "metastore-lakehouse"
 
         # Providers
-        self.workspace_provider = databricks.Provider(
-            "provider-workspace-neptune",
-            host=self.infra_stacks["dev"].get_output("dbks-ws-host"),
-            azure_client_id=self.infra_stacks["dev"].get_output("neptune-client-id"),
-            azure_client_secret=self.infra_stacks["dev"].get_output("neptune-client-secret"),
-            azure_tenant_id="ab09b389-116f-42c5-9826-3505f22a906b",
-        )
+        self.workspace_provider = None
 
         # Resources
         self.groups = None
+        self.user_resources = None
         self.metastore = None
+        self.metastore_grants = None
+        self.workspace_groups = None
         self.catalogs = {}
 
-    def run(self):
+    def run(self, deploy_catalog=True):
+        pass
         self.set_users_and_groups()
         self.set_metastore()
         self.set_data_access()
-        self.set_catalogs()
-        self.set_init_scripts()
+
+        # There is usually a delay of a few seconds before the grants in Databricks are active which
+        # cause the deployment of the catalog to fail. If you encounter this type of issue, deploy the
+        # resources above this comment first and do a second deployment for the rest of them.
+        if deploy_catalog:
+            self.set_catalogs()
+            self.set_init_scripts()
 
     # ----------------------------------------------------------------------- #
     # Users                                                                   #
@@ -69,10 +72,14 @@ class Service:
         with open("./users.yaml") as fp:
             users = [models.User.model_validate(u) for u in yaml.safe_load(fp)]
 
+        self.user_resources = []
         for u in users:
             if u.display_name is None:
                 u.display_name = u.user_name
-            u.deploy(groups=list(self.groups.values()))
+            u.deploy(
+                groups=list(self.groups.values()),
+            )
+            self.user_resources += [u.resources]
 
         # ------------------------------------------------------------------- #
         # Service Principals                                                  #
@@ -87,6 +94,7 @@ class Service:
                 sp.application_id = self.infra_stacks["dev"].get_output("neptune-client-id").apply(lambda x: f"{x}")
 
             sp.deploy(groups=list(self.groups.values()))
+            self.user_resources += [sp.resources]
 
     # ----------------------------------------------------------------------- #
     # Metastore                                                               #
@@ -105,32 +113,63 @@ class Service:
             region="eastus",
             force_destroy=True,
             owner="role-metastore-admins",
+            opts=pulumi.ResourceOptions(depends_on=self.user_resources)
+        )
+
+        # Explicit dependency is required to ensure role-metastore-admins is the owner/admin of the metastore
+        self.workspace_provider = databricks.Provider(
+            "provider-workspace-neptune",
+            host=self.infra_stacks["dev"].get_output("dbks-ws-host"),
+            azure_client_id=self.infra_stacks["dev"].get_output("neptune-client-id"),
+            azure_client_secret=self.infra_stacks["dev"].get_output("neptune-client-secret"),
+            azure_tenant_id="ab09b389-116f-42c5-9826-3505f22a906b",
+            opts=pulumi.ResourceOptions(
+                depends_on=[self.metastore],
+            )
         )
 
         # Workspaces assignment
+        workspace_assignments = []
         for env, infra_stack in self.infra_stacks.items():
             k = f"{self.metastore_name}-{self.org}-dbwks-{self.service}-{env}"
-            databricks.MetastoreAssignment(
+            workspace_assignments += [databricks.MetastoreAssignment(
                 k,
                 metastore_id=self.metastore.id,
                 workspace_id=infra_stack.get_output('dbks-ws-id'),
-            )
+            )]
 
-        # TODO: Add group(s) to workspace. This is currently not supported by
-        #       Pulumi and must be done manually in the account console.
-        #       Until done, the grant below might not be assigned.
+        # Assign groups to workspaces
+        self.workspace_groups = []
+        for env, infra_stack in self.infra_stacks.items():
+            for group_name, group in self.groups.items():
+                k = f"permission-workspace-{env}-group-{group_name}"
 
-        databricks.Grants(
+                permission = "USER"
+                if "workspaceadmin" in group_name:
+                    permission = "ADMIN"
+
+                self.workspace_groups += [databricks.MwsPermissionAssignment(
+                    k,
+                    workspace_id=infra_stack.get_output('dbks-ws-id'),
+                    principal_id=group.resources.group.id,
+                    permissions=[permission]
+                )]
+
+        self.metastore_grants = databricks.Grants(
             f"grants-{self.metastore_name}",
             metastore=self.metastore.id,
             grants=[
                 databricks.GrantsGrantArgs(
                     principal="role-metastore-admins", privileges=[
                         "CREATE_CATALOG",
+                        "CREATE_EXTERNAL_LOCATION",
                     ]
                 ),
             ],
-            opts=pulumi.ResourceOptions(provider=self.workspace_provider)
+            opts=pulumi.ResourceOptions(
+                provider=self.workspace_provider,
+                depends_on=workspace_assignments + self.workspace_groups,
+            )
         )
 
     def set_data_access(self):
@@ -151,7 +190,12 @@ class Service:
                 azure_managed_identity=databricks.MetastoreDataAccessAzureManagedIdentityArgs(
                     access_connector_id=infra_stack.get_output("databricks-access-connector-id"),
                 ),
+                force_destroy=True,
                 is_default=env=="dev",
+                opts=pulumi.ResourceOptions(
+                    provider=self.workspace_provider,
+                    depends_on=[self.metastore_grants] + self.workspace_groups,
+                )
             )
 
             if env != "dev":
@@ -165,7 +209,10 @@ class Service:
                     force_destroy=True,
                     url=pulumi.Output.all(container_name, storage_account_name).apply(
                         lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/"),
-                    opts=pulumi.ResourceOptions(provider=self.workspace_provider),
+                    opts=pulumi.ResourceOptions(
+                        provider=self.workspace_provider,
+                        depends_on=[self.metastore_grants] + self.workspace_groups,
+                    ),
                 )
 
     # ----------------------------------------------------------------------- #
@@ -185,8 +232,10 @@ class Service:
                 catalog.storage_root = pulumi.Output.all(container_name, storage_account_name).apply(
                     lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/")
 
-            catalog.deploy(opts=pulumi.ResourceOptions(provider=self.workspace_provider))
-
+            catalog.deploy(opts=pulumi.ResourceOptions(
+                provider=self.workspace_provider,
+                depends_on=[self.metastore_grants]
+            ))
             self.catalogs[catalog.name] = catalog
 
     # ----------------------------------------------------------------------- #
@@ -239,4 +288,4 @@ class Service:
 
 if __name__ == "__main__":
     service = Service()
-    service.run()
+    service.run(deploy_catalog=True)
