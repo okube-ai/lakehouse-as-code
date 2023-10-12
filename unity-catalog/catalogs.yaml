@@ -1,0 +1,117 @@
+# --------------------------------------------------------------------------- #
+# dev                                                                         #
+# --------------------------------------------------------------------------- #
+
+- name: dev
+  isolation_mode: OPEN
+  grants:
+    - principal: account users
+      privileges:
+        - USE_CATALOG
+        - USE_SCHEMA
+  schemas:
+    - name: finance
+      grants:
+        - principal: domain-finance
+          privileges:
+            - SELECT
+    - name: engineering
+      grants:
+        - principal: domain-engineering
+          privileges:
+            - SELECT
+    - name: sandbox
+      grants:
+        - principal: account users
+          privileges:
+            - SELECT
+            - MODIFY
+            - CREATE_FUNCTION
+            - CREATE_MATERIALIZED_VIEW
+            - CREATE_MODEL
+            - CREATE_TABLE
+    - name: sources
+      volumes:
+        - name: landing
+          schema_name: sources
+
+
+# --------------------------------------------------------------------------- #
+# prod                                                                        #
+# --------------------------------------------------------------------------- #
+
+- name: prod
+  isolation_mode: OPEN
+  grants:
+    - principal: account users
+      privileges:
+        - USE_CATALOG
+        - USE_SCHEMA
+  schemas:
+    - name: finance
+      grants:
+        - principal: domain-finance
+          privileges:
+            - SELECT
+    - name: engineering
+      grants:
+        - principal: domain-engineering
+          privileges:
+            - SELECT
+    - name: sandbox
+      grants:
+        - principal: account users
+          privileges:
+            - SELECT
+            - MODIFY
+            - CREATE_FUNCTION
+            - CREATE_MATERIALIZED_VIEW
+            - CREATE_MODEL
+            - CREATE_TABLE
+    - name: sources
+      volumes:
+        - name: landing
+          schema_name: sources
+
+# --------------------------------------------------------------------------- #
+# sandbox                                                                     #
+# --------------------------------------------------------------------------- #
+
+- name: sandbox
+  isolation_mode: OPEN
+  grants:
+    - principal: account users
+      privileges:
+        - USE_CATALOG
+        - USE_SCHEMA
+        - SELECT
+        - MODIFY
+        - CREATE_FUNCTION
+        - CREATE_MATERIALIZED_VIEW
+        - CREATE_MODEL
+        - CREATE_SCHEMA
+        - CREATE_TABLE
+        - READ_VOLUME
+        - CREATE_VOLUME
+  schemas:
+    - name: default
+
+# --------------------------------------------------------------------------- #
+# libraries                                                                   #
+# --------------------------------------------------------------------------- #
+
+- name: libraries
+  isolation_mode: OPEN
+  grants:
+    - principal: account users
+      privileges:
+        - USE_CATALOG
+        - USE_SCHEMA
+        - READ_VOLUME
+    - principal: role-metastore-admins
+      privileges:
+        - WRITE_VOLUME
+  schemas:
+    - name: default
+      volumes:
+        - name: init_scripts

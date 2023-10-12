@@ -1,0 +1,6 @@
+- display_name: neptune
+  groups:
+    - role-workspace-admins
+    - role-metastore-admins
+  roles:
+    - account_admin

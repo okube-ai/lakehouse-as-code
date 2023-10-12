@@ -1,4 +1,3 @@
-import json
 import uuid
 
 import pulumi
@@ -6,6 +5,7 @@ from pulumi import Output
 import pulumi_azure as azure
 import pulumi_azure_native as azure_native
 import pulumi_azuread as azuread
+import pulumi_databricks as databricks
 
 
 # --------------------------------------------------------------------------- #
@@ -15,7 +15,7 @@ import pulumi_azuread as azuread
 class Service:
 
     def __init__(self):
-        self.org = "o3"  # TODO: Rename for o3?
+        self.org = "o3"
         self.service = "lakehouse"
         self.pulumi_config = pulumi.Config()
         self.azure_config = azure_native.authorization.get_client_config()
@@ -23,11 +23,13 @@ class Service:
         self.tenant_id = self.azure_config.tenant_id
         self.subscription_id = self.azure_config.subscription_id
 
+        # Providers
+        self.databricks_workspace_provider = None
+
         # Resources
         self.app = None
         self.app_secret = None
         self.sp = None
-        # self.sp_secret = None
         self.me = None
         self.rg = None
         self.keyvault = None
@@ -38,7 +40,7 @@ class Service:
 
     def run(self):
 
-        # Resources Group
+        # Service principals
         self.set_service_principal()
 
         # Resources Group
@@ -53,7 +55,7 @@ class Service:
         # Databricks workspace
         self.set_databricks_workspace()
 
-        # Databricks metastore
+        # Databricks connector
         self.set_databricks_connector()
 
     def set_service_principal(self):
@@ -84,10 +86,11 @@ class Service:
             location="eastus",
             resource_group_name=f"{k}-{self.env}"
         )
+        pulumi.export("resource-group-name", self.rg.name)
 
     def set_keyvault(self):
 
-        k = f"{self.org}-rg-{self.service}"
+        k = f"{self.org}-kv-{self.service}"
         self.keyvault = azure_native.keyvault.Vault(
             k,
             vault_name=f"{k}-{self.env}",
@@ -109,29 +112,22 @@ class Service:
         ]:
             self._set_secret(key, value)
 
-        # # RBAC - Olivier - Key Vault Administrator
-        # # https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#key-vault-administrator
-        k = "rbac-me-keyvault"
-        id = "00482a5a-887f-4fb3-b363-3b7fe8e74483"
-        role = azure_native.authorization.RoleAssignment(
-            k,
+        # RBAC - Olivier - Key Vault Administrator
+        # https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#key-vault-administrator
+        self._set_rbac(
+            name="rbac-87073600-2bce-41d9-ae65-15eda3e6f858-keyvault",
+            role_id="00482a5a-887f-4fb3-b363-3b7fe8e74483",
             principal_id="87073600-2bce-41d9-ae65-15eda3e6f858",
             principal_type="User",
-            role_assignment_name=str(uuid.uuid5(uuid.UUID(id), name=k)),  # random but static user-provided UUID
-            role_definition_id=f"/subscriptions/{self.subscription_id}/providers/Microsoft.Authorization/roleDefinitions/{id}",
             scope=self.keyvault.id,
         )
 
         # RBAC - Databricks - Key Vault Reader
         # https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#key-vault-reader
-        k = "rbac-neptune-keyvault"
-        id = "00482a5a-887f-4fb3-b363-3b7fe8e74483"
-        role = azure_native.authorization.RoleAssignment(
-            k,
+        self._set_rbac(
+            name="rbac-neptune-keyvault",
+            role_id="00482a5a-887f-4fb3-b363-3b7fe8e74483",
             principal_id=self.sp.object_id,
-            principal_type="ServicePrincipal",
-            role_assignment_name=str(uuid.uuid5(uuid.UUID(id), name=k)),  # random but static user-provided UUID
-            role_definition_id=f"/subscriptions/{self.subscription_id}/providers/Microsoft.Authorization/roleDefinitions/{id}",
             scope=self.keyvault.id,
         )
 
@@ -170,14 +166,10 @@ class Service:
 
         # RBAC - Databricks App - Storage Blob Data Contributor
         # https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#storage-blob-data-contributor
-        k = "rbac-neptune-storage-contributor"
-        id = "ba92f5b4-2d11-453d-a403-e96b0029c9fe"
-        role = azure_native.authorization.RoleAssignment(
-            k,
+        self._set_rbac(
+            name="rbac-neptune-storage",
+            role_id="ba92f5b4-2d11-453d-a403-e96b0029c9fe",
             principal_id=self.sp.object_id,
-            principal_type="ServicePrincipal",
-            role_assignment_name=str(uuid.uuid5(uuid.UUID(id), name=k)),  # random but static user-provided UUID
-            role_definition_id=f"/subscriptions/{self.subscription_id}/providers/Microsoft.Authorization/roleDefinitions/{id}",
             scope=self.storage_account.id,
         )
 
@@ -216,15 +208,27 @@ class Service:
 
         # RBAC - Workspace Connector - Storage Account Contributor
         # https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#storage-blob-data-contributor
-        k = "rbac-dbksac-storage-contributor"
-        id = "ba92f5b4-2d11-453d-a403-e96b0029c9fe"
-        role = azure_native.authorization.RoleAssignment(
-            k,
+        self._set_rbac(
+            name="rbac-databricks-connector-storage",
+            role_id="ba92f5b4-2d11-453d-a403-e96b0029c9fe",
             principal_id=connector.identity.principal_id,
-            principal_type="ServicePrincipal",
-            role_assignment_name=str(uuid.uuid5(uuid.UUID(id), name=k)),  # random but static user-provided UUID
-            role_definition_id=f"/subscriptions/{self.subscription_id}/providers/Microsoft.Authorization/roleDefinitions/{id}",
             scope=self.storage_account.id,
+        )
+
+    def _set_rbac(self, name, role_id, principal_id, scope, principal_type="ServicePrincipal"):
+        name = name + f"-{role_id}-{self.env}"
+
+        return azure_native.authorization.RoleAssignment(
+            name,
+            principal_id=principal_id,
+            principal_type=principal_type,
+            role_assignment_name=str(uuid.uuid5(uuid.UUID(role_id), name=name)),  # random but static user-provided UUID
+            # role_assignment_name=str(uuid.uuid4()),  # random but static user-provided UUID
+            role_definition_id=f"/subscriptions/{self.subscription_id}/providers/Microsoft.Authorization/roleDefinitions/{role_id}",
+            scope=scope,
+            opts=pulumi.ResourceOptions(
+                delete_before_replace=True
+            ),
         )
 
     def _set_secret(self, key, value):
