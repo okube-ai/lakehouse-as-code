@@ -1,35 +1,3 @@
-"""A Python Pulumi program"""
-
-import pulumi
-
-
-"""
-
-    def set_databricks_mount(self):
-        # TODO: REPLACE WITH VOLUME
-        mount = databricks.Mount(
-            "landing-mount",
-            name="landing/",
-            uri=Output.all(container=self.container_landing.name, account=self.storage_account.name).apply(
-                lambda args: f"abfss://{args['container']}@{args['account']}.dfs.core.windows.net/"),
-            extra_configs={
-                "fs.azure.account.auth.type": "OAuth",
-                "fs.azure.account.oauth.provider.type": "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider",
-                "fs.azure.account.oauth2.client.id": self.pulumi_config.get("neptune_client_id"),
-                "fs.azure.account.oauth2.client.secret": self.pulumi_config.get_secret("neptune_client_secret"),
-                "fs.azure.account.oauth2.client.endpoint": f"https://login.microsoftonline.com/{self.tenant_id}/oauth2/token",
-            },
-            opts=pulumi.ResourceOptions(
-                provider=self.databricks_workspace_provider,
-                replace_on_changes=["*"],
-                delete_before_replace=True,
-            ),
-        )
-    
-
-"""
-
-import os
 import yaml
 
 import pulumi
@@ -123,6 +91,8 @@ class Service:
             init_script.deploy(opts=pulumi.ResourceOptions(
                 provider=self.workspace_provider,
             ))
+
+        # TODO: Add scripts to the list of allowed list
 
     # ----------------------------------------------------------------------- #
     # Clusters                                                                #
