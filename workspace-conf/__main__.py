@@ -65,6 +65,16 @@ class Service:
         self.set_secrets()
         self.set_init_scripts()
         self.set_clusters()
+        self.set_warehouses()
+
+    @property
+    def cluster_env_vars(self):
+        return {
+            "AZURE_KEYVAULT_URL": "{{secrets/azure/keyvault-url}}",
+            "AZURE_TENANT_ID": "{{secrets/azure/tenant-id}}",
+            "AZURE_CLIENT_ID": "{{secrets/azure/client-id}}",
+            "AZURE_CLIENT_SECRET": "{{secrets/azure/client-secret}}",
+        }
 
     # ----------------------------------------------------------------------- #
     # Secrets                                                                 #
@@ -106,7 +116,7 @@ class Service:
         require a different location.
         """
 
-        with open("init_scripts.yaml") as fp:
+        with open("initscripts.yaml") as fp:
             init_scripts = [models.InitScript.model_validate(s) for s in yaml.safe_load(fp)]
 
         for init_script in init_scripts:
@@ -123,9 +133,23 @@ class Service:
             clusters = [models.Cluster.model_validate(c) for c in yaml.safe_load(fp)]
 
         for cluster in clusters:
+            cluster.spark_env_vars = self.cluster_env_vars
             cluster.deploy(opts=pulumi.ResourceOptions(
                 provider=self.workspace_provider,
                 depends_on=self.secret_resources,
+            ))
+
+    # ----------------------------------------------------------------------- #
+    # Warehouses                                                              #
+    # ----------------------------------------------------------------------- #
+
+    def set_warehouses(self):
+        with open("warehouses.yaml") as fp:
+            warehouses = [models.Warehouse.model_validate(c) for c in yaml.safe_load(fp)]
+
+        for warehouse in warehouses:
+            warehouse.deploy(opts=pulumi.ResourceOptions(
+                provider=self.workspace_provider,
             ))
 
 

@@ -19,4 +19,3 @@
     - group_name: role-analysts
       permission_level: CAN_RESTART
   is_pinned: True
-  #            spark_env_vars=self.cluster_env_vars,
