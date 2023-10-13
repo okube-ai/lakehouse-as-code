@@ -1,0 +1,22 @@
+- name: default
+  spark_version: 14.0.x-scala2.12
+  data_security_mode: USER_ISOLATION
+  node_type_id: Standard_DS3_v2
+  autoscale:
+    min_workers: 1
+    max_workers: 4
+  num_workers: 0
+  autotermination_minutes: 30
+  init_scripts:
+    - volumes:
+        destination: /Volumes/libraries/default/init_scripts/install_laktory.sh
+  libraries:
+    - pypi:
+        package: laktory
+  permissions:
+    - group_name: role-engineers
+      permission_level: CAN_RESTART
+    - group_name: role-analysts
+      permission_level: CAN_RESTART
+  is_pinned: True
+  #            spark_env_vars=self.cluster_env_vars,
