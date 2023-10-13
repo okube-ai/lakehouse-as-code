@@ -64,6 +64,7 @@ class Service:
             "aad-app-neptune",
             display_name=f"Neptune{self.env.title()}"
         )
+        pulumi.export("tenant-id", self.tenant_id)
         pulumi.export("neptune-object-id", self.app.object_id)
         pulumi.export("neptune-client-id", self.app.application_id)
 
@@ -105,6 +106,7 @@ class Service:
                 enable_rbac_authorization=True,
             ),
         )
+        pulumi.export("keyvault-url", self.keyvault.properties.vault_uri)
 
         # Secrets
         for key, value in [
