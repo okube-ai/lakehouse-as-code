@@ -33,8 +33,11 @@
     - name: sources
       volumes:
         - name: landing
-          schema_name: sources
-
+          volume_type: EXTERNAL
+          grants:
+            - principal: account users # TODO: Review roles
+              privileges:
+                - READ_VOLUME
 
 # --------------------------------------------------------------------------- #
 # prod                                                                        #
@@ -71,7 +74,10 @@
     - name: sources
       volumes:
         - name: landing
-          schema_name: sources
+          grants:
+            - principal: account users # TODO: Review roles
+              privileges:
+                - READ_VOLUME
 
 # --------------------------------------------------------------------------- #
 # sandbox                                                                     #

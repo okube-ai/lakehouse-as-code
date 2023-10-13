@@ -32,6 +32,7 @@ class Service:
         self.metastore = None
         self.metastore_grants = None
         self.workspace_groups = None
+        self.external_locations = None
         self.catalogs = {}
 
     def run(self, deploy_catalog=True):
@@ -145,7 +146,7 @@ class Service:
                 k = f"permission-workspace-{env}-group-{group_name}"
 
                 permission = "USER"
-                if "workspaceadmin" in group_name:
+                if "workspace-admins" in group_name:
                     permission = "ADMIN"
 
                 self.workspace_groups += [databricks.MwsPermissionAssignment(
@@ -163,6 +164,8 @@ class Service:
                     principal="role-metastore-admins", privileges=[
                         "CREATE_CATALOG",
                         "CREATE_EXTERNAL_LOCATION",
+                        # "MANAGE_ALLOWLIST",  # TODO: Review why not allowed
+                        # TODO: Find a way for the admins to view the external locations
                     ]
                 ),
             ],
@@ -173,6 +176,8 @@ class Service:
         )
 
     def set_data_access(self):
+
+        self.external_locations = []
 
         for env, infra_stack in self.infra_stacks.items():
 
@@ -202,7 +207,7 @@ class Service:
                 container_name = infra_stack.get_output("container-metastore-name")
                 storage_account_name = infra_stack.get_output("container-metastore-account-name")
 
-                location = databricks.ExternalLocation(
+                self.external_locations += [databricks.ExternalLocation(
                     f"dbks-external-location-{env}",
                     name=f"dbks-external-location-{env}",
                     credential_name=metastore_access.name,
@@ -213,7 +218,24 @@ class Service:
                         provider=self.workspace_provider,
                         depends_on=[self.metastore_grants] + self.workspace_groups,
                     ),
-                )
+                )]
+
+            # Landing containers
+            container_name = infra_stack.get_output("container-landing-name")
+            storage_account_name = infra_stack.get_output("container-landing-account-name")
+
+            self.external_locations += [databricks.ExternalLocation(
+                f"dbks-external-location-landing-{env}",
+                name=f"dbks-external-location-landing-{env}",
+                credential_name=metastore_access.name,
+                force_destroy=True,
+                url=pulumi.Output.all(container_name, storage_account_name).apply(
+                    lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/"),
+                opts=pulumi.ResourceOptions(
+                    provider=self.workspace_provider,
+                    depends_on=[self.metastore_grants] + self.workspace_groups,
+                ),
+            )]
 
     # ----------------------------------------------------------------------- #
     # Catalogs                                                                #
@@ -232,9 +254,16 @@ class Service:
                 catalog.storage_root = pulumi.Output.all(container_name, storage_account_name).apply(
                     lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/")
 
+            if catalog.name in ["dev"]:  # TODO: add prod once deployed
+                infra_stack = self.infra_stacks[catalog.name]
+                container_name = infra_stack.get_output("container-landing-name")
+                storage_account_name = infra_stack.get_output("container-landing-account-name")
+                catalog.schemas[-1].volumes[0].storage_location = pulumi.Output.all(container_name, storage_account_name).apply(
+                    lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/")
+
             catalog.deploy(opts=pulumi.ResourceOptions(
                 provider=self.workspace_provider,
-                depends_on=[self.metastore_grants]
+                depends_on=[self.metastore_grants] + self.external_locations,
             ))
             self.catalogs[catalog.name] = catalog
 

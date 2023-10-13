@@ -1,0 +1,4 @@
+- source: ../unity-catalog/init_scripts/install_laktory.sh
+  permissions:
+    - group_name: account users
+      permission_level: CAN_READ
