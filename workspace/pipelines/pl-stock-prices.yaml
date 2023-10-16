@@ -1,0 +1,12 @@
+name: pl-stock-prices
+libraries:
+  - notebook:
+      path: /pipelines/dlt_template_brz.py
+tables:
+  - name: brz_stock_prices
+    timestamp_key: data.created_at
+    event_source:
+      name: stock_price
+      producer:
+        name: yahoo-finance
+    zone: BRONZE

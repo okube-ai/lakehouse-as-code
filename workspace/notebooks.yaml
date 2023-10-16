@@ -1,0 +1,9 @@
+- source: ./notebooks/pipelines/dlt_template_brz.py
+  permissions:
+    - group_name: account users
+      permission_level: CAN_READ
+
+- source: ./notebooks/pipelines/dlt_template_slv.py
+  permissions:
+    - group_name: account users
+      permission_level: CAN_READ

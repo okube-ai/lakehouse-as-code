@@ -1,3 +1,5 @@
+import os
+
 import yaml
 
 import pulumi
@@ -29,7 +31,42 @@ class Service:
         # Resources
 
     def run(self):
-        pass
+        self.set_notebooks()
+        self.set_pipelines()
+
+    # ----------------------------------------------------------------------- #
+    # Notebooks                                                               #
+    # ----------------------------------------------------------------------- #
+
+    def set_notebooks(self):
+        with open("notebooks.yaml") as fp:
+            notebooks = [models.Notebook.model_validate(s) for s in yaml.safe_load(fp)]
+
+        for notebook in notebooks:
+
+            notebook.deploy(opts=pulumi.ResourceOptions(
+                provider=self.workspace_provider,
+            ))
+
+    def set_pipelines(self):
+
+        root_dir = "./pipelines/"
+
+        pipelines = []
+        for filename in os.listdir(root_dir):
+            filepath = os.path.join(root_dir, filename)
+            with open(filepath, "r") as fp:
+                pipelines += [models.Pipeline.model_validate_yaml(fp)]
+
+        for pipeline in pipelines:
+            print(type(pipeline))
+            pipeline.deploy(opts=pulumi.ResourceOptions(
+                provider=self.workspace_provider,
+            ))
+
+    # ----------------------------------------------------------------------- #
+    # Pipelines                                                               #
+    # ----------------------------------------------------------------------- #
 
 
 # --------------------------------------------------------------------------- #
