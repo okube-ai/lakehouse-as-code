@@ -1,4 +1,9 @@
 name: pl-stock-prices
+clusters:
+  - name : default
+    autoscale:
+      min_workers: 1
+      max_workers: 2
 libraries:
   - notebook:
       path: /pipelines/dlt_template_brz.py
