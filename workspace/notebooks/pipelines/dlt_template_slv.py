@@ -18,6 +18,7 @@ logger = get_logger(__name__)
 pl_name = spark.conf.get("pipeline_name", "pl-stock-prices")
 pl = read_metadata(pipeline=pl_name)
 
+
 def define_silver_table(table):
     @dlt.table(
         name=table.name,
