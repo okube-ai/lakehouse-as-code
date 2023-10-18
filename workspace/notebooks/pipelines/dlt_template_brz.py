@@ -2,18 +2,21 @@
 # MAGIC %pip install laktory
 
 # COMMAND ----------
-import json
 import pyspark.sql.functions as F
 
 from laktory import dlt
 from laktory import models
-from laktory._logger import get_logger
+from laktory import read_metadata
+from laktory import settings
+from laktory import get_logger
 
 dlt.spark = spark
 logger = get_logger(__name__)
 
-pl_name = spark.conf.get("pipeline_name", "pl-stock-prices")
 
+# Read pipeline definition
+pl_name = spark.conf.get("pipeline_name", "pl-stock-prices")
+pl = read_metadata(pipeline=pl_name)
 
 def define_bronze_table(table):
     @dlt.table(
@@ -25,30 +28,20 @@ def define_bronze_table(table):
 
         # Read Source
         df = table.read_source(spark)
+        df.printSchema()
 
         # Process
         df = table.process_bronze(df)
 
+        # Return
         return df
 
     return get_df
 
 
-tables = (
-    spark.read.table("main.laktory.tables")
-    .filter(F.col("pipeline_name") == pl_name)
-    .filter(F.col("zone") == "BRONZE")
-)
-
-for row in tables.collect():
-    d = row.asDict(recursive=True)
-    d["columns"] = json.loads(d["columns"])
-    if d["table_source"] is None:
-        del d["table_source"]
-    if d["event_source"] is None:
-        del d["event_source"]
-    table = models.Table(**d)
-    wrapper = define_bronze_table(table)
-
-    df = dlt.get_df(wrapper)
-    display(df)
+# Build tables
+for table in pl.tables:
+    if table.zone == "BRONZE":
+        wrapper = define_bronze_table(table)
+        df = dlt.get_df(wrapper)
+        display(df)
