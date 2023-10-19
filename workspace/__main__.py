@@ -33,6 +33,7 @@ class Service:
     def run(self):
         self.set_notebooks()
         self.set_pipelines()
+        self.set_jobs()
 
     # ----------------------------------------------------------------------- #
     # Notebooks                                                               #
@@ -66,6 +67,25 @@ class Service:
             if self.env != "prod":
                 pipeline.development = True
             pipeline.deploy(opts=pulumi.ResourceOptions(
+                provider=self.workspace_provider,
+            ))
+
+    # ----------------------------------------------------------------------- #
+    # Jobs                                                                    #
+    # ----------------------------------------------------------------------- #
+
+    def set_jobs(self):
+
+        root_dir = "./jobs/"
+
+        jobs = []
+        for filename in os.listdir(root_dir):
+            filepath = os.path.join(root_dir, filename)
+            with open(filepath, "r") as fp:
+                jobs += [models.Job.model_validate_yaml(fp)]
+
+        for job in jobs:
+            job.deploy(opts=pulumi.ResourceOptions(
                 provider=self.workspace_provider,
             ))
 
