@@ -41,6 +41,8 @@ tables:
   - name: slv_stock_prices
 #    timestamp_key: data.created_at
     table_source:
+      catalog_name: dev
+      schema_name: finance
       name: brz_stock_prices
     zone: SILVER
     columns:
@@ -48,7 +50,7 @@ tables:
         type: timestamp
         func_name: coalesce
         input_cols:
-          - _created_at
+          - data._created_at
 
       - name: low
         type: double

@@ -29,6 +29,7 @@ class Service:
         )
 
         # Resources
+        self.pipelines = {}
 
     def run(self):
         self.set_notebooks()
@@ -70,6 +71,7 @@ class Service:
             pipeline.deploy(opts=pulumi.ResourceOptions(
                 provider=self.workspace_provider,
             ))
+            self.pipelines[pipeline.name] = pipeline
 
     # ----------------------------------------------------------------------- #
     # Jobs                                                                    #
@@ -86,6 +88,10 @@ class Service:
                 jobs += [models.Job.model_validate_yaml(fp)]
 
         for job in jobs:
+            # for task in job.tasks:
+            #     if getattr(task, "pipeline_task"):
+            #         pl_name = task.pipeline_task.pipeline_id
+            #         task.pipeline_task.pipeline_id = self.pipelines[pl_name].resources.pipeline.id
             job.deploy(opts=pulumi.ResourceOptions(
                 provider=self.workspace_provider,
             ))

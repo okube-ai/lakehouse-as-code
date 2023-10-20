@@ -1,5 +1,7 @@
 - display_name: neptune
   groups:
+    - domain-engineering
+    - domain-finance
     - role-workspace-admins
     - role-metastore-admins
   roles:
