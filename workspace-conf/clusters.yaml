@@ -14,7 +14,7 @@
     - pypi:
         package: laktory
     - pypi:
-        package: yahoo-finance
+        package: yfinance
   permissions:
     - group_name: role-engineers
       permission_level: CAN_RESTART
