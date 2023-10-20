@@ -64,6 +64,7 @@ class Service:
                 pipelines += [models.Pipeline.model_validate_yaml(fp)]
 
         for pipeline in pipelines:
+            pipeline.catalog = self.env
             if self.env != "prod":
                 pipeline.development = True
             pipeline.deploy(opts=pulumi.ResourceOptions(

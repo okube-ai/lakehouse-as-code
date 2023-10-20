@@ -1,5 +1,7 @@
 name: pl-stock-prices
 
+target: finance
+
 clusters:
   - name : default
     node_type_id: Standard_DS3_v2

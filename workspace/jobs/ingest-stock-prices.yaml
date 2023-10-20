@@ -8,7 +8,7 @@ tasks:
   - task_key: ingest
     job_cluster_key: main
     notebook_task:
-      notebook_path: /job/ingest_stock_prices
+      notebook_path: /jobs/ingest_stock_prices.py
     libraries:
       - pypi:
           package: laktory
