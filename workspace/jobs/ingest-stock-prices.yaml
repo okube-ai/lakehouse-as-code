@@ -11,6 +11,8 @@ tasks:
       notebook_path: /job/ingest_stock_prices
     libraries:
       - pypi:
+          package: laktory
+      - pypi:
           package: yfinance
 
   - task_key: pipeline

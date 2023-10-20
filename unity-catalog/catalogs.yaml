@@ -38,6 +38,9 @@
             - principal: account users # TODO: Review roles
               privileges:
                 - READ_VOLUME
+            - principal: role-metastore-admins
+              privileges:
+                - WRITE_VOLUME
 
 # --------------------------------------------------------------------------- #
 # prod                                                                        #
@@ -78,6 +81,9 @@
             - principal: account users # TODO: Review roles
               privileges:
                 - READ_VOLUME
+            - principal: role-metastore-admins
+              privileges:
+                - WRITE_VOLUME
 
 # --------------------------------------------------------------------------- #
 # sandbox                                                                     #
