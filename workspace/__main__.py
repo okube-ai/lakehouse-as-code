@@ -88,13 +88,20 @@ class Service:
                 jobs += [models.Job.model_validate_yaml(fp)]
 
         for job in jobs:
-            # for task in job.tasks:
-            #     if getattr(task, "pipeline_task"):
-            #         pl_name = task.pipeline_task.pipeline_id
-            #         task.pipeline_task.pipeline_id = self.pipelines[pl_name].resources.pipeline.id
-            job.deploy(opts=pulumi.ResourceOptions(
-                provider=self.workspace_provider,
-            ))
+            for task in job.tasks:
+                if getattr(task, "pipeline_task"):
+                    pl_name = task.pipeline_task.pipeline_id
+                    # pipeline_id = self.pipelines[pl_name].resources.pipeline.id
+                    # print(type(pipeline_id))
+                    # print("PIPELINE ID", pipeline_id)
+                    # print(task.pipeline_task.model_fields)
+
+                    # task.pipeline_task.pipeline_id = pipeline_id
+            job.deploy(pipelines=self.pipelines,
+                       opts=pulumi.ResourceOptions(
+                           provider=self.workspace_provider,
+                       )
+                       )
 
 
 # --------------------------------------------------------------------------- #
