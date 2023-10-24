@@ -1,0 +1,67 @@
+name: pl-stock-prices
+
+catalog: ${var.env}
+target: finance
+development: ${var.is_dev}
+
+clusters:
+  - name : default
+    node_type_id: Standard_DS3_v2
+    autoscale:
+      min_workers: 1
+      max_workers: 2
+#    init_scripts:  # TODO: Enable when supported by Databricks
+#      - volumes:
+#          destination: /Volumes/libraries/default/init_scripts/install_laktory.sh
+
+libraries:
+  - notebook:
+      path: /pipelines/dlt_template_brz.py
+  - notebook:
+      path: /pipelines/dlt_template_slv.py
+
+permissions:
+  - group_name: account users
+    permission_level: CAN_VIEW
+  - group_name: role-engineers
+    permission_level: CAN_RUN
+
+# --------------------------------------------------------------------------- #
+# Tables                                                                      #
+# --------------------------------------------------------------------------- #
+
+tables:
+  - name: brz_stock_prices
+    timestamp_key: data.created_at
+    event_source:
+      name: stock_price
+      producer:
+        name: yahoo-finance
+    zone: BRONZE
+
+
+  - name: slv_stock_prices
+#    timestamp_key: data.created_at
+    table_source:
+      catalog_name: dev
+      schema_name: finance
+      name: brz_stock_prices
+    zone: SILVER
+    columns:
+      - name: created_at
+        type: timestamp
+        func_name: coalesce
+        input_cols:
+          - data._created_at
+
+      - name: low
+        type: double
+        func_name: coalesce
+        input_cols:
+          - data.low
+
+      - name: high
+        type: double
+        func_name: coalesce
+        input_cols:
+          - data.high

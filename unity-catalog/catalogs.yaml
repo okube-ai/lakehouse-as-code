@@ -34,16 +34,21 @@
       volumes:
         - name: landing
           volume_type: EXTERNAL
+          storage_location: ${var.landing_storage_location}
           grants:
             - principal: account users # TODO: Review roles
               privileges:
                 - READ_VOLUME
+            - principal: role-metastore-admins
+              privileges:
+                - WRITE_VOLUME
 
 # --------------------------------------------------------------------------- #
 # prod                                                                        #
 # --------------------------------------------------------------------------- #
 
 - name: prod
+#  storage_root: ${var.prod_storage_root}  # TODO: Enable when ready
   isolation_mode: OPEN
   grants:
     - principal: account users
@@ -74,10 +79,15 @@
     - name: sources
       volumes:
         - name: landing
+#          volume_type: EXTERNAL
+#          storage_location: ${var.landing_storage_location}  # TODO: Enable when ready
           grants:
             - principal: account users # TODO: Review roles
               privileges:
                 - READ_VOLUME
+            - principal: role-metastore-admins
+              privileges:
+                - WRITE_VOLUME
 
 # --------------------------------------------------------------------------- #
 # sandbox                                                                     #

@@ -11,6 +11,7 @@ from laktory import models
 # Service                                                                     #
 # --------------------------------------------------------------------------- #
 
+
 class Service:
     def __init__(self):
         self.org = "o3"
@@ -27,7 +28,7 @@ class Service:
         self.workspace_provider = None
 
         # Resources
-        self.groups = None
+        self.group_ids = None
         self.user_resources = None
         self.metastore = None
         self.metastore_grants = None
@@ -53,18 +54,16 @@ class Service:
     # ----------------------------------------------------------------------- #
 
     def set_users_and_groups(self):
-
         # ------------------------------------------------------------------- #
         # Groups                                                              #
         # ------------------------------------------------------------------- #
 
         with open("groups.yaml") as fp:
-
-            self.groups = {}
+            self.group_ids = {}
             for d in yaml.safe_load(fp):
                 g = models.Group.model_validate(d)
                 g.deploy()
-                self.groups[g.display_name] = g
+                self.group_ids[g.display_name] = g.id
 
         # ------------------------------------------------------------------- #
         # Users                                                               #
@@ -78,7 +77,7 @@ class Service:
             if u.display_name is None:
                 u.display_name = u.user_name
             u.deploy(
-                groups=list(self.groups.values()),
+                group_ids=self.group_ids,
             )
             self.user_resources += [u.resources]
 
@@ -87,14 +86,17 @@ class Service:
         # ------------------------------------------------------------------- #
 
         with open("./serviceprincipals.yaml") as fp:
-            service_principals = [models.ServicePrincipal.model_validate(u) for u in yaml.safe_load(fp)]
+            service_principals = [
+                models.ServicePrincipal.model_validate(u) for u in yaml.safe_load(fp)
+            ]
 
         for sp in service_principals:
-
-            if sp.display_name == "neptune":
-                sp.application_id = self.infra_stacks["dev"].get_output("neptune-client-id").apply(lambda x: f"{x}")
-
-            sp.deploy(groups=list(self.groups.values()))
+            sp.vars = {
+                "neptune_client_id": self.infra_stacks["dev"].get_output(
+                    "neptune-client-id"
+                )
+            }
+            sp.deploy(group_ids=self.group_ids)
             self.user_resources += [sp.resources]
 
     # ----------------------------------------------------------------------- #
@@ -102,19 +104,22 @@ class Service:
     # ----------------------------------------------------------------------- #
 
     def set_metastore(self):
-
         container_name = self.infra_stacks["dev"].get_output("container-metastore-name")
-        storage_account_name = self.infra_stacks["dev"].get_output("container-metastore-account-name")
+        storage_account_name = self.infra_stacks["dev"].get_output(
+            "container-metastore-account-name"
+        )
 
         self.metastore = databricks.Metastore(
             self.metastore_name,
             name=f"metastore-lakehouse",
             cloud="azure",
-            storage_root=pulumi.Output.all(container_name, storage_account_name).apply(lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/"),
+            storage_root=pulumi.Output.all(container_name, storage_account_name).apply(
+                lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/"
+            ),
             region="eastus",
             force_destroy=True,
             owner="role-metastore-admins",
-            opts=pulumi.ResourceOptions(depends_on=self.user_resources)
+            opts=pulumi.ResourceOptions(depends_on=self.user_resources),
         )
 
         # Explicit dependency is required to ensure role-metastore-admins is the owner/admin of the metastore
@@ -122,65 +127,72 @@ class Service:
             "provider-workspace-neptune",
             host=self.infra_stacks["dev"].get_output("dbks-ws-host"),
             azure_client_id=self.infra_stacks["dev"].get_output("neptune-client-id"),
-            azure_client_secret=self.infra_stacks["dev"].get_output("neptune-client-secret"),
+            azure_client_secret=self.infra_stacks["dev"].get_output(
+                "neptune-client-secret"
+            ),
             azure_tenant_id="ab09b389-116f-42c5-9826-3505f22a906b",
             opts=pulumi.ResourceOptions(
                 depends_on=[self.metastore],
-            )
+            ),
         )
 
         # Workspaces assignment
         workspace_assignments = []
         for env, infra_stack in self.infra_stacks.items():
             k = f"{self.metastore_name}-{self.org}-dbwks-{self.service}-{env}"
-            workspace_assignments += [databricks.MetastoreAssignment(
-                k,
-                metastore_id=self.metastore.id,
-                workspace_id=infra_stack.get_output('dbks-ws-id'),
-            )]
+            workspace_assignments += [
+                databricks.MetastoreAssignment(
+                    k,
+                    metastore_id=self.metastore.id,
+                    workspace_id=infra_stack.get_output("dbks-ws-id"),
+                )
+            ]
 
         # Assign groups to workspaces
         self.workspace_groups = []
         for env, infra_stack in self.infra_stacks.items():
-            for group_name, group in self.groups.items():
+            for group_name, group_id in self.group_ids.items():
                 k = f"permission-workspace-{env}-group-{group_name}"
 
                 permission = "USER"
                 if "workspace-admins" in group_name:
                     permission = "ADMIN"
 
-                self.workspace_groups += [databricks.MwsPermissionAssignment(
-                    k,
-                    workspace_id=infra_stack.get_output('dbks-ws-id'),
-                    principal_id=group.resources.group.id,
-                    permissions=[permission]
-                )]
+                self.workspace_groups += [
+                    databricks.MwsPermissionAssignment(
+                        k,
+                        workspace_id=infra_stack.get_output("dbks-ws-id"),
+                        principal_id=group_id,
+                        permissions=[permission],
+                        opts=pulumi.ResourceOptions(depends_on=workspace_assignments),
+                    )
+                ]
 
         self.metastore_grants = databricks.Grants(
             f"grants-{self.metastore_name}",
             metastore=self.metastore.id,
             grants=[
                 databricks.GrantsGrantArgs(
-                    principal="role-metastore-admins", privileges=[
+                    principal="role-metastore-admins",
+                    privileges=[
                         "CREATE_CATALOG",
+                        "CREATE_CONNECTION",
                         "CREATE_EXTERNAL_LOCATION",
-                        # "MANAGE_ALLOWLIST",  # TODO: Review why not allowed
-                        # TODO: Find a way for the admins to view the external locations
-                    ]
+                        "CREATE_STORAGE_CREDENTIAL",
+                        # "MANAGE_ALLOWLIST",  # TODO: Figure out why this is not supported
+                    ],
                 ),
             ],
             opts=pulumi.ResourceOptions(
                 provider=self.workspace_provider,
-                depends_on=workspace_assignments + self.workspace_groups,
-            )
+                depends_on=self.workspace_groups,
+            ),
         )
 
     def set_data_access(self):
-
         self.external_locations = []
 
         for env, infra_stack in self.infra_stacks.items():
-
             # Metastore Data Access
             # This creates a Storage Credentials and an External location if
             # the `is_default` is selected. Otherwise, external location needs
@@ -193,78 +205,103 @@ class Service:
                 name=k,
                 metastore_id=self.metastore.id,
                 azure_managed_identity=databricks.MetastoreDataAccessAzureManagedIdentityArgs(
-                    access_connector_id=infra_stack.get_output("databricks-access-connector-id"),
+                    access_connector_id=infra_stack.get_output(
+                        "databricks-access-connector-id"
+                    ),
                 ),
-                force_destroy=True,
-                is_default=env=="dev",
+                force_destroy=False,
+                is_default=env == "dev",
                 opts=pulumi.ResourceOptions(
                     provider=self.workspace_provider,
-                    depends_on=[self.metastore_grants] + self.workspace_groups,
-                )
+                    depends_on=[self.metastore_grants],
+                ),
             )
 
             if env != "dev":
                 container_name = infra_stack.get_output("container-metastore-name")
-                storage_account_name = infra_stack.get_output("container-metastore-account-name")
+                storage_account_name = infra_stack.get_output(
+                    "container-metastore-account-name"
+                )
 
-                self.external_locations += [databricks.ExternalLocation(
-                    f"dbks-external-location-{env}",
-                    name=f"dbks-external-location-{env}",
+                self.external_locations += [
+                    databricks.ExternalLocation(
+                        f"dbks-external-location-{env}",
+                        name=f"dbks-external-location-{env}",
+                        credential_name=metastore_access.name,
+                        force_destroy=True,
+                        url=pulumi.Output.all(
+                            container_name, storage_account_name
+                        ).apply(
+                            lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/"
+                        ),
+                        opts=pulumi.ResourceOptions(
+                            provider=self.workspace_provider,
+                            depends_on=[self.metastore_grants],
+                        ),
+                    )
+                ]
+
+            # Landing containers
+            container_name = infra_stack.get_output("container-landing-name")
+            storage_account_name = infra_stack.get_output(
+                "container-landing-account-name"
+            )
+
+            self.external_locations += [
+                databricks.ExternalLocation(
+                    f"dbks-external-location-landing-{env}",
+                    name=f"dbks-external-location-landing-{env}",
                     credential_name=metastore_access.name,
                     force_destroy=True,
                     url=pulumi.Output.all(container_name, storage_account_name).apply(
-                        lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/"),
+                        lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/"
+                    ),
                     opts=pulumi.ResourceOptions(
                         provider=self.workspace_provider,
                         depends_on=[self.metastore_grants] + self.workspace_groups,
                     ),
-                )]
-
-            # Landing containers
-            container_name = infra_stack.get_output("container-landing-name")
-            storage_account_name = infra_stack.get_output("container-landing-account-name")
-
-            self.external_locations += [databricks.ExternalLocation(
-                f"dbks-external-location-landing-{env}",
-                name=f"dbks-external-location-landing-{env}",
-                credential_name=metastore_access.name,
-                force_destroy=True,
-                url=pulumi.Output.all(container_name, storage_account_name).apply(
-                    lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/"),
-                opts=pulumi.ResourceOptions(
-                    provider=self.workspace_provider,
-                    depends_on=[self.metastore_grants] + self.workspace_groups,
-                ),
-            )]
+                )
+            ]
 
     # ----------------------------------------------------------------------- #
     # Catalogs                                                                #
     # ----------------------------------------------------------------------- #
 
     def set_catalogs(self):
-
         with open(f"./catalogs.yaml") as fp:
             catalogs = [models.Catalog.model_validate(u) for u in yaml.safe_load(fp)]
 
         for catalog in catalogs:
+            vars = {}
 
-            if catalog.name == "prod" and "prod" in self.infra_stacks:
-                container_name = self.infra_stacks["prod"].get_output("container-metastore-name")
-                storage_account_name = self.infra_stacks["prod"].get_output("container-metastore-account-name")
-                catalog.storage_root = pulumi.Output.all(container_name, storage_account_name).apply(
-                    lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/")
+            if "prod" in self.infra_stacks:
+                container_name = self.infra_stacks["prod"].get_output(
+                    "container-metastore-name"
+                )
+                storage_account_name = self.infra_stacks["prod"].get_output(
+                    "container-metastore-account-name"
+                )
+                vars["prod_storage_root"] = pulumi.Output.all(
+                    container_name, storage_account_name
+                ).apply(lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/")
 
             if catalog.name in ["dev"]:  # TODO: add prod once deployed
                 infra_stack = self.infra_stacks[catalog.name]
                 container_name = infra_stack.get_output("container-landing-name")
-                storage_account_name = infra_stack.get_output("container-landing-account-name")
-                catalog.schemas[-1].volumes[0].storage_location = pulumi.Output.all(container_name, storage_account_name).apply(
-                    lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/")
+                storage_account_name = infra_stack.get_output(
+                    "container-landing-account-name"
+                )
+                vars["landing_storage_location"] = pulumi.Output.all(
+                    container_name, storage_account_name
+                ).apply(lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/")
 
-            catalog.deploy(opts=pulumi.ResourceOptions(
-                provider=self.workspace_provider,
-                depends_on=[self.metastore_grants] + self.external_locations,
-            ))
+            catalog.vars = vars
+            catalog.deploy(
+                opts=pulumi.ResourceOptions(
+                    provider=self.workspace_provider,
+                    depends_on=[self.metastore_grants] + self.external_locations,
+                )
+            )
             self.catalogs[catalog.name] = catalog
 
     # ----------------------------------------------------------------------- #
@@ -272,20 +309,21 @@ class Service:
     # ----------------------------------------------------------------------- #
 
     def set_init_scripts(self):
-
         root_dir = "./init_scripts"
 
         resource_group_name = self.infra_stacks["dev"].get_output("resource-group-name")
         container_name = self.infra_stacks["dev"].get_output("container-metastore-name")
-        storage_account_name = self.infra_stacks["dev"].get_output("container-metastore-account-name")
+        storage_account_name = self.infra_stacks["dev"].get_output(
+            "container-metastore-account-name"
+        )
         volume = self.catalogs["libraries"].schemas[0].volumes[0].resources.volume
 
         for filename in os.listdir(root_dir):
             key = filename.split(".")[0].replace("_", "-")
             filepath = os.path.join(root_dir, filename)
 
-            blob_name = pulumi.Output.all(volume.storage_location, filename).apply(lambda args:
-                f"{args[0].split('windows.net')[-1]}/{args[1]}"
+            blob_name = pulumi.Output.all(volume.storage_location, filename).apply(
+                lambda args: f"{args[0].split('windows.net')[-1]}/{args[1]}"
             )
 
             blob = azure_native.storage.Blob(
@@ -298,7 +336,6 @@ class Service:
                 opts=pulumi.ResourceOptions(
                     depends_on=[volume],
                 ),
-
             )
 
             # TODO: Directly write BDFS file when supported

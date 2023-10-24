@@ -7,12 +7,11 @@
     max_workers: 4
   num_workers: 0
   autotermination_minutes: 30
-  init_scripts:
-    - volumes:
-        destination: /Volumes/libraries/default/init_scripts/install_laktory.sh
   libraries:
     - pypi:
-        package: laktory
+        package: 'laktory==0.0.8'
+    - pypi:
+        package: yfinance
   permissions:
     - group_name: role-engineers
       permission_level: CAN_RESTART

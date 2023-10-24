@@ -1,0 +1,28 @@
+name: job-stock-prices
+clusters:
+  - name: main
+    spark_version: 14.0.x-scala2.12
+    node_type_id: Standard_DS3_v2
+
+tasks:
+  - task_key: ingest
+    job_cluster_key: main
+    notebook_task:
+      notebook_path: /jobs/ingest_stock_prices.py
+    libraries:
+      - pypi:
+          package: 'laktory==0.0.8'
+      - pypi:
+          package: yfinance
+
+  - task_key: pipeline
+    depends_ons:
+      - task_key: ingest
+    pipeline_task:
+      pipeline_id: ${var.pl-stock-prices-id}
+
+permissions:
+  - group_name: account users
+    permission_level: CAN_VIEW
+  - group_name: role-engineers
+    permission_level: CAN_MANAGE_RUN

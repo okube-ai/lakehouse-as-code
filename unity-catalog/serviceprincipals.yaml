@@ -1,5 +1,8 @@
 - display_name: neptune
+  application_id: ${var.neptune_client_id}
   groups:
+    - domain-engineering
+    - domain-finance
     - role-workspace-admins
     - role-metastore-admins
   roles:
