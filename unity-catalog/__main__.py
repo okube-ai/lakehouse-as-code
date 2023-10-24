@@ -266,10 +266,12 @@ class Service:
                     lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/")
 
             catalog.vars = vars
-            catalog.deploy(opts=pulumi.ResourceOptions(
-                provider=self.workspace_provider,
-                depends_on=[self.metastore_grants] + self.external_locations,
-            ))
+            catalog.deploy(
+                opts=pulumi.ResourceOptions(
+                    provider=self.workspace_provider,
+                    depends_on=[self.metastore_grants] + self.external_locations,
+                )
+            )
             self.catalogs[catalog.name] = catalog
 
     # ----------------------------------------------------------------------- #
