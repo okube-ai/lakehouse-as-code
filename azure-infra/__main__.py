@@ -12,8 +12,8 @@ import pulumi_databricks as databricks
 # Service                                                                     #
 # --------------------------------------------------------------------------- #
 
-class Service:
 
+class Service:
     def __init__(self):
         self.org = "o3"
         self.service = "lakehouse"
@@ -39,7 +39,6 @@ class Service:
         self.workspace = None
 
     def run(self):
-
         # Service principals
         self.set_service_principal()
 
@@ -59,10 +58,8 @@ class Service:
         self.set_databricks_connector()
 
     def set_service_principal(self):
-
         self.app = azuread.Application(
-            "aad-app-neptune",
-            display_name=f"Neptune{self.env.title()}"
+            "aad-app-neptune", display_name=f"Neptune{self.env.title()}"
         )
         pulumi.export("tenant-id", self.tenant_id)
         pulumi.export("neptune-object-id", self.app.object_id)
@@ -83,14 +80,11 @@ class Service:
     def set_resource_group(self):
         k = f"{self.org}-rg-{self.service}"
         self.rg = azure_native.resources.ResourceGroup(
-            k,
-            location="eastus",
-            resource_group_name=f"{k}-{self.env}"
+            k, location="eastus", resource_group_name=f"{k}-{self.env}"
         )
         pulumi.export("resource-group-name", self.rg.name)
 
     def set_keyvault(self):
-
         k = f"{self.org}-kv-{self.service}"
         self.keyvault = azure_native.keyvault.Vault(
             k,
@@ -134,7 +128,6 @@ class Service:
         )
 
     def set_storage(self):
-
         k = f"{self.org}stg{self.service}"
         self.storage_account = azure.storage.Account(
             k,
@@ -150,21 +143,27 @@ class Service:
             "landing",
             name="landing",
             storage_account_name=self.storage_account.name,
-            container_access_type="private"
+            container_access_type="private",
         )
         pulumi.export("container-landing-id", self.container_landing.id)
         pulumi.export("container-landing-name", self.container_landing.name)
-        pulumi.export("container-landing-account-name", self.container_landing.storage_account_name)
+        pulumi.export(
+            "container-landing-account-name",
+            self.container_landing.storage_account_name,
+        )
 
         self.container_metastore = azure.storage.Container(
             "metastore",
             name="metastore",
             storage_account_name=self.storage_account.name,
-            container_access_type="private"
+            container_access_type="private",
         )
         pulumi.export("container-metastore-id", self.container_metastore.id)
         pulumi.export("container-metastore-name", self.container_metastore.name)
-        pulumi.export("container-metastore-account-name", self.container_metastore.storage_account_name)
+        pulumi.export(
+            "container-metastore-account-name",
+            self.container_metastore.storage_account_name,
+        )
 
         # RBAC - Databricks App - Storage Blob Data Contributor
         # https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#storage-blob-data-contributor
@@ -176,8 +175,10 @@ class Service:
         )
 
         # Save secrets
-        secret = self._set_secret("lakehouse-sa-conn-str",
-                                  self.storage_account.primary_connection_string.apply(lambda x: x))
+        secret = self._set_secret(
+            "lakehouse-sa-conn-str",
+            self.storage_account.primary_connection_string.apply(lambda x: x),
+        )
 
     def set_databricks_workspace(self):
         k = f"{self.org}-dbksws-{self.service}"
@@ -194,7 +195,6 @@ class Service:
         secret = self._set_secret("databricks-host", self.workspace.workspace_url)
 
     def set_databricks_connector(self):
-
         # Connector
         k = f"{self.org}-dbksac-{self.service}"
         connector = azure.databricks.AccessConnector(
@@ -217,20 +217,22 @@ class Service:
             scope=self.storage_account.id,
         )
 
-    def _set_rbac(self, name, role_id, principal_id, scope, principal_type="ServicePrincipal"):
+    def _set_rbac(
+        self, name, role_id, principal_id, scope, principal_type="ServicePrincipal"
+    ):
         name = name + f"-{role_id}-{self.env}"
 
         return azure_native.authorization.RoleAssignment(
             name,
             principal_id=principal_id,
             principal_type=principal_type,
-            role_assignment_name=str(uuid.uuid5(uuid.UUID(role_id), name=name)),  # random but static user-provided UUID
+            role_assignment_name=str(
+                uuid.uuid5(uuid.UUID(role_id), name=name)
+            ),  # random but static user-provided UUID
             # role_assignment_name=str(uuid.uuid4()),  # random but static user-provided UUID
             role_definition_id=f"/subscriptions/{self.subscription_id}/providers/Microsoft.Authorization/roleDefinitions/{role_id}",
             scope=scope,
-            opts=pulumi.ResourceOptions(
-                delete_before_replace=True
-            ),
+            opts=pulumi.ResourceOptions(delete_before_replace=True),
         )
 
     def _set_secret(self, key, value):

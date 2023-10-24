@@ -9,6 +9,7 @@ from laktory import models
 # Service                                                                     #
 # --------------------------------------------------------------------------- #
 
+
 class Service:
     def __init__(self):
         self.org = "o3"
@@ -50,13 +51,13 @@ class Service:
     # ----------------------------------------------------------------------- #
 
     def set_secrets(self):
-
         with open("secretscopes.yaml") as fp:
-            secret_scopes = [models.SecretScope.model_validate(s) for s in yaml.safe_load(fp)]
+            secret_scopes = [
+                models.SecretScope.model_validate(s) for s in yaml.safe_load(fp)
+            ]
 
         self.secret_resources = []
         for secret_scope in secret_scopes:
-
             for s in secret_scope.secrets:
                 if s.key == "keyvault-url":
                     s.value = self.infra_stack.get_output("keyvault-url")
@@ -71,7 +72,9 @@ class Service:
                     raise ValueError(f"Secret {s.scope}.{s.key} value empty")
 
             self.secret_resources += [
-                secret_scope.deploy(opts=pulumi.ResourceOptions(provider=self.workspace_provider))
+                secret_scope.deploy(
+                    opts=pulumi.ResourceOptions(provider=self.workspace_provider)
+                )
             ]
 
     # ----------------------------------------------------------------------- #
@@ -86,12 +89,16 @@ class Service:
         """
 
         with open("initscripts.yaml") as fp:
-            init_scripts = [models.InitScript.model_validate(s) for s in yaml.safe_load(fp)]
+            init_scripts = [
+                models.InitScript.model_validate(s) for s in yaml.safe_load(fp)
+            ]
 
         for init_script in init_scripts:
-            init_script.deploy(opts=pulumi.ResourceOptions(
-                provider=self.workspace_provider,
-            ))
+            init_script.deploy(
+                opts=pulumi.ResourceOptions(
+                    provider=self.workspace_provider,
+                )
+            )
 
         # TODO: Add scripts to the list of allowed list
 
@@ -105,10 +112,12 @@ class Service:
 
         for cluster in clusters:
             cluster.spark_env_vars = self.cluster_env_vars
-            cluster.deploy(opts=pulumi.ResourceOptions(
-                provider=self.workspace_provider,
-                depends_on=self.secret_resources,
-            ))
+            cluster.deploy(
+                opts=pulumi.ResourceOptions(
+                    provider=self.workspace_provider,
+                    depends_on=self.secret_resources,
+                )
+            )
 
     # ----------------------------------------------------------------------- #
     # Warehouses                                                              #
@@ -116,12 +125,16 @@ class Service:
 
     def set_warehouses(self):
         with open("warehouses.yaml") as fp:
-            warehouses = [models.Warehouse.model_validate(c) for c in yaml.safe_load(fp)]
+            warehouses = [
+                models.Warehouse.model_validate(c) for c in yaml.safe_load(fp)
+            ]
 
         for warehouse in warehouses:
-            warehouse.deploy(opts=pulumi.ResourceOptions(
-                provider=self.workspace_provider,
-            ))
+            warehouse.deploy(
+                opts=pulumi.ResourceOptions(
+                    provider=self.workspace_provider,
+                )
+            )
 
 
 # --------------------------------------------------------------------------- #

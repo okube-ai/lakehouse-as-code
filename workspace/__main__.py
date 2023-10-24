@@ -11,6 +11,7 @@ from laktory import models
 # Service                                                                     #
 # --------------------------------------------------------------------------- #
 
+
 class Service:
     def __init__(self):
         self.org = "o3"
@@ -46,16 +47,17 @@ class Service:
             notebooks = [models.Notebook.model_validate(s) for s in yaml.safe_load(fp)]
 
         for notebook in notebooks:
-            notebook.deploy(opts=pulumi.ResourceOptions(
-                provider=self.workspace_provider,
-            ))
+            notebook.deploy(
+                opts=pulumi.ResourceOptions(
+                    provider=self.workspace_provider,
+                )
+            )
 
     # ----------------------------------------------------------------------- #
     # Pipelines                                                               #
     # ----------------------------------------------------------------------- #
 
     def set_pipelines(self):
-
         root_dir = "./pipelines/"
 
         pipelines = []
@@ -72,9 +74,11 @@ class Service:
             pipeline.catalog = self.env
             if self.env != "prod":
                 pipeline.development = True
-            pipeline.deploy(opts=pulumi.ResourceOptions(
-                provider=self.workspace_provider,
-            ))
+            pipeline.deploy(
+                opts=pulumi.ResourceOptions(
+                    provider=self.workspace_provider,
+                )
+            )
             self.pipelines[pipeline.name] = pipeline
             self.pipeline_ids[pipeline.name] = pipeline.id
 
@@ -95,11 +99,11 @@ class Service:
 
         for job in jobs:
             job.vars = vars
-            job.deploy(pipelines=self.pipelines,
-                       opts=pulumi.ResourceOptions(
-                           provider=self.workspace_provider,
-                       )
-                       )
+            job.deploy(
+                opts=pulumi.ResourceOptions(
+                    provider=self.workspace_provider,
+                )
+            )
 
 
 # --------------------------------------------------------------------------- #
