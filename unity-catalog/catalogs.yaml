@@ -47,6 +47,7 @@
 # --------------------------------------------------------------------------- #
 
 - name: prod
+  storage_root: ${var.prod_storage_root}
   isolation_mode: OPEN
   grants:
     - principal: account users
@@ -77,6 +78,8 @@
     - name: sources
       volumes:
         - name: landing
+          volume_type: EXTERNAL
+          storage_location: ${var.landing_storage_location}
           grants:
             - principal: account users # TODO: Review roles
               privileges:

@@ -90,10 +90,9 @@ class Service:
             service_principals = [models.ServicePrincipal.model_validate(u) for u in yaml.safe_load(fp)]
 
         for sp in service_principals:
-
-            if sp.display_name == "neptune":
-                sp.application_id = self.infra_stacks["dev"].get_output("neptune-client-id").apply(lambda x: f"{x}")
-
+            sp.vars = {
+                "neptune_client_id": self.infra_stacks["dev"].get_output("neptune-client-id")
+            }
             sp.deploy(groups=list(self.groups.values()))
             self.user_resources += [sp.resources]
 
@@ -153,7 +152,8 @@ class Service:
                     k,
                     workspace_id=infra_stack.get_output('dbks-ws-id'),
                     principal_id=group.resources.group.id,
-                    permissions=[permission]
+                    permissions=[permission],
+                    opts=pulumi.ResourceOptions(depends_on=workspace_assignments)
                 )]
 
         self.metastore_grants = databricks.Grants(
@@ -163,15 +163,16 @@ class Service:
                 databricks.GrantsGrantArgs(
                     principal="role-metastore-admins", privileges=[
                         "CREATE_CATALOG",
+                        "CREATE_CONNECTION",
                         "CREATE_EXTERNAL_LOCATION",
-                        # "MANAGE_ALLOWLIST",  # TODO: Review why not allowed
-                        # TODO: Find a way for the admins to view the external locations
+                        "CREATE_STORAGE_CREDENTIAL",
+                        # "MANAGE_ALLOWLIST",  # TODO: Figure out why this is not supported
                     ]
                 ),
             ],
             opts=pulumi.ResourceOptions(
                 provider=self.workspace_provider,
-                depends_on=workspace_assignments + self.workspace_groups,
+                depends_on=self.workspace_groups,
             )
         )
 
@@ -195,11 +196,11 @@ class Service:
                 azure_managed_identity=databricks.MetastoreDataAccessAzureManagedIdentityArgs(
                     access_connector_id=infra_stack.get_output("databricks-access-connector-id"),
                 ),
-                force_destroy=True,
+                force_destroy=False,
                 is_default=env=="dev",
                 opts=pulumi.ResourceOptions(
                     provider=self.workspace_provider,
-                    depends_on=[self.metastore_grants] + self.workspace_groups,
+                    depends_on=[self.metastore_grants],
                 )
             )
 
@@ -216,7 +217,7 @@ class Service:
                         lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/"),
                     opts=pulumi.ResourceOptions(
                         provider=self.workspace_provider,
-                        depends_on=[self.metastore_grants] + self.workspace_groups,
+                        depends_on=[self.metastore_grants],
                     ),
                 )]
 
@@ -248,19 +249,23 @@ class Service:
 
         for catalog in catalogs:
 
-            if catalog.name == "prod" and "prod" in self.infra_stacks:
+            vars = {
+            }
+
+            if "prod" in self.infra_stacks:
                 container_name = self.infra_stacks["prod"].get_output("container-metastore-name")
                 storage_account_name = self.infra_stacks["prod"].get_output("container-metastore-account-name")
-                catalog.storage_root = pulumi.Output.all(container_name, storage_account_name).apply(
+                vars["prod_storage_root"] = pulumi.Output.all(container_name, storage_account_name).apply(
                     lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/")
 
             if catalog.name in ["dev"]:  # TODO: add prod once deployed
                 infra_stack = self.infra_stacks[catalog.name]
                 container_name = infra_stack.get_output("container-landing-name")
                 storage_account_name = infra_stack.get_output("container-landing-account-name")
-                catalog.schemas[-1].volumes[0].storage_location = pulumi.Output.all(container_name, storage_account_name).apply(
+                vars["landing_storage_location"] = pulumi.Output.all(container_name, storage_account_name).apply(
                     lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/")
 
+            catalog.vars = vars
             catalog.deploy(opts=pulumi.ResourceOptions(
                 provider=self.workspace_provider,
                 depends_on=[self.metastore_grants] + self.external_locations,
