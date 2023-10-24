@@ -19,7 +19,7 @@ tasks:
     depends_ons:
       - task_key: ingest
     pipeline_task:
-      pipeline_id: pl-stock-prices
+      pipeline_id: ${var.pl-stock-prices-id}
 
 permissions:
   - group_name: account users

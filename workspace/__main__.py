@@ -30,6 +30,7 @@ class Service:
 
         # Resources
         self.pipelines = {}
+        self.pipeline_ids = {}
 
     def run(self):
         self.set_notebooks()
@@ -45,7 +46,6 @@ class Service:
             notebooks = [models.Notebook.model_validate(s) for s in yaml.safe_load(fp)]
 
         for notebook in notebooks:
-
             notebook.deploy(opts=pulumi.ResourceOptions(
                 provider=self.workspace_provider,
             ))
@@ -65,6 +65,10 @@ class Service:
                 pipelines += [models.Pipeline.model_validate_yaml(fp)]
 
         for pipeline in pipelines:
+            pipeline.vars = {
+                "env": self.env,
+                "is_dev": self.env == "dev",
+            }
             pipeline.catalog = self.env
             if self.env != "prod":
                 pipeline.development = True
@@ -72,13 +76,13 @@ class Service:
                 provider=self.workspace_provider,
             ))
             self.pipelines[pipeline.name] = pipeline
+            self.pipeline_ids[pipeline.name] = pipeline.id
 
     # ----------------------------------------------------------------------- #
     # Jobs                                                                    #
     # ----------------------------------------------------------------------- #
 
     def set_jobs(self):
-
         root_dir = "./jobs/"
 
         jobs = []
@@ -87,16 +91,10 @@ class Service:
             with open(filepath, "r") as fp:
                 jobs += [models.Job.model_validate_yaml(fp)]
 
-        for job in jobs:
-            for task in job.tasks:
-                if getattr(task, "pipeline_task"):
-                    pl_name = task.pipeline_task.pipeline_id
-                    # pipeline_id = self.pipelines[pl_name].resources.pipeline.id
-                    # print(type(pipeline_id))
-                    # print("PIPELINE ID", pipeline_id)
-                    # print(task.pipeline_task.model_fields)
+        vars = {f"{k}-id": v for k, v in self.pipeline_ids.items()}
 
-                    # task.pipeline_task.pipeline_id = pipeline_id
+        for job in jobs:
+            job.vars = vars
             job.deploy(pipelines=self.pipelines,
                        opts=pulumi.ResourceOptions(
                            provider=self.workspace_provider,

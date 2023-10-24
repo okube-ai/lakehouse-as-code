@@ -27,7 +27,7 @@ class Service:
         self.workspace_provider = None
 
         # Resources
-        self.groups = None
+        self.group_ids = None
         self.user_resources = None
         self.metastore = None
         self.metastore_grants = None
@@ -60,11 +60,11 @@ class Service:
 
         with open("groups.yaml") as fp:
 
-            self.groups = {}
+            self.group_ids = {}
             for d in yaml.safe_load(fp):
                 g = models.Group.model_validate(d)
                 g.deploy()
-                self.groups[g.display_name] = g
+                self.group_ids[g.display_name] = g.id
 
         # ------------------------------------------------------------------- #
         # Users                                                               #
@@ -77,9 +77,7 @@ class Service:
         for u in users:
             if u.display_name is None:
                 u.display_name = u.user_name
-            u.deploy(
-                groups=list(self.groups.values()),
-            )
+            u.deploy(group_ids=self.group_ids,)
             self.user_resources += [u.resources]
 
         # ------------------------------------------------------------------- #
@@ -93,7 +91,7 @@ class Service:
             sp.vars = {
                 "neptune_client_id": self.infra_stacks["dev"].get_output("neptune-client-id")
             }
-            sp.deploy(groups=list(self.groups.values()))
+            sp.deploy(group_ids=self.group_ids)
             self.user_resources += [sp.resources]
 
     # ----------------------------------------------------------------------- #
@@ -141,7 +139,7 @@ class Service:
         # Assign groups to workspaces
         self.workspace_groups = []
         for env, infra_stack in self.infra_stacks.items():
-            for group_name, group in self.groups.items():
+            for group_name, group_id in self.group_ids.items():
                 k = f"permission-workspace-{env}-group-{group_name}"
 
                 permission = "USER"
@@ -151,7 +149,7 @@ class Service:
                 self.workspace_groups += [databricks.MwsPermissionAssignment(
                     k,
                     workspace_id=infra_stack.get_output('dbks-ws-id'),
-                    principal_id=group.resources.group.id,
+                    principal_id=group_id,
                     permissions=[permission],
                     opts=pulumi.ResourceOptions(depends_on=workspace_assignments)
                 )]
