@@ -1,0 +1,124 @@
+{
+    "catalog": "dev",
+    "channel": "PREVIEW",
+    "clusters": [
+        {
+            "autoscale": {
+                "min_workers": 1,
+                "max_workers": 2
+            },
+            "enable_local_disk_encryption": true,
+            "init_scripts": [],
+            "name": "default",
+            "node_type_id": "Standard_DS3_v2",
+            "permissions": [],
+            "spark_conf": {},
+            "spark_env_vars": {},
+            "ssh_public_keys": []
+        }
+    ],
+    "configuration": {},
+    "development": true,
+    "libraries": [
+        {
+            "notebook": {
+                "path": "/pipelines/dlt_template_brz.py"
+            }
+        },
+        {
+            "notebook": {
+                "path": "/pipelines/dlt_template_slv.py"
+            }
+        }
+    ],
+    "name": "pl-stock-prices",
+    "notifications": [],
+    "permissions": [
+        {
+            "permission_level": "CAN_VIEW",
+            "group_name": "account users"
+        },
+        {
+            "permission_level": "CAN_RUN",
+            "group_name": "role-engineers"
+        }
+    ],
+    "tables": [
+        {
+            "name": "brz_stock_prices",
+            "columns": [],
+            "catalog_name": "${var.env}",
+            "schema_name": "finance",
+            "timestamp_key": "data.created_at",
+            "event_source": {
+                "name": "stock_price",
+                "producer": {
+                    "name": "yahoo-finance",
+                    "party": 1
+                },
+                "events_root": "/Volumes/dev/sources/landing/events/",
+                "read_as_stream": true,
+                "type": "STORAGE_EVENTS",
+                "fmt": "JSON",
+                "multiline": false
+            },
+            "zone": "BRONZE",
+            "pipeline_name": "pl-stock-prices"
+        },
+        {
+            "name": "slv_stock_prices",
+            "columns": [
+                {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "catalog_name": "${var.env}",
+                    "schema_name": "finance",
+                    "table_name": "slv_stock_prices",
+                    "func_name": "coalesce",
+                    "input_cols": [
+                        "data._created_at"
+                    ],
+                    "func_kwargs": {},
+                    "jsonize": false
+                },
+                {
+                    "name": "low",
+                    "type": "double",
+                    "catalog_name": "${var.env}",
+                    "schema_name": "finance",
+                    "table_name": "slv_stock_prices",
+                    "func_name": "coalesce",
+                    "input_cols": [
+                        "data.low"
+                    ],
+                    "func_kwargs": {},
+                    "jsonize": false
+                },
+                {
+                    "name": "high",
+                    "type": "double",
+                    "catalog_name": "${var.env}",
+                    "schema_name": "finance",
+                    "table_name": "slv_stock_prices",
+                    "func_name": "coalesce",
+                    "input_cols": [
+                        "data.high"
+                    ],
+                    "func_kwargs": {},
+                    "jsonize": false
+                }
+            ],
+            "catalog_name": "${var.env}",
+            "schema_name": "finance",
+            "table_source": {
+                "read_as_stream": true,
+                "name": "brz_stock_prices",
+                "schema_name": "finance",
+                "catalog_name": "dev"
+            },
+            "zone": "SILVER",
+            "pipeline_name": "pl-stock-prices"
+        }
+    ],
+    "target": "finance"
+}
