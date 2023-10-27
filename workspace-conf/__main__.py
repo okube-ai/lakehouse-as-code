@@ -43,7 +43,7 @@ class Service:
             "AZURE_TENANT_ID": "{{secrets/azure/tenant-id}}",
             "AZURE_CLIENT_ID": "{{secrets/azure/client-id}}",
             "AZURE_CLIENT_SECRET": "{{secrets/azure/client-secret}}",
-            "WORKSPACE_ENV": self.env,
+            "LAKTORY_WORKSPACE_ENV": self.env,
         }
 
     # ----------------------------------------------------------------------- #
