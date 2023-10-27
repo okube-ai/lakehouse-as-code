@@ -71,9 +71,6 @@ class Service:
                 "env": self.env,
                 "is_dev": self.env == "dev",
             }
-            pipeline.catalog = self.env
-            if self.env != "prod":
-                pipeline.development = True
             pipeline.deploy(
                 opts=pulumi.ResourceOptions(
                     provider=self.workspace_provider,
