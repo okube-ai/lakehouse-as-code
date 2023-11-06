@@ -43,7 +43,7 @@ tables:
   - name: slv_stock_prices
 #    timestamp_key: data.created_at
     table_source:
-      catalog_name: dev
+      catalog_name: ${var.env}
       schema_name: finance
       name: brz_stock_prices
     zone: SILVER
