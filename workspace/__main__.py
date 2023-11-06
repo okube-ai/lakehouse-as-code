@@ -39,6 +39,20 @@ class Service:
         self.set_jobs()
 
     # ----------------------------------------------------------------------- #
+    # Properties                                                              #
+    # ----------------------------------------------------------------------- #
+
+    @property
+    def cluster_env_vars(self):
+        return {
+            "AZURE_KEYVAULT_URL": "{{secrets/azure/keyvault-url}}",
+            "AZURE_TENANT_ID": "{{secrets/azure/tenant-id}}",
+            "AZURE_CLIENT_ID": "{{secrets/azure/client-id}}",
+            "AZURE_CLIENT_SECRET": "{{secrets/azure/client-secret}}",
+            "LAKTORY_WORKSPACE_ENV": self.env,
+        }
+
+    # ----------------------------------------------------------------------- #
     # Notebooks                                                               #
     # ----------------------------------------------------------------------- #
 
@@ -71,6 +85,13 @@ class Service:
                 "env": self.env,
                 "is_dev": self.env == "dev",
             }
+            pipeline.clusters[0].spark_env_vars = self.cluster_env_vars
+
+            # TODO: Refactor and improve
+            for table in pipeline.tables:
+                if table.event_source:
+                    table.event_source.events_root = f"/Volumes/{self.env}/sources/landing/events/"
+
             pipeline.deploy(
                 opts=pulumi.ResourceOptions(
                     provider=self.workspace_provider,
@@ -93,6 +114,7 @@ class Service:
                 jobs += [models.Job.model_validate_yaml(fp)]
 
         vars = {f"{k}-id": v for k, v in self.pipeline_ids.items()}
+        vars["pause_status"] = "PAUSED" if self.env == "dev" else None
 
         for job in jobs:
             job.vars = vars

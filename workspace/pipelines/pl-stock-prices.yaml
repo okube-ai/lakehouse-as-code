@@ -50,18 +50,18 @@ tables:
     columns:
       - name: created_at
         type: timestamp
-        func_name: coalesce
-        input_cols:
+        spark_func_name: coalesce
+        spark_func_args:
           - data._created_at
 
       - name: low
         type: double
-        func_name: coalesce
-        input_cols:
+        spark_func_name: coalesce
+        spark_func_args:
           - data.low
 
       - name: high
         type: double
-        func_name: coalesce
-        input_cols:
+        spark_func_name: coalesce
+        spark_func_args:
           - data.high

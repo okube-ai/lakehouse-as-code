@@ -1,4 +1,4 @@
-laktory==0.0.8
+laktory==0.0.12
 pulumi>=3.0.0,<4.0.0
 pulumi_azure
 pulumi_azure_native

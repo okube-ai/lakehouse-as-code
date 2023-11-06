@@ -13,7 +13,6 @@ from laktory import get_logger
 dlt.spark = spark
 logger = get_logger(__name__)
 
-
 # Read pipeline definition
 pl_name = spark.conf.get("pipeline_name", "pl-stock-prices")
 pl = read_metadata(pipeline=pl_name)
@@ -24,7 +23,7 @@ def define_silver_table(table):
         name=table.name,
         comment=table.comment,
     )
-    def get_df():
+    def get_df(table=table):
         logger.info(f"Building {table.name} table")
 
         # Read Source
@@ -32,7 +31,7 @@ def define_silver_table(table):
         df.printSchema()
 
         # Process
-        df = table.process_silver(df, table)
+        df = table.process_silver(df)
 
         # Return
         return df
