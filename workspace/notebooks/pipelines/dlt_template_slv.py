@@ -1,13 +1,14 @@
 # Databricks notebook source
-# MAGIC %pip install 'laktory==0.0.15'
+# MAGIC %pip install 'laktory==0.0.16'
 
 # COMMAND ----------
 import pyspark.sql.functions as F
+import importlib
+import sys
+import os
 
 from laktory import dlt
-from laktory import models
 from laktory import read_metadata
-from laktory import settings
 from laktory import get_logger
 
 dlt.spark = spark
@@ -16,6 +17,15 @@ logger = get_logger(__name__)
 # Read pipeline definition
 pl_name = spark.conf.get("pipeline_name", "pl-stock-prices")
 pl = read_metadata(pipeline=pl_name)
+
+# Import User Defined Functions
+sys.path.append("/Workspace/pipelines/")
+udfs = []
+for udf in pl.udfs:
+    if udf.module_path:
+        sys.path.append(os.path.abspath(udf.module_path))
+    module = importlib.import_module(udf.module_name)
+    udfs += [getattr(module, udf.function_name)]
 
 
 # --------------------------------------------------------------------------- #
@@ -35,7 +45,7 @@ def define_table(table):
         df.printSchema()
 
         # Process
-        df = table.process_silver(df)
+        df = table.process_silver(df, udfs=udfs)
 
         # Return
         return df
@@ -62,7 +72,6 @@ def define_cdc_table(table):
 # --------------------------------------------------------------------------- #
 # Execution                                                                   #
 # --------------------------------------------------------------------------- #
-
 
 # Build tables
 for table in pl.tables:

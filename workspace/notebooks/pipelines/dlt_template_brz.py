@@ -1,13 +1,11 @@
 # Databricks notebook source
-# MAGIC %pip install 'laktory==0.0.15'
+# MAGIC %pip install 'laktory==0.0.16'
 
 # COMMAND ----------
 import pyspark.sql.functions as F
 
 from laktory import dlt
-from laktory import models
 from laktory import read_metadata
-from laktory import settings
 from laktory import get_logger
 
 dlt.spark = spark
@@ -63,7 +61,6 @@ def define_cdc_table(table):
 # --------------------------------------------------------------------------- #
 # Execution                                                                   #
 # --------------------------------------------------------------------------- #
-
 
 # Build tables
 for table in pl.tables:

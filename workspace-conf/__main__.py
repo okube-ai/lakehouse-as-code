@@ -32,7 +32,7 @@ class Service:
 
     def run(self):
         self.set_secrets()
-        self.set_init_scripts()
+        self.set_workspace_files()
         self.set_clusters()
         self.set_warehouses()
 
@@ -78,23 +78,23 @@ class Service:
             ]
 
     # ----------------------------------------------------------------------- #
-    # Init Scripts                                                            #
+    # Workspace Files                                                         #
     # ----------------------------------------------------------------------- #
 
-    def set_init_scripts(self):
+    def set_workspace_files(self):
         """
         Init scripts are installed in Unity Catalog Volumes in the unity
         catalog stack. However, no isolation clusters can't connect to UC and
         require a different location.
         """
 
-        with open("initscripts.yaml") as fp:
-            init_scripts = [
-                models.InitScript.model_validate(s) for s in yaml.safe_load(fp)
+        with open("workspacefiles.yaml") as fp:
+            workspace_files = [
+                models.WorkspaceFile.model_validate(s) for s in yaml.safe_load(fp)
             ]
 
-        for init_script in init_scripts:
-            init_script.deploy(
+        for workspace_file in workspace_files:
+            workspace_file.deploy(
                 opts=pulumi.ResourceOptions(
                     provider=self.workspace_provider,
                 )

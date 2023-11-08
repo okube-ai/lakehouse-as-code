@@ -20,6 +20,10 @@ libraries:
   - notebook:
       path: /pipelines/dlt_template_slv.py
 
+udfs:
+  - module_name: stock_functions
+    function_name: high
+
 permissions:
   - group_name: account users
     permission_level: CAN_VIEW
@@ -52,14 +56,21 @@ tables:
         spark_func_args:
           - data._created_at
 
-      - name: low
+      - name: open
         type: double
         spark_func_name: coalesce
         spark_func_args:
-          - data.low
+          - data.open
+
+      - name: close
+        type: double
+        spark_func_name: coalesce
+        spark_func_args:
+          - data.close
 
       - name: high
         type: double
-        spark_func_name: coalesce
+        spark_func_name: high
         spark_func_args:
-          - data.high
+          - data.open
+          - data.close

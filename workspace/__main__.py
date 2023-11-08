@@ -35,6 +35,7 @@ class Service:
 
     def run(self):
         self.set_notebooks()
+        self.set_workspace_files()
         self.set_pipelines()
         self.set_jobs()
 
@@ -62,6 +63,24 @@ class Service:
 
         for notebook in notebooks:
             notebook.deploy(
+                opts=pulumi.ResourceOptions(
+                    provider=self.workspace_provider,
+                )
+            )
+
+    # ----------------------------------------------------------------------- #
+    # Workspace Files                                                         #
+    # ----------------------------------------------------------------------- #
+
+    def set_workspace_files(self):
+
+        with open("workspacefiles.yaml") as fp:
+            workspace_files = [
+                models.WorkspaceFile.model_validate(s) for s in yaml.safe_load(fp)
+            ]
+
+        for workspace_file in workspace_files:
+            workspace_file.deploy(
                 opts=pulumi.ResourceOptions(
                     provider=self.workspace_provider,
                 )
