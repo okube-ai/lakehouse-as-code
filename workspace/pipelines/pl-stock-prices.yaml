@@ -54,14 +54,21 @@ tables:
         spark_func_args:
           - data._created_at
 
-      - name: low
+      - name: open
         type: double
         spark_func_name: coalesce
         spark_func_args:
-          - data.low
+          - data.open
+
+      - name: close
+        type: double
+        spark_func_name: coalesce
+        spark_func_args:
+          - data.close
 
       - name: high
         type: double
-        spark_func_name: coalesce
+        spark_func_name: high
         spark_func_args:
-          - data.high
+          - data.open
+          - data.close
