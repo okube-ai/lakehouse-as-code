@@ -20,6 +20,10 @@ libraries:
   - notebook:
       path: /pipelines/dlt_template_slv.py
 
+udfs:
+  - module_name: stock_functions
+    function_name: high
+
 permissions:
   - group_name: account users
     permission_level: CAN_VIEW
