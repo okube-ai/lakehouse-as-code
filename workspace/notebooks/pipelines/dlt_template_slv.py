@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %pip install 'laktory==0.0.15'
+# MAGIC %pip install 'laktory==0.0.16'
 
 # COMMAND ----------
 import pyspark.sql.functions as F
