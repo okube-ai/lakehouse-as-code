@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %pip install laktory
+# MAGIC %pip install 'laktory==0.0.15'
 
 # COMMAND ----------
 import pyspark.sql.functions as F
@@ -18,12 +18,16 @@ pl_name = spark.conf.get("pipeline_name", "pl-stock-prices")
 pl = read_metadata(pipeline=pl_name)
 
 
-def define_silver_table(table):
+# --------------------------------------------------------------------------- #
+# Non-CDC Tables                                                              #
+# --------------------------------------------------------------------------- #
+
+def define_table(table):
     @dlt.table(
         name=table.name,
         comment=table.comment,
     )
-    def get_df(table=table):
+    def get_df():
         logger.info(f"Building {table.name} table")
 
         # Read Source
@@ -39,9 +43,35 @@ def define_silver_table(table):
     return get_df
 
 
+# --------------------------------------------------------------------------- #
+# CDC tables                                                                  #
+# --------------------------------------------------------------------------- #
+
+def define_cdc_table(table):
+
+    dlt.create_streaming_table(
+        name=table.name,
+        comment=table.comment,
+    )
+
+    df = dlt.apply_changes(**table.apply_changes_kwargs)
+
+    return df
+
+
+# --------------------------------------------------------------------------- #
+# Execution                                                                   #
+# --------------------------------------------------------------------------- #
+
+
 # Build tables
 for table in pl.tables:
     if table.zone == "SILVER":
-        wrapper = define_silver_table(table)
-        df = dlt.get_df(wrapper)
-        display(df)
+        if table.is_from_cdc:
+            df = define_cdc_table(table)
+            display(df)
+
+        else:
+            wrapper = define_table(table)
+            df = dlt.get_df(wrapper)
+            display(df)
