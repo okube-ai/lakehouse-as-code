@@ -19,6 +19,7 @@ pl_name = spark.conf.get("pipeline_name", "pl-stock-prices")
 pl = read_metadata(pipeline=pl_name)
 
 # Import User Defined Functions
+sys.path.append("/Workspace/pipelines/")
 udfs = []
 for udf in pl.udfs:
     if udf.module_path:
