@@ -38,6 +38,8 @@ class Service:
         # Key Vault
         # self.set_keyvault()
 
+        # https://docs.gcp.databricks.com/dev-tools/terraform/gcp-workspace.html
+
         # Storage Account
         self.set_storage()
 
