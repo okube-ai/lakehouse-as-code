@@ -18,16 +18,18 @@ symbols = [
     "MSFT",
 ]
 
-t1 = datetime(2023, 10, 20)
-t0 = t1 - timedelta(days=3)
+t1 = datetime(2023, 11, 1)
+t0 = datetime(2023, 1, 1)
+# t0 = t1 - timedelta(days=3)
 
-# --------------------------------------------------------------------------- #
-# Fetch events                                                                #
-# --------------------------------------------------------------------------- #
-
-events = []
 for s in symbols:
-    df = yf.download(s, t0, t1, interval="1m")
+
+    # ----------------------------------------------------------------------- #
+    # Fetch events                                                            #
+    # ----------------------------------------------------------------------- #
+
+    events = []
+    df = yf.download(s, t0, t1, interval="1h")
     for _, row in df.iterrows():
         events += [
             DataEvent(
@@ -42,14 +44,14 @@ for s in symbols:
                     "close": float(row["Close"]),
                     "high": float(row["High"]),
                     "low": float(row["Low"]),
+                    "volume": float(row["Volume"]),
                 },
             )
         ]
 
+    # --------------------------------------------------------------------------- #
+    # Write events                                                                #
+    # --------------------------------------------------------------------------- #
 
-# --------------------------------------------------------------------------- #
-# Write events                                                                #
-# --------------------------------------------------------------------------- #
-
-for event in events:
-    event.to_databricks(skip_if_exists=True)
+    for event in events:
+        event.to_databricks(suffix=s, skip_if_exists=True)
