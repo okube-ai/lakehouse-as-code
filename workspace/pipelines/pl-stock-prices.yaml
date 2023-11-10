@@ -45,7 +45,7 @@ tables:
 
 
   - name: slv_stock_prices
-#    timestamp_key: data.created_at
+    timestamp_key: created_at
     table_source:
       name: brz_stock_prices
     zone: SILVER
@@ -74,3 +74,35 @@ tables:
         spark_func_args:
           - data.open
           - data.close
+
+  - name: brz_stock_metadata
+    event_source:
+      name: stock_metadata
+      read_as_stream: False
+      producer:
+        name: yahoo-finance
+    zone: BRONZE
+
+  - name: slv_stock_metadata
+    table_source:
+      name: brz_stock_metadata
+      read_as_stream: False
+    zone: SILVER
+    columns:
+      - name: symbol
+        type: string
+        spark_func_name: coalesce
+        spark_func_args:
+          - data.symbol
+
+      - name: currency
+        type: string
+        spark_func_name: coalesce
+        spark_func_args:
+          - data.currency
+
+      - name: first_trade_date
+        type: timestamp
+        spark_func_name: coalesce
+        spark_func_args:
+          - data.firstTradeDate
