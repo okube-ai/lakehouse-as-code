@@ -2,6 +2,7 @@ import uuid
 
 import pulumi
 import pulumi_gcp as gcp
+import pulumi_databricks as databricks
 
 
 # --------------------------------------------------------------------------- #
@@ -13,10 +14,8 @@ class Service:
         self.org = "o3"
         self.service = "lakehouse"
         self.pulumi_config = pulumi.Config()
-        # self.gcp_config = gcp.authorization.get_client_config()
+        self.databricks_config = pulumi.Config("databricks")
         self.env = pulumi.get_stack()
-        # self.tenant_id = self.azure_config.tenant_id
-        # self.subscription_id = self.azure_config.subscription_id
 
         # Providers
         self.databricks_workspace_provider = None
@@ -28,9 +27,8 @@ class Service:
         self.me = None
         self.rg = None
         self.keyvault = None
-        self.storage_account = None
-        self.container_landing = None
-        self.container_metastore = None
+        self.bucket_landing = None
+        self.bucket_metastore = None
         self.workspace = None
 
     def run(self):
@@ -42,77 +40,37 @@ class Service:
 
         # Storage Account
         self.set_storage()
-        #
-        # # Databricks workspace
-        # self.set_databricks_workspace()
+
+        # Databricks workspace
+        self.set_workspace()
         #
         # # Databricks connector
         # self.set_databricks_connector()
 
     def set_storage(self):
         k = f"{self.org}-bucket-{self.service}-landing"
-
-        static_site = gcp.storage.Bucket(
+        self.bucket_landing = gcp.storage.Bucket(
             k,
             name=k,
             location="US",
             uniform_bucket_level_access=True,
             # force_destroy=True,
-            # cors=[gcp.storage.BucketCorArgs(
-            #     max_age_seconds=3600,
-            #     methods=[
-            #         "GET",
-            #         "HEAD",
-            #         "PUT",
-            #         "POST",
-            #         "DELETE",
-            #     ],
-            #     origins=["http://image-store.com"],
-            #     response_headers=["*"],
-            # )],
-            # location="EU",
-            # website=gcp.storage.BucketWebsiteArgs(
-            #     main_page_suffix="index.html",
-            #     not_found_page="404.html",
-            # )
         )
+        pulumi.export("bucket-landing-id", self.bucket_landing.id)
+        pulumi.export("bucket-landing-name", self.bucket_landing.name)
 
-        # self.storage_account = gcp.storage.Account(
-        #     k,
-        #     name=f"{k}{self.env}",
-        #     resource_group_name=self.rg.name,
-        #     location=self.rg.location,
-        #     account_tier="Standard",
-        #     account_replication_type="LRS",
-        #     is_hns_enabled=True,  # required for Datalake Gen 2
-        # )
-        #
-        # self.container_landing = azure.storage.Container(
-        #     "landing",
-        #     name="landing",
-        #     storage_account_name=self.storage_account.name,
-        #     container_access_type="private",
-        # )
-        # pulumi.export("container-landing-id", self.container_landing.id)
-        # pulumi.export("container-landing-name", self.container_landing.name)
-        # pulumi.export(
-        #     "container-landing-account-name",
-        #     self.container_landing.storage_account_name,
-        # )
-        #
-        # self.container_metastore = azure.storage.Container(
-        #     "metastore",
-        #     name="metastore",
-        #     storage_account_name=self.storage_account.name,
-        #     container_access_type="private",
-        # )
-        # pulumi.export("container-metastore-id", self.container_metastore.id)
-        # pulumi.export("container-metastore-name", self.container_metastore.name)
-        # pulumi.export(
-        #     "container-metastore-account-name",
-        #     self.container_metastore.storage_account_name,
-        # )
-        #
+        k = f"{self.org}-bucket-{self.service}-metastore"
+        self.bucket_metastore = gcp.storage.Bucket(
+            k,
+            name=k,
+            location="US",
+            uniform_bucket_level_access=True,
+            # force_destroy=True,
+        )
+        pulumi.export("bucket-metastore-id", self.bucket_metastore.id)
+        pulumi.export("bucket-metastore-name", self.bucket_metastore.name)
+
+        # TODO: Set RBAC on bucket
         # # RBAC - Databricks App - Storage Blob Data Contributor
         # # https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#storage-blob-data-contributor
         # self._set_rbac(
@@ -128,6 +86,47 @@ class Service:
         #     self.storage_account.primary_connection_string.apply(lambda x: x),
         # )
 
+    # ----------------------------------------------------------------------- #
+    # Workspace                                                               #
+    # ----------------------------------------------------------------------- #
+
+    def set_workspace(self):
+
+        k = f"{self.org}-dbksws-{self.service}"
+        # self.workspace = databricks.MwsWorkspaces(
+        #     k,
+        #     account_id=self.databricks_config.get("account_id"),
+        #     cloud="gcp",
+        #     # aws_region=aws.get_region().id,
+        #     workspace_name=k,
+        #     location="US",
+        #     # credentials_id=self.credentials.credentials_id,
+        #     # storage_configuration_id=self.bms.root.conf.storage_configuration_id,
+        #     # network_id=self.network.network_id,
+        #     opts=pulumi.ResourceOptions(delete_before_replace=True)
+        # )
+        # pulumi.export(f"dbks-ws-host", self.workspace.workspace_url)
+        # pulumi.export(f"dbks-ws-name", self.workspace.workspace_name)
+        #
+        # self.databricks_workspace_provider = databricks.Provider(
+        #     "workspace",
+        #     host=self.workspace.workspace_url,
+        #     username=self.databricks_config.get("username"),
+        #     password=self.databricks_config.get("password"),
+        # )
+        #
+        # # Token
+        # name = self.rnp.get_name(ResourceTypes.DBKS_WORKSPACE_PAT, "lakehouse")
+        # self.workspace_pat = databricks.Token(
+        #     name,
+        #     comment="pulumi-ci-cd",
+        #     lifetime_seconds=3600*24*364,
+        #     opts=pulumi.ResourceOptions(
+        #         provider=self.databricks_workspace_provider,
+        #         depends_on=[self.workspace],
+        #     ),
+        # )
+        # pulumi.export(f"dbks-ws-token", self.workspace_pat.token_value)
 
 
 # --------------------------------------------------------------------------- #
