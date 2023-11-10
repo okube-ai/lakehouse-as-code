@@ -1,0 +1,3 @@
+config:
+  databricks:account_id: 03dbbf26-1078-4875-a2e3-3effe10b19fb
+  gcp:project: lakehouse-dev-404702

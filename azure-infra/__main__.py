@@ -1,11 +1,9 @@
 import uuid
 
 import pulumi
-from pulumi import Output
 import pulumi_azure as azure
 import pulumi_azure_native as azure_native
 import pulumi_azuread as azuread
-import pulumi_databricks as databricks
 
 
 # --------------------------------------------------------------------------- #
@@ -22,9 +20,6 @@ class Service:
         self.env = pulumi.get_stack()
         self.tenant_id = self.azure_config.tenant_id
         self.subscription_id = self.azure_config.subscription_id
-
-        # Providers
-        self.databricks_workspace_provider = None
 
         # Resources
         self.app = None
