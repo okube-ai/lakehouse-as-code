@@ -19,22 +19,6 @@ symbols = [
     "MSFT",
 ]
 
-
-class DatelessDataEvent(DataEvent):
-
-    @property
-    def dirpath(self) -> str:
-        return f"{self.event_root}"
-
-    def get_filename(self, fmt="json", suffix=None) -> str:
-        prefix = self.name
-        if suffix is not None:
-            prefix += f"_{suffix}"
-        if fmt == "json_stream":
-            fmt = "txt"
-        return f"{prefix}.{fmt}"
-
-
 for s in symbols:
     print(s)
     ticker = yf.Ticker(s)
@@ -42,10 +26,11 @@ for s in symbols:
     data = ticker.history_metadata
     del data["tradingPeriods"]
 
-    event = DatelessDataEvent(
+    event = DataEvent(
         name="stock_metadata",
         producer=Producer(name="yahoo-finance"),
         data=data,
+        tstamp_in_path=False
     )
     event.to_databricks(overwrite=True, suffix=s)
 
