@@ -30,11 +30,11 @@ def define_table(table):
         logger.info(f"Building {table.name} table")
 
         # Read Source
-        df = table.read_source(spark)
+        df = table.builder.read_source(spark)
         df.printSchema()
 
         # Process
-        df = table.process_bronze(df)
+        df = table.process(df, udfs=None, spark=spark)
 
         # Return
         return df

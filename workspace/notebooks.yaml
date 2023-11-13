@@ -21,3 +21,8 @@
   permissions:
     - group_name: account users
       permission_level: CAN_READ
+
+- source: ./notebooks/pipelines/dlt_template_slv_star.py
+  permissions:
+    - group_name: account users
+      permission_level: CAN_READ
