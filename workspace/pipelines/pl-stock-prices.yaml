@@ -119,3 +119,8 @@ tables:
       table_source:
         name: slv_stock_prices
         read_as_stream: False
+      joins:
+        - other:
+            name: slv_stock_metadata
+          "on":
+            - symbol
