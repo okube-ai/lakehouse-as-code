@@ -108,8 +108,8 @@ class Service:
 
             # TODO: Refactor and improve
             for table in pipeline.tables:
-                if table.event_source:
-                    table.event_source.events_root = f"/Volumes/{self.env}/sources/landing/events/"
+                if table.builder.event_source:
+                    table.builder.event_source.events_root = f"/Volumes/{self.env}/sources/landing/events/"
 
             pipeline.deploy(
                 opts=pulumi.ResourceOptions(

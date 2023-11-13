@@ -11,13 +11,24 @@ tasks:
       notebook_path: /jobs/ingest_stock_prices.py
     libraries:
       - pypi:
-          package: 'laktory==0.0.16'
+          package: 'laktory==0.0.17'
+      - pypi:
+          package: yfinance
+
+  - task_key: ingest-metadata
+    job_cluster_key: main
+    notebook_task:
+      notebook_path: /jobs/ingest_stock_metadata.py
+    libraries:
+      - pypi:
+          package: 'laktory==0.0.17'
       - pypi:
           package: yfinance
 
   - task_key: pipeline
     depends_ons:
       - task_key: ingest
+      - task_key: ingest-metadata
     pipeline_task:
       pipeline_id: ${var.pl-stock-prices-id}
 

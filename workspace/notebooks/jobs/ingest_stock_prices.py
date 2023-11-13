@@ -1,6 +1,7 @@
 import os
 import yfinance as yf
 from datetime import datetime
+from datetime import date
 from datetime import timedelta
 
 from laktory.models import DataEvent
@@ -18,16 +19,18 @@ symbols = [
     "MSFT",
 ]
 
-t1 = datetime(2023, 10, 20)
+today = date.today()
+t1 = datetime(today.year, today.month, today.day)
 t0 = t1 - timedelta(days=3)
 
-# --------------------------------------------------------------------------- #
-# Fetch events                                                                #
-# --------------------------------------------------------------------------- #
-
-events = []
 for s in symbols:
-    df = yf.download(s, t0, t1, interval="1m")
+
+    # ----------------------------------------------------------------------- #
+    # Fetch events                                                            #
+    # ----------------------------------------------------------------------- #
+
+    events = []
+    df = yf.download(s, t0, t1, interval="1h")
     for _, row in df.iterrows():
         events += [
             DataEvent(
@@ -36,20 +39,18 @@ for s in symbols:
                 data={
                     "created_at": _,
                     "symbol": s,
-                    "open": float(
-                        row["Open"]
-                    ),  # np.float64 are not supported for serialization
+                    "open": float(row["Open"]),  # np.float64 are not supported for serialization
                     "close": float(row["Close"]),
                     "high": float(row["High"]),
                     "low": float(row["Low"]),
+                    "volume": float(row["Volume"]),
                 },
             )
         ]
 
+    # --------------------------------------------------------------------------- #
+    # Write events                                                                #
+    # --------------------------------------------------------------------------- #
 
-# --------------------------------------------------------------------------- #
-# Write events                                                                #
-# --------------------------------------------------------------------------- #
-
-for event in events:
-    event.to_databricks(skip_if_exists=True)
+    for event in events:
+        event.to_databricks(suffix=s, skip_if_exists=True)

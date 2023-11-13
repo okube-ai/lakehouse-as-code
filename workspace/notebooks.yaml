@@ -5,12 +5,24 @@
     - group_name: role-engineers
       permission_level: CAN_RUN
 
+- source: ./notebooks/jobs/ingest_stock_metadata.py
+  permissions:
+    - group_name: account users
+      permission_level: CAN_READ
+    - group_name: role-engineers
+      permission_level: CAN_RUN
+
 - source: ./notebooks/pipelines/dlt_template_brz.py
   permissions:
     - group_name: account users
       permission_level: CAN_READ
 
 - source: ./notebooks/pipelines/dlt_template_slv.py
+  permissions:
+    - group_name: account users
+      permission_level: CAN_READ
+
+- source: ./notebooks/pipelines/dlt_template_slv_star.py
   permissions:
     - group_name: account users
       permission_level: CAN_READ
