@@ -1,5 +1,6 @@
 # Databricks notebook source
-# MAGIC %pip install 'laktory==0.0.16'
+# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@
+# MAGIC %pip install 'laktory==0.0.17'
 
 # COMMAND ----------
 import pyspark.sql.functions as F
@@ -45,7 +46,7 @@ def define_table(table):
         df.printSchema()
 
         # Process
-        df = table.process(df, udfs=udfs, spark=spark)
+        df = table.builder.process(df, udfs=udfs, spark=spark)
 
         # Return
         return df
@@ -64,7 +65,7 @@ def define_cdc_table(table):
         comment=table.comment,
     )
 
-    df = dlt.apply_changes(**table.apply_changes_kwargs)
+    df = dlt.apply_changes(**table.builder.apply_changes_kwargs)
 
     return df
 
