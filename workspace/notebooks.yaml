@@ -31,3 +31,8 @@
   permissions:
     - group_name: account users
       permission_level: CAN_READ
+
+- source: ./notebooks/pipelines/dlt_gld_stock_performances.py
+  permissions:
+    - group_name: account users
+      permission_level: CAN_READ

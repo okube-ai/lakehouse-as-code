@@ -17,50 +17,18 @@ spark.conf.set("spark.sql.session.timeZone", "UTC")
 
 ws_env = os.getenv("LAKTORY_WORKSPACE_ENV")
 
-METRICS = {
-    "count": {
-        "func": F.count,
-        "args": (F.col("symbol"),),
-        "fill": 0,
-    },
-    "low": {
-        "func": F.min,
-        "args": (F.col("low"),),
-        "fill": 0,
-    },
-    "high": {
-        "func": F.max,
-        "args": (F.col("high"),),
-        "fill": 0,
-    },
-    "open": {
-        "func": F.first,
-        "args": (F.col("open"),),
-        "fill": 0,
-    },
-    "close": {
-        "func": F.last,
-        "args": (F.col("close"),),
-        "fill": 0,
-    },
-}
-
 # --------------------------------------------------------------------------- #
 # Account Balances                                                            #
 # --------------------------------------------------------------------------- #
 
 
-def define_table(td, key):
-    # Table name
-    table_name = f"gld_stock_prices_by"
-    if key is not None:
-        table_name += f"_{key}"
-
+def define_table():
+    table_name = f"gld_stock_performances"
     @dlt.table(
         name=table_name,
         table_properties={},
     )
-    def get_df(td=td):
+    def get_df():
 
         logger.info(f"Building {table_name}")
 
@@ -70,13 +38,26 @@ def define_table(td, key):
 
         logger.info("Reading data")
 
-        df = dlt.read_stream(f"{ws_env}.finance.slv_star_stock_prices")
+        df = dlt.read(f"{ws_env}.finance.slv_star_stock_prices")
 
         # ------------------------------------------------------------------- #
-        # Process data                                                        #
+        # Group by stock / day                                                #
         # ------------------------------------------------------------------- #
 
-        df = aggregate(df, td)
+        df = df.withColumn("date", F.date_trunc("DAY", F.col("_tstamp")))
+
+        df = df.groupby(["symbol", "date"]).agg(
+            F.first("open").alias("open"),
+            F.last("close").alias("close"),
+        )
+        df = df.withColumn("gain", (F.col("close") - F.col("open")) / F.col("open"))
+
+        df = df.groupby("symbol").agg(
+            F.min("gain").alias("gain_min"),
+            F.max("gain").alias("gain_max"),
+            F.mean("gain").alias("gain_mean"),
+            (F.product(1+F.col("gain"))-1).alias("gain_total"),
+        )
 
         # ------------------------------------------------------------------- #
         # Output                                                              #
@@ -88,37 +69,9 @@ def define_table(td, key):
 
 
 # --------------------------------------------------------------------------- #
-# Aggregate                                                                   #
-# --------------------------------------------------------------------------- #
-
-def aggregate(df, td):
-    logger.info("Grouping by window")
-
-    # Window
-    w = F.window(
-        timeColumn="_tstamp",
-        windowDuration=td,  # window duration
-        slideDuration=td,  # sampling frequency
-    )
-
-    # Build arguments
-    args = []
-    for col, m in METRICS.items():
-        args += [m["func"](*m["args"]).alias(f"{col}")]
-
-    dfa = df.groupby([w] + ["symbol"]).agg(*args)
-
-    return dfa
-
-
-# --------------------------------------------------------------------------- #
 # Execute                                                                     #
 # --------------------------------------------------------------------------- #
 
-for td in [
-    # ("4 hours", "4h"),
-    ("1 day", "1d"),
-]:
-    wrapper = define_table(*td)
-    df = dlt.get_df(wrapper)
-    display(df)
+wrapper = define_table()
+df = dlt.get_df(wrapper)
+display(df)
