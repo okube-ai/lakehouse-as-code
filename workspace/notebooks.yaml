@@ -12,17 +12,27 @@
     - group_name: role-engineers
       permission_level: CAN_RUN
 
-- source: ./notebooks/pipelines/dlt_template_brz.py
+- source: ./notebooks/pipelines/dlt_brz_template.py
   permissions:
     - group_name: account users
       permission_level: CAN_READ
 
-- source: ./notebooks/pipelines/dlt_template_slv.py
+- source: ./notebooks/pipelines/dlt_slv_template.py
   permissions:
     - group_name: account users
       permission_level: CAN_READ
 
-- source: ./notebooks/pipelines/dlt_template_slv_star.py
+- source: ./notebooks/pipelines/dlt_slv_star_template.py
+  permissions:
+    - group_name: account users
+      permission_level: CAN_READ
+
+- source: ./notebooks/pipelines/dlt_gld_stock_prices.py
+  permissions:
+    - group_name: account users
+      permission_level: CAN_READ
+
+- source: ./notebooks/pipelines/dlt_gld_stock_performances.py
   permissions:
     - group_name: account users
       permission_level: CAN_READ

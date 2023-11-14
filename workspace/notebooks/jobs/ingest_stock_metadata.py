@@ -1,8 +1,4 @@
-import os
 import yfinance as yf
-from datetime import datetime
-from datetime import date
-from datetime import timedelta
 
 from laktory.models import DataEvent
 from laktory.models import Producer

@@ -16,15 +16,19 @@ clusters:
 
 libraries:
   - notebook:
-      path: /pipelines/dlt_template_brz.py
+      path: /pipelines/dlt_brz_template.py
   - notebook:
-      path: /pipelines/dlt_template_slv.py
+      path: /pipelines/dlt_slv_template.py
   - notebook:
-      path: /pipelines/dlt_template_slv_star.py
+      path: /pipelines/dlt_slv_star_template.py
+  - notebook:
+      path: /pipelines/dlt_gld_stock_prices.py
+  - notebook:
+      path: /pipelines/dlt_gld_stock_performances.py
 
 udfs:
   - module_name: stock_functions
-    function_name: high
+    function_name: symbol_to_name
 
 permissions:
   - group_name: account users
@@ -66,6 +70,12 @@ tables:
         spark_func_args:
           - data.symbol
 
+      - name: name
+        type: string
+        spark_func_name: symbol_to_name
+        spark_func_args:
+          - data.symbol
+
       - name: open
         type: double
         spark_func_name: coalesce
@@ -78,12 +88,24 @@ tables:
         spark_func_args:
           - data.close
 
+      - name: low
+        type: double
+        spark_func_name: coalesce
+        spark_func_args:
+          - data.low
+
       - name: high
         type: double
-        spark_func_name: high
+        spark_func_name: coalesce
         spark_func_args:
-          - data.open
-          - data.close
+          - data.high
+
+#      #TODO: Uncomment for demo
+#      - name: volume
+#        type: double
+#        spark_func_name: coalesce
+#        spark_func_args:
+#          - data.volume
 
   - name: brz_stock_metadata
     builder:
