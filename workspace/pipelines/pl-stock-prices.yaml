@@ -23,6 +23,8 @@ libraries:
       path: /pipelines/dlt_slv_star_template.py
   - notebook:
       path: /pipelines/dlt_gld_stock_prices.py
+  - notebook:
+      path: /pipelines/dlt_gld_stock_performances.py
 
 udfs:
   - module_name: stock_functions
