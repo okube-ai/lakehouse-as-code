@@ -65,7 +65,7 @@ def define_cdc_table(table):
 
 # Build tables
 for table in pl.tables:
-    if table.template == "BRONZE":
+    if table.builder.template == "BRONZE":
         if table.is_from_cdc:
             df = define_cdc_table(table)
             display(df)

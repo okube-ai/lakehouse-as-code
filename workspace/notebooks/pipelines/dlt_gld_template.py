@@ -60,7 +60,7 @@ def define_table(table):
 
 # Build tables
 for table in pl.tables:
-    if table.template == "GOLD":
+    if table.builder.template == "GOLD":
         wrapper = define_table(table)
         df = dlt.get_df(wrapper)
         display(df)
