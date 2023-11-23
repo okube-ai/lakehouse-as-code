@@ -27,6 +27,11 @@
     - group_name: account users
       permission_level: CAN_READ
 
+- source: ./notebooks/pipelines/dlt_gld_template.py
+  permissions:
+    - group_name: account users
+      permission_level: CAN_READ
+
 - source: ./notebooks/pipelines/dlt_gld_stock_prices.py
   permissions:
     - group_name: account users
