@@ -9,7 +9,7 @@
   autotermination_minutes: 30
   libraries:
     - pypi:
-        package: 'laktory==0.0.17'
+        package: 'laktory==0.0.18'
     - pypi:
         package: yfinance
   permissions:
