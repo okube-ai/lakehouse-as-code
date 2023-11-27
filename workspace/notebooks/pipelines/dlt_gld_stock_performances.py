@@ -1,44 +1,50 @@
-import os
+# Databricks notebook source
+# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@gold_window_partition_by
+# MAGIC %pip install 'laktory==0.0.20'
+
+# COMMAND ----------
 import pyspark.sql.functions as F
+import importlib
+import sys
+import os
 
 from laktory import dlt
+from laktory import read_metadata
 from laktory import get_logger
 
+spark.conf.set("spark.sql.session.timeZone", "UTC")
 dlt.spark = spark
 logger = get_logger(__name__)
 
+# Read pipeline definition
+pl_name = spark.conf.get("pipeline_name", "pl-stock-prices")
+pl = read_metadata(pipeline=pl_name)
+
+# Import User Defined Functions
+sys.path.append("/Workspace/pipelines/")
+udfs = []
+for udf in pl.udfs:
+    if udf.module_path:
+        sys.path.append(os.path.abspath(udf.module_path))
+    module = importlib.import_module(udf.module_name)
+    udfs += [getattr(module, udf.function_name)]
+
 
 # --------------------------------------------------------------------------- #
-# Setup                                                                       #
+# Tables                                                                      #
 # --------------------------------------------------------------------------- #
 
-# Required to filter windows
-spark.conf.set("spark.sql.session.timeZone", "UTC")
-
-ws_env = os.getenv("LAKTORY_WORKSPACE_ENV")
-
-# --------------------------------------------------------------------------- #
-# Account Balances                                                            #
-# --------------------------------------------------------------------------- #
-
-
-def define_table():
-    table_name = f"gld_stock_performances"
+def define_table(table):
     @dlt.table(
-        name=table_name,
-        table_properties={},
+        name=table.name,
+        comment=table.comment,
     )
     def get_df():
+        logger.info(f"Building {table.name} table")
 
-        logger.info(f"Building {table_name}")
-
-        # ------------------------------------------------------------------- #
-        # Read data                                                           #
-        # ------------------------------------------------------------------- #
-
-        logger.info("Reading data")
-
-        df = dlt.read(f"{ws_env}.finance.slv_star_stock_prices")
+        # Read Source
+        df = table.builder.read_source(spark)
+        df.printSchema()
 
         # ------------------------------------------------------------------- #
         # Group by stock / day                                                #
@@ -69,9 +75,12 @@ def define_table():
 
 
 # --------------------------------------------------------------------------- #
-# Execute                                                                     #
+# Execution                                                                   #
 # --------------------------------------------------------------------------- #
 
-wrapper = define_table()
-df = dlt.get_df(wrapper)
-display(df)
+# Build tables
+for table in pl.tables:
+    if table.builder.template == "STOCK_PERFORMANCES":
+        wrapper = define_table(table)
+        df = dlt.get_df(wrapper)
+        display(df)

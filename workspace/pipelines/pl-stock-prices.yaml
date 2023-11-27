@@ -23,10 +23,8 @@ libraries:
       path: /pipelines/dlt_slv_star_template.py
   - notebook:
       path: /pipelines/dlt_gld_template.py
-#  - notebook:
-#      path: /pipelines/dlt_gld_stock_prices.py
-#  - notebook:
-#      path: /pipelines/dlt_gld_stock_performances.py
+  - notebook:
+      path: /pipelines/dlt_gld_stock_performances.py
 
 udfs:
   - module_name: stock_functions
@@ -206,3 +204,11 @@ tables:
             spark_func_name: last
             spark_func_args:
               - close
+
+  - name: gld_stock_performances
+    builder:
+      zone: GOLD
+      template: STOCK_PERFORMANCES
+      table_source:
+        name: slv_star_stock_prices
+        read_as_stream: False
