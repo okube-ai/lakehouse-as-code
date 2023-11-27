@@ -4,6 +4,9 @@ catalog: ${var.env}
 target: finance
 development: ${var.is_dev}
 
+## TODO: Uncomment for DEMO
+#continuous: True
+
 clusters:
   - name : default
     node_type_id: Standard_DS3_v2
