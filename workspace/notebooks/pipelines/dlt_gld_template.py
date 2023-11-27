@@ -12,7 +12,6 @@ from laktory import dlt
 from laktory import read_metadata
 from laktory import get_logger
 
-spark.conf.set("spark.sql.session.timeZone", "UTC")
 dlt.spark = spark
 logger = get_logger(__name__)
 
@@ -46,29 +45,10 @@ def define_table(table):
         df = table.builder.read_source(spark)
         df.printSchema()
 
-        # ------------------------------------------------------------------- #
-        # Group by stock / day                                                #
-        # ------------------------------------------------------------------- #
+        # Process
+        df = table.builder.process(df, udfs=udfs, spark=spark)
 
-        df = df.withColumn("date", F.date_trunc("DAY", F.col("_tstamp")))
-
-        df = df.groupby(["symbol", "date"]).agg(
-            F.first("open").alias("open"),
-            F.last("close").alias("close"),
-        )
-        df = df.withColumn("gain", (F.col("close") - F.col("open")) / F.col("open"))
-
-        df = df.groupby("symbol").agg(
-            F.min("gain").alias("gain_min"),
-            F.max("gain").alias("gain_max"),
-            F.mean("gain").alias("gain_mean"),
-            (F.product(1+F.col("gain"))-1).alias("gain_total"),
-        )
-
-        # ------------------------------------------------------------------- #
-        # Output                                                              #
-        # ------------------------------------------------------------------- #
-
+        # Return
         return df
 
     return get_df
@@ -80,7 +60,7 @@ def define_table(table):
 
 # Build tables
 for table in pl.tables:
-    if table.builder.template == "STOCK_PERFORMANCES":
+    if table.builder.template == "GOLD":
         wrapper = define_table(table)
         df = dlt.get_df(wrapper)
         display(df)

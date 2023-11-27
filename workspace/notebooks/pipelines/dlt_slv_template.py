@@ -1,6 +1,6 @@
 # Databricks notebook source
-# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@
-# MAGIC %pip install 'laktory==0.0.17'
+# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@gold_window_partition_by
+# MAGIC %pip install 'laktory==0.0.20'
 
 # COMMAND ----------
 import pyspark.sql.functions as F
@@ -76,7 +76,7 @@ def define_cdc_table(table):
 
 # Build tables
 for table in pl.tables:
-    if table.zone == "SILVER":
+    if table.builder.template == "SILVER":
         if table.is_from_cdc:
             df = define_cdc_table(table)
             display(df)
