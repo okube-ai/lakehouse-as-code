@@ -25,7 +25,7 @@ libraries:
   - notebook:
       path: /pipelines/dlt_slv_star_template.py
   - notebook:
-      path: /pipelines/dlt_gld_stock_prices.py
+      path: /pipelines/dlt_gld_template.py
   - notebook:
       path: /pipelines/dlt_gld_stock_performances.py
 
@@ -44,6 +44,11 @@ permissions:
 # --------------------------------------------------------------------------- #
 
 tables:
+
+  # ------------------------------------------------------------------------- #
+  # Bronze                                                                    #
+  # ------------------------------------------------------------------------- #
+
   - name: brz_stock_prices
     timestamp_key: data.created_at
     builder:
@@ -119,6 +124,10 @@ tables:
         producer:
           name: yahoo-finance
 
+  # ------------------------------------------------------------------------- #
+  # Silver                                                                    #
+  # ------------------------------------------------------------------------- #
+
   - name: slv_stock_metadata
     builder:
       zone: SILVER
@@ -160,3 +169,49 @@ tables:
               - first_traded
           "on":
             - symbol
+
+  # ------------------------------------------------------------------------- #
+  # Gold                                                                      #
+  # ------------------------------------------------------------------------- #
+
+  - name: gld_stock_prices_by_1d
+    builder:
+      zone: GOLD
+      table_source:
+        name: slv_star_stock_prices
+        read_as_stream: True
+      aggregation:
+        groupby_columns:
+          - symbol
+        groupby_window:
+          time_column: _tstamp
+          window_duration: 1 day
+        agg_expressions:
+          - name: count
+            spark_func_name: count
+            spark_func_args:
+              - symbol
+          - name: low
+            spark_func_name: min
+            spark_func_args:
+              - low
+          - name: high
+            spark_func_name: max
+            spark_func_args:
+              - high
+          - name: open
+            spark_func_name: first
+            spark_func_args:
+              - open
+          - name: close
+            spark_func_name: last
+            spark_func_args:
+              - close
+
+  - name: gld_stock_performances
+    builder:
+      zone: GOLD
+      template: STOCK_PERFORMANCES
+      table_source:
+        name: slv_star_stock_prices
+        read_as_stream: False
