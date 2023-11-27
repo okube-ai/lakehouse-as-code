@@ -33,6 +33,7 @@ for udf in pl.udfs:
 # Tables                                                                      #
 # --------------------------------------------------------------------------- #
 
+
 def define_table(table):
     @dlt.table(
         name=table.name,

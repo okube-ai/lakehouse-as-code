@@ -34,6 +34,7 @@ for udf in pl.udfs:
 # Tables                                                                      #
 # --------------------------------------------------------------------------- #
 
+
 def define_table(table):
     @dlt.table(
         name=table.name,
@@ -62,7 +63,7 @@ def define_table(table):
             F.min("gain").alias("gain_min"),
             F.max("gain").alias("gain_max"),
             F.mean("gain").alias("gain_mean"),
-            (F.product(1+F.col("gain"))-1).alias("gain_total"),
+            (F.product(1 + F.col("gain")) - 1).alias("gain_total"),
         )
 
         # ------------------------------------------------------------------- #

@@ -73,7 +73,6 @@ class Service:
     # ----------------------------------------------------------------------- #
 
     def set_workspace_files(self):
-
         with open("workspacefiles.yaml") as fp:
             workspace_files = [
                 models.WorkspaceFile.model_validate(s) for s in yaml.safe_load(fp)
@@ -109,7 +108,9 @@ class Service:
             # TODO: Refactor and improve
             for table in pipeline.tables:
                 if table.builder.event_source:
-                    table.builder.event_source.events_root = f"/Volumes/{self.env}/sources/landing/events/"
+                    table.builder.event_source.events_root = (
+                        f"/Volumes/{self.env}/sources/landing/events/"
+                    )
 
             pipeline.deploy(
                 opts=pulumi.ResourceOptions(

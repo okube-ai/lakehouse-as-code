@@ -33,6 +33,7 @@ for udf in pl.udfs:
 # Non-CDC Tables                                                              #
 # --------------------------------------------------------------------------- #
 
+
 def define_table(table):
     @dlt.table(
         name=table.name,
@@ -58,8 +59,8 @@ def define_table(table):
 # CDC tables                                                                  #
 # --------------------------------------------------------------------------- #
 
-def define_cdc_table(table):
 
+def define_cdc_table(table):
     dlt.create_streaming_table(
         name=table.name,
         comment=table.comment,
