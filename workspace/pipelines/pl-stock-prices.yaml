@@ -52,7 +52,7 @@ tables:
   - name: brz_stock_prices
     timestamp_key: data.created_at
     builder:
-      zone: BRONZE
+      layer: BRONZE
       event_source:
         name: stock_price
         producer:
@@ -62,7 +62,7 @@ tables:
   - name: slv_stock_prices
     timestamp_key: created_at
     builder:
-      zone: SILVER
+      layer: SILVER
       table_source:
         name: brz_stock_prices
     columns:
@@ -117,7 +117,7 @@ tables:
 
   - name: brz_stock_metadata
     builder:
-      zone: BRONZE
+      layer: BRONZE
       event_source:
         name: stock_metadata
         read_as_stream: False
@@ -130,7 +130,7 @@ tables:
 
   - name: slv_stock_metadata
     builder:
-      zone: SILVER
+      layer: SILVER
       table_source:
         name: brz_stock_metadata
         read_as_stream: False
@@ -155,7 +155,7 @@ tables:
 
   - name: slv_star_stock_prices
     builder:
-      zone: SILVER_STAR
+      layer: SILVER_STAR
       table_source:
         name: slv_stock_prices
         read_as_stream: True
@@ -176,7 +176,7 @@ tables:
 
   - name: gld_stock_prices_by_1d
     builder:
-      zone: GOLD
+      layer: GOLD
       table_source:
         name: slv_star_stock_prices
         read_as_stream: True
@@ -210,7 +210,7 @@ tables:
 
   - name: gld_stock_performances
     builder:
-      zone: GOLD
+      layer: GOLD
       template: STOCK_PERFORMANCES
       table_source:
         name: slv_star_stock_prices

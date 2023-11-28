@@ -26,7 +26,6 @@ for s in symbols:
         name="stock_metadata",
         producer=Producer(name="yahoo-finance"),
         data=data,
-        tstamp_in_path=False
+        tstamp_in_path=False,
     )
     event.to_databricks(overwrite=True, suffix=s)
-

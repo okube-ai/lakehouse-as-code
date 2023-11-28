@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@gold_window_partition_by
-# MAGIC %pip install 'laktory==0.0.20'
+# MAGIC %pip install 'laktory==0.0.21'
 
 # COMMAND ----------
 import pyspark.sql.functions as F
@@ -21,6 +21,7 @@ pl = read_metadata(pipeline=pl_name)
 # --------------------------------------------------------------------------- #
 # Non-CDC Tables                                                              #
 # --------------------------------------------------------------------------- #
+
 
 def define_table(table):
     @dlt.table(
@@ -47,8 +48,8 @@ def define_table(table):
 # CDC tables                                                                  #
 # --------------------------------------------------------------------------- #
 
-def define_cdc_table(table):
 
+def define_cdc_table(table):
     dlt.create_streaming_table(
         name=table.name,
         comment=table.comment,
