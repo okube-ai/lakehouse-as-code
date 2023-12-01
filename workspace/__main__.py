@@ -104,7 +104,6 @@ class Service:
         vars = {"sql_tasks_warehouse_id": self.pulumi_config.get("sql_tasks_warehouse_id")}
         for query in queries:
             query.vars = vars
-
             query.deploy(
                 opts=pulumi.ResourceOptions(
                     provider=self.workspace_provider,

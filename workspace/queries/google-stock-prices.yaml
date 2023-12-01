@@ -1,4 +1,0 @@
-name: google-stock-prices
-query: SELECT * FROM dev.finance.slv_stock_prices
-warehouse_id: ${var.sql_tasks_warehouse_id}
-parent: ./queries
