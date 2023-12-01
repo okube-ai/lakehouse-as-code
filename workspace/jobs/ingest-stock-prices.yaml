@@ -32,6 +32,16 @@ tasks:
     pipeline_task:
       pipeline_id: ${var.pl-stock-prices-id}
 
+#  - task_key: view
+#    view_task:
+#      catalog_name: dev
+#      schema_name: finance
+#      view_name: slv_googl_stock_prices
+#      definition: SELECT * from slv_stock_prices
+#      warehouse_id: ${var.sql_tasks_warehouse_id}
+#    depends_ons:
+#      - task_key: pipeline
+
 permissions:
   - group_name: account users
     permission_level: CAN_VIEW

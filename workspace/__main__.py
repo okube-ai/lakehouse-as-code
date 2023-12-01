@@ -5,6 +5,7 @@ import yaml
 import pulumi
 import pulumi_databricks as databricks
 from laktory import models
+from laktory import settings
 
 
 # --------------------------------------------------------------------------- #
@@ -30,12 +31,14 @@ class Service:
         )
 
         # Resources
+        self.query_ids = {}
         self.pipelines = {}
         self.pipeline_ids = {}
 
     def run(self):
         self.set_notebooks()
         self.set_workspace_files()
+        self.set_queries()
         self.set_pipelines()
         self.set_jobs()
 
@@ -84,6 +87,30 @@ class Service:
                     provider=self.workspace_provider,
                 )
             )
+
+    # ----------------------------------------------------------------------- #
+    # Queries                                                                 #
+    # ----------------------------------------------------------------------- #
+
+    def set_queries(self):
+        root_dir = "./queries/"
+
+        queries = []
+        for filename in os.listdir(root_dir):
+            filepath = os.path.join(root_dir, filename)
+            with open(filepath, "r") as fp:
+                queries += [models.SqlQuery.model_validate_yaml(fp)]
+
+        vars = {"sql_tasks_warehouse_id": self.pulumi_config.get("sql_tasks_warehouse_id")}
+        for query in queries:
+            query.vars = vars
+
+            query.deploy(
+                opts=pulumi.ResourceOptions(
+                    provider=self.workspace_provider,
+                )
+            )
+            self.query_ids[query.name] = query.id
 
     # ----------------------------------------------------------------------- #
     # Pipelines                                                               #
@@ -135,6 +162,7 @@ class Service:
 
         vars = {f"{k}-id": v for k, v in self.pipeline_ids.items()}
         vars["pause_status"] = "PAUSED" if self.env == "dev" else None
+        vars["sql_tasks_warehouse_id"] = self.pulumi_config.get("sql_tasks_warehouse_id")
 
         for job in jobs:
             job.vars = vars
