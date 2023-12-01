@@ -1,5 +1,14 @@
-name: view-slv-star-google-stock-prices
-query: SELECT * FROM dev.finance.slv_star_stock_prices WHERE symbol = 'GOOGL'
+name: view-google-stocks
+query: |
+  CREATE VIEW IF NOT EXISTS
+    dev.finance.slv_star_google_stock_prices 
+  AS 
+    SELECT
+      * 
+    FROM 
+      dev.finance.slv_star_stock_prices 
+    WHERE
+      symbol = 'GOOGL'
 warehouse_id: ${var.sql_tasks_warehouse_id}
 parent: "folders/2479128258235176"  # TODO: Get value from workspace conf
 run_as_role: viewer
