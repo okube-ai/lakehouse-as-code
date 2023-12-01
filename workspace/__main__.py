@@ -5,7 +5,6 @@ import yaml
 import pulumi
 import pulumi_databricks as databricks
 from laktory import models
-from laktory import settings
 
 
 # --------------------------------------------------------------------------- #
@@ -20,6 +19,7 @@ class Service:
         self.pulumi_config = pulumi.Config()
         self.env = pulumi.get_stack()
         self.infra_stack = pulumi.StackReference(f"okube/azure-infra/{self.env}")
+        self.conf_stack = pulumi.StackReference(f"okube/workspace-conf/{self.env}")
 
         # Providers
         self.workspace_provider = databricks.Provider(
@@ -103,7 +103,10 @@ class Service:
 
         vars = {
             "env": self.env,
-            "sql_tasks_warehouse_id": self.pulumi_config.get("sql_tasks_warehouse_id")
+            "sql_tasks_warehouse_id": self.pulumi_config.get("sql_tasks_warehouse_id"),
+            "directory-/queries/views/": "2479128258235176",
+            # Can't be used because it results as a float
+            # "directory-/queries/views/": self.conf_stack.get_output("directory-/queries/views/"),
         }
         for query in queries:
             query.vars = vars
