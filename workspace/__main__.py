@@ -160,6 +160,8 @@ class Service:
                 jobs += [models.Job.model_validate_yaml(fp)]
 
         vars = {f"{k}-id": v for k, v in self.pipeline_ids.items()}
+        for k, v in self.query_ids.items():
+            vars[f"{k}-id"] = v
         vars["pause_status"] = "PAUSED" if self.env == "dev" else None
         vars["sql_tasks_warehouse_id"] = self.pulumi_config.get("sql_tasks_warehouse_id")
 
