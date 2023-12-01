@@ -1,12 +1,12 @@
 name: view-google-stocks
 query: |
   CREATE VIEW IF NOT EXISTS
-    dev.finance.slv_star_google_stock_prices 
+    ${var.env}.finance.slv_star_google_stock_prices 
   AS 
     SELECT
       * 
     FROM 
-      dev.finance.slv_star_stock_prices 
+      ${var.env}.finance.slv_star_stock_prices 
     WHERE
       symbol = 'GOOGL'
 warehouse_id: ${var.sql_tasks_warehouse_id}

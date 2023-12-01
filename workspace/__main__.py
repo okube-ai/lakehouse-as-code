@@ -101,7 +101,10 @@ class Service:
             with open(filepath, "r") as fp:
                 queries += [models.SqlQuery.model_validate_yaml(fp)]
 
-        vars = {"sql_tasks_warehouse_id": self.pulumi_config.get("sql_tasks_warehouse_id")}
+        vars = {
+            "env": self.env,
+            "sql_tasks_warehouse_id": self.pulumi_config.get("sql_tasks_warehouse_id")
+        }
         for query in queries:
             query.vars = vars
             query.deploy(
