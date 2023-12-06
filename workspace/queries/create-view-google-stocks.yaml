@@ -1,6 +1,6 @@
-name: view-google-stocks
+name: create-view-google-stocks
 query: |
-  CREATE VIEW IF NOT EXISTS
+  CREATE OR REPLACE VIEW
     ${var.env}.finance.slv_star_google_stock_prices 
   AS 
     SELECT

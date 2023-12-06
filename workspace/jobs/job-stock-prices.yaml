@@ -35,7 +35,7 @@ tasks:
   - task_key: view
     sql_task:
       query:
-        query_id: ${var.view-google-stocks-id}
+        query_id: ${var.create-view-google-stocks-id}
       warehouse_id: ${var.sql_tasks_warehouse_id}
     depends_ons:
       - task_key: pipeline
