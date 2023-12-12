@@ -1,7 +1,7 @@
 import yfinance as yf
 
 from laktory.models import DataEvent
-from laktory.models import Producer
+from laktory.models import DataProducer
 
 
 # --------------------------------------------------------------------------- #
@@ -24,7 +24,7 @@ for s in symbols:
 
     event = DataEvent(
         name="stock_metadata",
-        producer=Producer(name="yahoo-finance"),
+        producer=DataProducer(name="yahoo-finance"),
         data=data,
         tstamp_in_path=False,
     )

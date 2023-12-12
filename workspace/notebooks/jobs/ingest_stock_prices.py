@@ -5,7 +5,7 @@ from datetime import date
 from datetime import timedelta
 
 from laktory.models import DataEvent
-from laktory.models import Producer
+from laktory.models import DataProducer
 
 
 # --------------------------------------------------------------------------- #
@@ -34,7 +34,7 @@ for s in symbols:
         events += [
             DataEvent(
                 name="stock_price",
-                producer=Producer(name="yahoo-finance"),
+                producer=DataProducer(name="yahoo-finance"),
                 data={
                     "created_at": _,
                     "symbol": s,
