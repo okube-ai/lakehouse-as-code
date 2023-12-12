@@ -128,7 +128,7 @@ class Service:
         for filename in os.listdir(root_dir):
             filepath = os.path.join(root_dir, filename)
             with open(filepath, "r") as fp:
-                pipelines += [models.DLTPipeline.model_validate_yaml(fp)]
+                pipelines += [models.Pipeline.model_validate_yaml(fp)]
 
         for pipeline in pipelines:
             pipeline.vars = {

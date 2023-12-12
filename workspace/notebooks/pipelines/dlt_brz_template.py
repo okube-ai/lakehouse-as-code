@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@view_task
-# MAGIC %pip install 'laktory==0.0.23'
+# MAGIC %pip install 'laktory==0.0.25'
 
 # COMMAND ----------
 import pyspark.sql.functions as F
