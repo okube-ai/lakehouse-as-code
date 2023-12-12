@@ -1,4 +1,4 @@
-name: workspace
+name: azure-infra
 runtime:
   name: python
 description: Lakehouse - Infra

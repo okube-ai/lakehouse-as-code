@@ -32,6 +32,7 @@ class Service:
 
     def run(self):
         self.set_secrets()
+        self.set_directories()
         self.set_workspace_files()
         self.set_clusters()
         self.set_warehouses()
@@ -76,6 +77,24 @@ class Service:
                     opts=pulumi.ResourceOptions(provider=self.workspace_provider)
                 )
             ]
+
+    # ----------------------------------------------------------------------- #
+    # Directories                                                             #
+    # ----------------------------------------------------------------------- #
+
+    def set_directories(self):
+        with open("directories.yaml") as fp:
+            directories = [
+                models.Directory.model_validate(s) for s in yaml.safe_load(fp)
+            ]
+
+        for directory in directories:
+            directory.deploy(
+                opts=pulumi.ResourceOptions(
+                    provider=self.workspace_provider,
+                )
+            )
+            pulumi.export(f"directory-{directory.path}", directory.object_id)
 
     # ----------------------------------------------------------------------- #
     # Workspace Files                                                         #

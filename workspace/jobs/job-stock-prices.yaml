@@ -11,7 +11,7 @@ tasks:
       notebook_path: /jobs/ingest_stock_prices.py
     libraries:
       - pypi:
-          package: 'laktory==0.0.21'
+          package: 'laktory==0.0.25'
       - pypi:
           package: yfinance
 
@@ -21,7 +21,7 @@ tasks:
       notebook_path: /jobs/ingest_stock_metadata.py
     libraries:
       - pypi:
-          package: 'laktory==0.0.21'
+          package: 'laktory==0.0.25'
       - pypi:
           package: yfinance
 
@@ -31,6 +31,14 @@ tasks:
       - task_key: ingest-metadata
     pipeline_task:
       pipeline_id: ${var.pl-stock-prices-id}
+
+  - task_key: view
+    sql_task:
+      query:
+        query_id: ${var.create-view-google-stocks-id}
+      warehouse_id: ${var.sql_tasks_warehouse_id}
+    depends_ons:
+      - task_key: pipeline
 
 permissions:
   - group_name: account users
