@@ -2,6 +2,7 @@
   groups:
     - role-workspace-admins
     - role-metastore-admins
+    - domain-finance
   roles:
     - account_admin
 
