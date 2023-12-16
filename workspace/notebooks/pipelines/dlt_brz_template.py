@@ -1,6 +1,6 @@
 # Databricks notebook source
-# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@view_task
-# MAGIC %pip install 'laktory==0.0.25'
+# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@table_expectations
+# MAGIC %pip install 'laktory==0.0.27'
 
 # COMMAND ----------
 import pyspark.sql.functions as F
@@ -28,6 +28,9 @@ def define_table(table):
         name=table.name,
         comment=table.comment,
     )
+    @dlt.expect_all(table.warning_expectations)
+    @dlt.expect_all_or_drop(table.drop_expectations)
+    @dlt.expect_all_or_fail(table.fail_expectations)
     def get_df():
         logger.info(f"Building {table.name} table")
 
