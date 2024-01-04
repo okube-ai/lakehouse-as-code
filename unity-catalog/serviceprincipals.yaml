@@ -1,6 +1,6 @@
 - display_name: neptune
   application_id: ${var.neptune_client_id}
-  groups:
+  group_ids:
     - domain-engineering
     - domain-finance
     - role-workspace-admins

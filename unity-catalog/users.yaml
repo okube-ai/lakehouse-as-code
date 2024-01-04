@@ -1,5 +1,5 @@
 - user_name: olivier@okube.ai
-  groups:
+  group_ids:
     - role-workspace-admins
     - role-metastore-admins
     - domain-finance
@@ -7,12 +7,12 @@
     - account_admin
 
 - user_name: data.analyst@okube.ai
-  groups:
+  group_ids:
   - role-analysts
   - domain-finance
   - domain-engineering
 
 - user_name: data.engineer@okube.ai
-  groups:
+  group_ids:
   - role-engineers
   - domain-engineering

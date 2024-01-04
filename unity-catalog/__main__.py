@@ -5,6 +5,8 @@ import pulumi
 import pulumi_databricks as databricks
 import pulumi_azure_native as azure_native
 from laktory import models
+from laktory import pulumi_outputs
+from laktory import pulumi_resources
 
 
 # --------------------------------------------------------------------------- #
@@ -28,7 +30,7 @@ class Service:
         self.workspace_provider = None
 
         # Resources
-        self.group_ids = None
+        self.group_ids = {}
         self.user_resources = None
         self.metastore = None
         self.metastore_grants = None
@@ -62,8 +64,9 @@ class Service:
             self.group_ids = {}
             for d in yaml.safe_load(fp):
                 g = models.Group.model_validate(d)
+                g.options.aliases = [f"urn:pulumi:global::unity-catalog::laktory:databricks:Group$databricks:index/group:Group::{g.resource_name}"]
                 g.deploy()
-                self.group_ids[g.display_name] = g.id
+                self.group_ids[g.display_name] = pulumi_outputs[f"group-{g.display_name}.id"]
 
         # ------------------------------------------------------------------- #
         # Users                                                               #
@@ -76,10 +79,19 @@ class Service:
         for u in users:
             if u.display_name is None:
                 u.display_name = u.user_name
-            u.deploy(
-                group_ids=self.group_ids,
-            )
-            self.user_resources += [u.resources]
+            u.group_ids = [f"resources.group-{g}.id" for g in u.group_ids]
+            u.options.aliases = [
+                f"urn:pulumi:global::unity-catalog::laktory:databricks:User$databricks:index/user:User::{u.resource_name}"
+            ]
+            i = 0
+            for role in u.roles:
+                i += 1
+                r = u.resources[i]
+                r.options.aliases = [
+                    f"urn:pulumi:global::unity-catalog::laktory:databricks:User$databricks:index/userRole:UserRole::{r.resource_name}",  # does not seems to match
+                ]
+            u.deploy()
+            self.user_resources += u._pulumi_resources.values()
 
         # ------------------------------------------------------------------- #
         # Service Principals                                                  #
@@ -91,13 +103,24 @@ class Service:
             ]
 
         for sp in service_principals:
-            sp.vars = {
+            sp.variables = {
                 "neptune_client_id": self.infra_stacks["dev"].get_output(
                     "neptune-client-id"
                 )
             }
-            sp.deploy(group_ids=self.group_ids)
-            self.user_resources += [sp.resources]
+            sp.group_ids = [f"resources.group-{g}.id" for g in sp.group_ids]
+            sp.options.aliases = [
+                f"urn:pulumi:global::unity-catalog::laktory:databricks:ServicePrincipal$databricks:index/servicePrincipal:ServicePrincipal::{sp.resource_name}"
+            ]
+            i = 0
+            for role in sp.roles:
+                i += 1
+                r = sp.resources[i]
+                r.options.aliases = [
+                    f"urn:pulumi:global::unity-catalog::laktory:databricks:ServicePrincipal$databricks:index/servicePrincipalRole:ServicePrincipalRole::{r.resource_name}",
+                ]
+            sp.deploy()
+            self.user_resources += sp._pulumi_resources.values()
 
     # ----------------------------------------------------------------------- #
     # Metastore                                                               #
@@ -272,7 +295,7 @@ class Service:
             catalogs = [models.Catalog.model_validate(u) for u in yaml.safe_load(fp)]
 
         for catalog in catalogs:
-            vars = {}
+            variables = {}
 
             if "prod" in self.infra_stacks:
                 container_name = self.infra_stacks["prod"].get_output(
@@ -281,7 +304,7 @@ class Service:
                 storage_account_name = self.infra_stacks["prod"].get_output(
                     "container-metastore-account-name"
                 )
-                vars["prod_storage_root"] = pulumi.Output.all(
+                variables["prod_storage_root"] = pulumi.Output.all(
                     container_name, storage_account_name
                 ).apply(lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/")
 
@@ -291,11 +314,58 @@ class Service:
                 storage_account_name = infra_stack.get_output(
                     "container-landing-account-name"
                 )
-                vars["landing_storage_location"] = pulumi.Output.all(
+                variables["landing_storage_location"] = pulumi.Output.all(
                     container_name, storage_account_name
                 ).apply(lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/")
 
-            catalog.vars = vars
+            catalog.variables = variables
+            catalog.options.aliases = [
+                f"urn:pulumi:global::unity-catalog::laktory:databricks:Catalog$databricks:index/catalog:Catalog::{catalog.resource_name}"
+            ]
+            i = 0
+            if catalog.grants:
+                i += 1
+                r = catalog.resources[i]
+                r.options.aliases = [
+                    f"urn:pulumi:global::unity-catalog::laktory:databricks:Catalog$databricks:index/grants:Grants::{r.resource_name}"
+                ]
+            for s in catalog.schemas:
+                i += 1
+                r = catalog.resources[i]
+                r.options.aliases = [
+                    f"urn:pulumi:global::unity-catalog::laktory:databricks:Catalog$databricks:index/catalog:Catalog$laktory:databricks:Schema$databricks:index/schema:Schema::{r.resource_name}"
+                ]
+                if s.grants:
+                    i += 1
+                    r = catalog.resources[i]
+                    r.options.aliases = [
+                        f"urn:pulumi:global::unity-catalog::laktory:databricks:Catalog$databricks:index/catalog:Catalog$laktory:databricks:Schema$databricks:index/grants:Grants::{r.resource_name}"
+                    ]
+
+                for v in s.volumes:
+                    i += 1
+                    r = catalog.resources[i]
+                    r.options.aliases = [
+                        f"urn:pulumi:global::unity-catalog::laktory:databricks:Catalog$databricks:index/catalog:Catalog$laktory:databricks:Schema$databricks:index/schema:Schema$laktory:databricks:Volume$databricks:index/volume:Volume::{r.resource_name}"
+                    ]
+                    if v.grants:
+                        i += 1
+                        r = catalog.resources[i]
+                        r.options.aliases = [
+                            f"urn:pulumi:global::unity-catalog::laktory:databricks:Catalog$databricks:index/catalog:Catalog$laktory:databricks:Schema$databricks:index/schema:Schema$laktory:databricks:Volume$databricks:index/grants:Grants::{r.resource_name}"
+                        ]
+
+                for t in s.tables:
+                    i += 1
+                    r = catalog.resources[i]
+                    print(r)
+                    # NOT USED
+                    if t.grants:
+                        i += 1
+                        r = catalog.resources[i]
+                        print(r)
+                        # NOT USED
+
             catalog.deploy(
                 opts=pulumi.ResourceOptions(
                     provider=self.workspace_provider,
@@ -316,7 +386,7 @@ class Service:
         storage_account_name = self.infra_stacks["dev"].get_output(
             "container-metastore-account-name"
         )
-        volume = self.catalogs["libraries"].schemas[0].volumes[0].resources.volume
+        volume = pulumi_resources["volume-libraries.default.init_scripts"]
 
         for filename in os.listdir(root_dir):
             key = filename.split(".")[0].replace("_", "-")
