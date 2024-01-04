@@ -79,7 +79,7 @@ class Service:
         for u in users:
             if u.display_name is None:
                 u.display_name = u.user_name
-            u.group_ids = [f"resources.group-{g}.id" for g in u.group_ids]
+            u.group_ids = [f"{{resources.group-{g}.id}}" for g in u.group_ids]
             u.options.aliases = [
                 f"urn:pulumi:global::unity-catalog::laktory:databricks:User$databricks:index/user:User::{u.resource_name}"
             ]
@@ -108,7 +108,7 @@ class Service:
                     "neptune-client-id"
                 )
             }
-            sp.group_ids = [f"resources.group-{g}.id" for g in sp.group_ids]
+            sp.group_ids = [f"{{resources.group-{g}.id}}" for g in sp.group_ids]
             sp.options.aliases = [
                 f"urn:pulumi:global::unity-catalog::laktory:databricks:ServicePrincipal$databricks:index/servicePrincipal:ServicePrincipal::{sp.resource_name}"
             ]
