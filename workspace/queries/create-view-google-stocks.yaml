@@ -9,10 +9,10 @@ query: |
       ${var.env}.finance.slv_star_stock_prices 
     WHERE
       symbol = 'GOOGL'
-warehouse_id: ${var.sql_tasks_warehouse_id}
-parent: folders/${var.directory-/queries/views/}
+data_source_id: ${var.sql_tasks_data_source_id}
+parent: ${var.directory-laktory-queries-views}
 run_as_role: viewer
-permissions:
+access_controls:
   - group_name: account users
     permission_level: CAN_VIEW
   - group_name: role-engineers

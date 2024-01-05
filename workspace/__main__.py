@@ -37,8 +37,8 @@ class Service:
 
     def run(self):
         self.set_notebooks()
-        # self.set_workspace_files()
-        # self.set_queries()
+        self.set_workspace_files()
+        self.set_queries()
         # self.set_pipelines()
         # self.set_jobs()
 
@@ -101,21 +101,19 @@ class Service:
             with open(filepath, "r") as fp:
                 queries += [models.SqlQuery.model_validate_yaml(fp)]
 
-        vars = {
+        variables = {
             "env": self.env,
-            "sql_tasks_warehouse_id": self.pulumi_config.get("sql_tasks_warehouse_id"),
-            "directory-/queries/views/": "2479128258235176",
-            # Can't be used because it results as a float
-            # "directory-/queries/views/": self.conf_stack.get_output("directory-/queries/views/"),
+            "sql_tasks_data_source_id": self.pulumi_config.get("sql_tasks_data_source_id"),
+            "directory-laktory-queries-views": self.conf_stack.get_output("directory-laktory-queries-views"),
         }
         for query in queries:
-            query.vars = vars
+            query.variables = variables
             query.to_pulumi(
                 opts=pulumi.ResourceOptions(
                     provider=self.workspace_provider,
                 )
             )
-            self.query_ids[query.name] = query.id
+            # self.query_ids[query.name] = query.id
 
     # ----------------------------------------------------------------------- #
     # Pipelines                                                               #

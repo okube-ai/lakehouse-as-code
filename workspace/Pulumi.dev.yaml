@@ -1,2 +1,3 @@
 config:
   workspace:sql_tasks_warehouse_id: 08b717ce051a0261
+  workspace:sql_tasks_data_source_id: d5e40c23-67bd-4442-a713-676014169664
