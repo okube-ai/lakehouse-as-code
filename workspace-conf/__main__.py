@@ -93,7 +93,10 @@ class Service:
                     provider=self.workspace_provider,
                 )
             )
-            pulumi.export(directory.resource_name, pulumi_resources[directory.resource_name].object_id)
+            pulumi.export(
+                directory.resource_name,
+                pulumi_resources[directory.resource_name].object_id.apply(lambda v: f"folders/{v}")
+            )
 
     # ----------------------------------------------------------------------- #
     # Workspace Files                                                         #
@@ -158,6 +161,10 @@ class Service:
                 opts=pulumi.ResourceOptions(
                     provider=self.workspace_provider,
                 )
+            )
+            pulumi.export(
+                f"{warehouse.resource_name}-data-source-id",
+                pulumi_resources[warehouse.resource_name].data_source_id
             )
 
 
