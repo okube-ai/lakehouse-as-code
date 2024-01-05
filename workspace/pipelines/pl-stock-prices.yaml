@@ -19,15 +19,15 @@ clusters:
 
 libraries:
   - notebook:
-      path: /pipelines/dlt_brz_template.py
+      path: /.laktory/pipelines/dlt_brz_template.py
   - notebook:
-      path: /pipelines/dlt_slv_template.py
+      path: /.laktory/pipelines/dlt_slv_template.py
   - notebook:
-      path: /pipelines/dlt_slv_star_template.py
+      path: /.laktory/pipelines/dlt_slv_star_template.py
   - notebook:
-      path: /pipelines/dlt_gld_template.py
+      path: /.laktory/pipelines/dlt_gld_template.py
   - notebook:
-      path: /pipelines/dlt_gld_stock_performances.py
+      path: /.laktory/pipelines/dlt_gld_stock_performances.py
 
 udfs:
   - module_name: stock_functions

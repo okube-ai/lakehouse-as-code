@@ -30,12 +30,12 @@ tasks:
       - task_key: ingest
       - task_key: ingest-metadata
     pipeline_task:
-      pipeline_id: ${var.pl-stock-prices-id}
+      pipeline_id: ${resources.pl-stock-prices.id}
 
   - task_key: view
     sql_task:
       query:
-        query_id: ${var.create-view-google-stocks-id}
+        query_id: ${resources.sql-query-create-view-google-stocks.id}
       warehouse_id: ${var.sql_tasks_warehouse_id}
     depends_ons:
       - task_key: pipeline

@@ -11,7 +11,6 @@ query: |
       symbol = 'GOOGL'
 data_source_id: ${var.sql_tasks_data_source_id}
 parent: ${var.directory-laktory-queries-views}
-run_as_role: viewer
 access_controls:
   - group_name: account users
     permission_level: CAN_VIEW

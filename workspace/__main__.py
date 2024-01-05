@@ -39,8 +39,8 @@ class Service:
         self.set_notebooks()
         self.set_workspace_files()
         self.set_queries()
-        # self.set_pipelines()
-        # self.set_jobs()
+        self.set_pipelines()
+        self.set_jobs()
 
     # ----------------------------------------------------------------------- #
     # Properties                                                              #
@@ -113,7 +113,6 @@ class Service:
                     provider=self.workspace_provider,
                 )
             )
-            # self.query_ids[query.name] = query.id
 
     # ----------------------------------------------------------------------- #
     # Pipelines                                                               #
@@ -129,26 +128,17 @@ class Service:
                 pipelines += [models.Pipeline.model_validate_yaml(fp)]
 
         for pipeline in pipelines:
-            pipeline.vars = {
+            pipeline.variables = {
                 "env": self.env,
                 "is_dev": self.env == "dev",
             }
             pipeline.clusters[0].spark_env_vars = self.cluster_env_vars
-
-            # TODO: Refactor and improve
-            for table in pipeline.tables:
-                if table.builder.event_source:
-                    table.builder.event_source.events_root = (
-                        f"/Volumes/{self.env}/sources/landing/events/"
-                    )
 
             pipeline.to_pulumi(
                 opts=pulumi.ResourceOptions(
                     provider=self.workspace_provider,
                 )
             )
-            self.pipelines[pipeline.name] = pipeline
-            self.pipeline_ids[pipeline.name] = pipeline.id
 
     # ----------------------------------------------------------------------- #
     # Jobs                                                                    #
@@ -163,14 +153,13 @@ class Service:
             with open(filepath, "r") as fp:
                 jobs += [models.Job.model_validate_yaml(fp)]
 
-        vars = {f"{k}-id": v for k, v in self.pipeline_ids.items()}
-        for k, v in self.query_ids.items():
-            vars[f"{k}-id"] = v
-        vars["pause_status"] = "PAUSED" if self.env == "dev" else None
-        vars["sql_tasks_warehouse_id"] = self.pulumi_config.get("sql_tasks_warehouse_id")
+        variables = {
+            "pause_status": "PAUSED" if self.env == "dev" else None,
+            "sql_tasks_warehouse_id": self.pulumi_config.get("sql_tasks_warehouse_id"),
+        }
 
         for job in jobs:
-            job.vars = vars
+            job.variables = variables
             job.to_pulumi(
                 opts=pulumi.ResourceOptions(
                     provider=self.workspace_provider,
