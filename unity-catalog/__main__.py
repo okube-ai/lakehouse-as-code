@@ -65,7 +65,7 @@ class Service:
             for d in yaml.safe_load(fp):
                 g = models.Group.model_validate(d)
                 g.options.aliases = [f"urn:pulumi:global::unity-catalog::laktory:databricks:Group$databricks:index/group:Group::{g.resource_name}"]
-                g.deploy()
+                g.to_pulumi()
                 self.group_ids[g.display_name] = pulumi_outputs[f"group-{g.display_name}.id"]
 
         # ------------------------------------------------------------------- #
@@ -79,7 +79,7 @@ class Service:
         for u in users:
             if u.display_name is None:
                 u.display_name = u.user_name
-            u.group_ids = [f"{{resources.group-{g}.id}}" for g in u.group_ids]
+            u.group_ids = [f"${{resources.group-{g}.id}}" for g in u.group_ids]
             u.options.aliases = [
                 f"urn:pulumi:global::unity-catalog::laktory:databricks:User$databricks:index/user:User::{u.resource_name}"
             ]
@@ -88,9 +88,9 @@ class Service:
                 i += 1
                 r = u.resources[i]
                 r.options.aliases = [
-                    f"urn:pulumi:global::unity-catalog::laktory:databricks:User$databricks:index/userRole:UserRole::{r.resource_name}",  # does not seems to match
+                    f"urn:pulumi:global::unity-catalog::laktory:databricks:User$databricks:index/userRole:UserRole::{r.resource_name}",  # does not seem to match
                 ]
-            u.deploy()
+            u.to_pulumi()
             self.user_resources += u._pulumi_resources.values()
 
         # ------------------------------------------------------------------- #
@@ -108,7 +108,7 @@ class Service:
                     "neptune-client-id"
                 )
             }
-            sp.group_ids = [f"{{resources.group-{g}.id}}" for g in sp.group_ids]
+            sp.group_ids = [f"${{resources.group-{g}.id}}" for g in sp.group_ids]
             sp.options.aliases = [
                 f"urn:pulumi:global::unity-catalog::laktory:databricks:ServicePrincipal$databricks:index/servicePrincipal:ServicePrincipal::{sp.resource_name}"
             ]
@@ -119,7 +119,7 @@ class Service:
                 r.options.aliases = [
                     f"urn:pulumi:global::unity-catalog::laktory:databricks:ServicePrincipal$databricks:index/servicePrincipalRole:ServicePrincipalRole::{r.resource_name}",
                 ]
-            sp.deploy()
+            sp.to_pulumi()
             self.user_resources += sp._pulumi_resources.values()
 
     # ----------------------------------------------------------------------- #
@@ -366,7 +366,7 @@ class Service:
                         print(r)
                         # NOT USED
 
-            catalog.deploy(
+            catalog.to_pulumi(
                 opts=pulumi.ResourceOptions(
                     provider=self.workspace_provider,
                     depends_on=[self.metastore_grants] + self.external_locations,
