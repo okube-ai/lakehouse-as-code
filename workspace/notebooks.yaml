@@ -1,38 +1,38 @@
 - source: ./notebooks/jobs/ingest_stock_prices.py
-  permissions:
+  access_controls:
     - group_name: account users
       permission_level: CAN_READ
     - group_name: role-engineers
       permission_level: CAN_RUN
 
 - source: ./notebooks/jobs/ingest_stock_metadata.py
-  permissions:
+  access_controls:
     - group_name: account users
       permission_level: CAN_READ
     - group_name: role-engineers
       permission_level: CAN_RUN
 
 - source: ./notebooks/pipelines/dlt_brz_template.py
-  permissions:
+  access_controls:
     - group_name: account users
       permission_level: CAN_READ
 
 - source: ./notebooks/pipelines/dlt_slv_template.py
-  permissions:
+  access_controls:
     - group_name: account users
       permission_level: CAN_READ
 
 - source: ./notebooks/pipelines/dlt_slv_star_template.py
-  permissions:
+  access_controls:
     - group_name: account users
       permission_level: CAN_READ
 
 - source: ./notebooks/pipelines/dlt_gld_template.py
-  permissions:
+  access_controls:
     - group_name: account users
       permission_level: CAN_READ
 
 - source: ./notebooks/pipelines/dlt_gld_stock_performances.py
-  permissions:
+  access_controls:
     - group_name: account users
       permission_level: CAN_READ

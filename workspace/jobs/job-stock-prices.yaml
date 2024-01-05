@@ -8,7 +8,7 @@ tasks:
   - task_key: ingest
     job_cluster_key: main
     notebook_task:
-      notebook_path: /jobs/ingest_stock_prices.py
+      notebook_path: /.laktory/jobs/ingest_stock_prices.py
     libraries:
       - pypi:
           package: 'laktory==0.0.27'
@@ -18,7 +18,7 @@ tasks:
   - task_key: ingest-metadata
     job_cluster_key: main
     notebook_task:
-      notebook_path: /jobs/ingest_stock_metadata.py
+      notebook_path: /.laktory/jobs/ingest_stock_metadata.py
     libraries:
       - pypi:
           package: 'laktory==0.0.27'
@@ -30,17 +30,17 @@ tasks:
       - task_key: ingest
       - task_key: ingest-metadata
     pipeline_task:
-      pipeline_id: ${var.pl-stock-prices-id}
+      pipeline_id: ${resources.pl-stock-prices.id}
 
   - task_key: view
     sql_task:
       query:
-        query_id: ${var.create-view-google-stocks-id}
+        query_id: ${resources.sql-query-create-view-google-stocks.id}
       warehouse_id: ${var.sql_tasks_warehouse_id}
     depends_ons:
       - task_key: pipeline
 
-permissions:
+access_controls:
   - group_name: account users
     permission_level: CAN_VIEW
   - group_name: role-engineers

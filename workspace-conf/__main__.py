@@ -3,6 +3,7 @@ import yaml
 import pulumi
 import pulumi_databricks as databricks
 from laktory import models
+from laktory import pulumi_resources
 
 
 # --------------------------------------------------------------------------- #
@@ -59,24 +60,19 @@ class Service:
 
         self.secret_resources = []
         for secret_scope in secret_scopes:
-            for s in secret_scope.secrets:
-                if s.key == "keyvault-url":
-                    s.value = self.infra_stack.get_output("keyvault-url")
-                elif s.key == "tenant-id":
-                    s.value = self.infra_stack.get_output("tenant-id")
-                elif s.key == "client-id":
-                    s.value = self.infra_stack.get_output("neptune-client-id")
-                elif s.key == "client-secret":
-                    s.value = self.infra_stack.get_output("neptune-client-secret")
-
-                if s.value is None:
-                    raise ValueError(f"Secret {s.scope}.{s.key} value empty")
-
-            self.secret_resources += [
-                secret_scope.deploy(
-                    opts=pulumi.ResourceOptions(provider=self.workspace_provider)
-                )
+            secret_scope.variables = {
+                "secret-keyvault-url": self.infra_stack.get_output("keyvault-url"),
+                "secret-tenant-id": self.infra_stack.get_output("tenant-id"),
+                "secret-client-id": self.infra_stack.get_output("neptune-client-id"),
+                "secret-client-secret": self.infra_stack.get_output("neptune-client-secret"),
+            }
+            secret_scope.options.aliases = [
+                f"urn:pulumi:dev::workspace-conf::laktory:databricks:SecretScope$databricks:index/secretScope:SecretScope::{secret_scope.resource_name}"
             ]
+
+            self.secret_resources += secret_scope.to_pulumi(
+                opts=pulumi.ResourceOptions(provider=self.workspace_provider)
+            ).values()
 
     # ----------------------------------------------------------------------- #
     # Directories                                                             #
@@ -89,12 +85,18 @@ class Service:
             ]
 
         for directory in directories:
-            directory.deploy(
+            directory.options.aliases = [
+                f"urn:pulumi:dev::workspace-conf::laktory:databricks:Directory$databricks:index/directory:Directory::{directory.resource_name}"
+            ]
+            directory.to_pulumi(
                 opts=pulumi.ResourceOptions(
                     provider=self.workspace_provider,
                 )
             )
-            pulumi.export(f"directory-{directory.path}", directory.object_id)
+            pulumi.export(
+                directory.resource_name,
+                pulumi_resources[directory.resource_name].object_id.apply(lambda v: f"folders/{v}")
+            )
 
     # ----------------------------------------------------------------------- #
     # Workspace Files                                                         #
@@ -113,7 +115,7 @@ class Service:
             ]
 
         for workspace_file in workspace_files:
-            workspace_file.deploy(
+            workspace_file.to_pulumi(
                 opts=pulumi.ResourceOptions(
                     provider=self.workspace_provider,
                 )
@@ -131,7 +133,10 @@ class Service:
 
         for cluster in clusters:
             cluster.spark_env_vars = self.cluster_env_vars
-            cluster.deploy(
+            cluster.options.aliases = [
+                f"urn:pulumi:dev::workspace-conf::laktory:databricks:Cluster$databricks:index/cluster:Cluster::{cluster.resource_name}",
+            ]
+            cluster.to_pulumi(
                 opts=pulumi.ResourceOptions(
                     provider=self.workspace_provider,
                     depends_on=self.secret_resources,
@@ -149,10 +154,17 @@ class Service:
             ]
 
         for warehouse in warehouses:
-            warehouse.deploy(
+            warehouse.options.aliases = [
+                f"urn:pulumi:dev::workspace-conf::laktory:databricks:Warehouse$databricks:index/sqlEndpoint:SqlEndpoint::{warehouse.resource_name}",
+            ]
+            warehouse.to_pulumi(
                 opts=pulumi.ResourceOptions(
                     provider=self.workspace_provider,
                 )
+            )
+            pulumi.export(
+                f"{warehouse.resource_name}-data-source-id",
+                pulumi_resources[warehouse.resource_name].data_source_id
             )
 
 

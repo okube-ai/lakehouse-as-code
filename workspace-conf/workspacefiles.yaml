@@ -1,5 +1,5 @@
 - source: ../unity-catalog/init_scripts/install_laktory.sh
   dirpath: /init_scripts/
-  permissions:
+  access_controls:
     - group_name: account users
       permission_level: CAN_READ
