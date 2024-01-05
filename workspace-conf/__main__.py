@@ -93,7 +93,7 @@ class Service:
                     provider=self.workspace_provider,
                 )
             )
-            pulumi.export(f"directory-{directory.path}", pulumi_resources[directory.resource_name].object_id)
+            pulumi.export(directory.resource_name, pulumi_resources[directory.resource_name].object_id)
 
     # ----------------------------------------------------------------------- #
     # Workspace Files                                                         #
