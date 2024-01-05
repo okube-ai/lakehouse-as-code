@@ -40,7 +40,7 @@ tasks:
     depends_ons:
       - task_key: pipeline
 
-permissions:
+access_controls:
   - group_name: account users
     permission_level: CAN_VIEW
   - group_name: role-engineers

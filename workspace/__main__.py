@@ -37,10 +37,10 @@ class Service:
 
     def run(self):
         self.set_notebooks()
-        self.set_workspace_files()
-        self.set_queries()
-        self.set_pipelines()
-        self.set_jobs()
+        # self.set_workspace_files()
+        # self.set_queries()
+        # self.set_pipelines()
+        # self.set_jobs()
 
     # ----------------------------------------------------------------------- #
     # Properties                                                              #
@@ -65,7 +65,7 @@ class Service:
             notebooks = [models.Notebook.model_validate(s) for s in yaml.safe_load(fp)]
 
         for notebook in notebooks:
-            notebook.deploy(
+            notebook.to_pulumi(
                 opts=pulumi.ResourceOptions(
                     provider=self.workspace_provider,
                 )
@@ -82,7 +82,7 @@ class Service:
             ]
 
         for workspace_file in workspace_files:
-            workspace_file.deploy(
+            workspace_file.to_pulumi(
                 opts=pulumi.ResourceOptions(
                     provider=self.workspace_provider,
                 )
@@ -110,7 +110,7 @@ class Service:
         }
         for query in queries:
             query.vars = vars
-            query.deploy(
+            query.to_pulumi(
                 opts=pulumi.ResourceOptions(
                     provider=self.workspace_provider,
                 )
@@ -144,7 +144,7 @@ class Service:
                         f"/Volumes/{self.env}/sources/landing/events/"
                     )
 
-            pipeline.deploy(
+            pipeline.to_pulumi(
                 opts=pulumi.ResourceOptions(
                     provider=self.workspace_provider,
                 )
@@ -173,7 +173,7 @@ class Service:
 
         for job in jobs:
             job.vars = vars
-            job.deploy(
+            job.to_pulumi(
                 opts=pulumi.ResourceOptions(
                     provider=self.workspace_provider,
                 )

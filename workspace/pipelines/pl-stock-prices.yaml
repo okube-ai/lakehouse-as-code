@@ -33,7 +33,7 @@ udfs:
   - module_name: stock_functions
     function_name: symbol_to_name
 
-permissions:
+access_controls:
   - group_name: account users
     permission_level: CAN_VIEW
   - group_name: role-engineers

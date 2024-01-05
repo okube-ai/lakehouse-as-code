@@ -1,4 +1,4 @@
 - source: ./workspacefiles/pipelines/stock_functions.py
-  permissions:
+  access_controls:
     - group_name: account users
       permission_level: CAN_READ
