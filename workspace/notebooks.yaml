@@ -1,38 +1,45 @@
-- source: ./notebooks/jobs/ingest_stock_prices.py
+notebook-job-ingest-stock-prices:
+  source: ./notebooks/jobs/ingest_stock_prices.py
   access_controls:
     - group_name: account users
       permission_level: CAN_READ
     - group_name: role-engineers
       permission_level: CAN_RUN
 
-- source: ./notebooks/jobs/ingest_stock_metadata.py
+notebook-job-ingest-stock-metadata:
+  source: ./notebooks/jobs/ingest_stock_metadata.py
   access_controls:
     - group_name: account users
       permission_level: CAN_READ
     - group_name: role-engineers
       permission_level: CAN_RUN
 
-- source: ./notebooks/pipelines/dlt_brz_template.py
+notebook-pipelines-dlt-brz-template:
+  source: ./notebooks/pipelines/dlt_brz_template.py
   access_controls:
     - group_name: account users
       permission_level: CAN_READ
 
-- source: ./notebooks/pipelines/dlt_slv_template.py
+notebook-pipelines-dlt-slv-template:
+  source: ./notebooks/pipelines/dlt_slv_template.py
   access_controls:
     - group_name: account users
       permission_level: CAN_READ
 
-- source: ./notebooks/pipelines/dlt_slv_star_template.py
+notebook-pipeline-dlt-slv-star-template:
+  source: ./notebooks/pipelines/dlt_slv_star_template.py
   access_controls:
     - group_name: account users
       permission_level: CAN_READ
 
-- source: ./notebooks/pipelines/dlt_gld_template.py
+notebook-pipelines-dlt-gld-template:
+  source: ./notebooks/pipelines/dlt_gld_template.py
   access_controls:
     - group_name: account users
       permission_level: CAN_READ
 
-- source: ./notebooks/pipelines/dlt_gld_stock_performances.py
+notebook-pipelines-dlt-gld-stock-performances:
+  source: ./notebooks/pipelines/dlt_gld_stock_performances.py
   access_controls:
     - group_name: account users
       permission_level: CAN_READ

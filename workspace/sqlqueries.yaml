@@ -1,4 +1,5 @@
-- name: create-view-google-stocks
+sql-query-create-view-google-stocks:
+  name: create-view-google-stocks
   query: |
     CREATE OR REPLACE VIEW
       ${var.env}.finance.slv_star_google_stock_prices 

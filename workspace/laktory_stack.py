@@ -176,10 +176,9 @@ if __name__ == "__main__":
     with open("./laktory.yaml", "r") as fp:
         stack = models.Stack.model_validate_yaml(fp)
 
-    print(stack)
-
-    stack.write_pulumi_stack()
+    pstack = stack.to_pulumi(env="dev")
+    pstack.write()
 
     # pstack = stack.to_pulumi_stack()
 
-    stack.pulumi_up("okube/dev", flags=["--yes"])
+    # stack.pulumi_up("okube/dev", flags=["--yes"])

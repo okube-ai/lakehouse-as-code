@@ -10,9 +10,9 @@ resources:
   workspacefiles: ${include.workspacefiles.yaml}
   sqlqueries: ${include.sqlqueries.yaml}
   pipelines:
-    - ${include.pipelines/pl-stock-prices.yaml}
+    pl-stock-prices: ${include.pipelines/pl-stock-prices.yaml}
   jobs:
-    - ${include.jobs/job-stock-prices.yaml}
+    job-stock-prices: ${include.jobs/job-stock-prices.yaml}
 variables:
   env: dev
   is_dev: true
