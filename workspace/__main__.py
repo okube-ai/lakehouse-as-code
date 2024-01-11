@@ -61,7 +61,7 @@ class Service:
     # ----------------------------------------------------------------------- #
 
     def set_notebooks(self):
-        with open("notebooks.yaml") as fp:
+        with open("resources/notebooks.yaml") as fp:
             notebooks = [models.Notebook.model_validate(s) for s in yaml.safe_load(fp)]
 
         for notebook in notebooks:
@@ -76,7 +76,7 @@ class Service:
     # ----------------------------------------------------------------------- #
 
     def set_workspace_files(self):
-        with open("workspacefiles.yaml") as fp:
+        with open("resources/workspacefiles.yaml") as fp:
             workspace_files = [
                 models.WorkspaceFile.model_validate(s) for s in yaml.safe_load(fp)
             ]

@@ -7,13 +7,13 @@ config:
   databricks:azure_client_secret: ${var.AZURE_CLIENT_SECRET}
   databricks:azure_tenant_id: ${var.AZURE_TENANT_ID}
 resources:
-  notebooks: ${include.notebooks.yaml}
-  workspacefiles: ${include.workspacefiles.yaml}
-  sqlqueries: ${include.sqlqueries.yaml}
+  notebooks: ${include.resources/notebooks.yaml}
+  workspacefiles: ${include.resources/workspacefiles.yaml}
+  sqlqueries: ${include.resources/sqlqueries.yaml}
   pipelines:
-    pl-stock-prices: ${include.pipelines/pl-stock-prices.yaml}
+    pl-stock-prices: ${include.resources/pl-stock-prices.yaml}
   jobs:
-    job-stock-prices: ${include.jobs/job-stock-prices.yaml}
+    job-stock-prices: ${include.resources/job-stock-prices.yaml}
 
 environments:
   dev:
