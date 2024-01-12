@@ -1,4 +1,5 @@
-- name: default
+cluster-default:
+  name: default
   spark_version: 14.0.x-scala2.12
   data_security_mode: USER_ISOLATION
   node_type_id: Standard_DS3_v2
@@ -9,7 +10,7 @@
   autotermination_minutes: 30
   libraries:
     - pypi:
-        package: 'laktory==0.0.27'
+        package: 'laktory==0.1.0'
     - pypi:
         package: yfinance
   access_controls:
@@ -18,3 +19,9 @@
     - group_name: role-analysts
       permission_level: CAN_RESTART
   is_pinned: True
+  spark_env_vars:
+    AZURE_KEYVAULT_URL: "{{secrets/azure/keyvault-url}}"
+    AZURE_TENANT_ID: "{{secrets/azure/tenant-id}}"
+    AZURE_CLIENT_ID: "{{secrets/azure/client-id}}"
+    AZURE_CLIENT_SECRET: "{{secrets/azure/client-secret}}"
+    LAKTORY_WORKSPACE_ENV: ${vars.env}

@@ -1,4 +1,5 @@
-- name: default
+warehouse-default:
+  name: default
   cluster_size: 2X-Small
   auto_stop_mins: 10
   channel_name: CHANNEL_NAME_PREVIEW

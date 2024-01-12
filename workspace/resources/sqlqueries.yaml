@@ -1,0 +1,19 @@
+sql-query-create-view-google-stocks:
+  name: create-view-google-stocks
+  query: |
+    CREATE OR REPLACE VIEW
+      ${vars.env}.finance.slv_star_google_stock_prices 
+    AS 
+      SELECT
+        * 
+      FROM 
+        ${vars.env}.finance.slv_star_stock_prices 
+      WHERE
+        symbol = 'GOOGL'
+  data_source_id: ${vars.sql_tasks_data_source_id}
+  parent: ${vars.directory-laktory-queries-views}
+  access_controls:
+    - group_name: account users
+      permission_level: CAN_VIEW
+    - group_name: role-engineers
+      permission_level: CAN_RUN
