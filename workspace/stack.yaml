@@ -1,11 +1,11 @@
 name: workspace
 description: Lakehouse - Workspace
-engine: pulumi
+backend: pulumi
 config:
-  databricks:host: ${var.DATABRICKS_HOST}
-  databricks:azure_client_id: ${var.AZURE_CLIENT_ID}
-  databricks:azure_client_secret: ${var.AZURE_CLIENT_SECRET}
-  databricks:azure_tenant_id: ${var.AZURE_TENANT_ID}
+  databricks:host: ${vars.DATABRICKS_HOST}
+  databricks:azure_client_id: ${vars.AZURE_CLIENT_ID}
+  databricks:azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
+  databricks:azure_tenant_id: ${vars.AZURE_TENANT_ID}
 resources:
   notebooks: ${include.resources/notebooks.yaml}
   workspacefiles: ${include.resources/workspacefiles.yaml}
@@ -20,6 +20,6 @@ environments:
     variables:
       env: dev
       is_dev: true
-      sql_tasks_data_source_id: d5e40c23-67bd-4442-a713-676014169664
-      directory-laktory-queries-views: folders/376437268450950
-      sql_tasks_warehouse_id: 08b717ce051a0261
+      sql_tasks_data_source_id: 5bc6297d-dc51-41dc-bac8-10e1e6d862be
+      directory-laktory-queries-views: folders/911347488458284
+      sql_tasks_warehouse_id: a6bc05a0fc5e55ae

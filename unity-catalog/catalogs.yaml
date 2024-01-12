@@ -34,7 +34,7 @@
       volumes:
         - name: landing
           volume_type: EXTERNAL
-          storage_location: ${var.landing_storage_location}
+          storage_location: ${vars.landing_storage_location}
           grants:
             - principal: account users # TODO: Review roles
               privileges:
@@ -48,7 +48,7 @@
 # --------------------------------------------------------------------------- #
 
 - name: prod
-#  storage_root: ${var.prod_storage_root}  # TODO: Enable when ready
+#  storage_root: ${vars.prod_storage_root}  # TODO: Enable when ready
   isolation_mode: OPEN
   grants:
     - principal: account users
@@ -80,7 +80,7 @@
       volumes:
         - name: landing
 #          volume_type: EXTERNAL
-#          storage_location: ${var.landing_storage_location}  # TODO: Enable when ready
+#          storage_location: ${vars.landing_storage_location}  # TODO: Enable when ready
           grants:
             - principal: account users # TODO: Review roles
               privileges:

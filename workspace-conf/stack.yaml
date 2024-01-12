@@ -1,0 +1,22 @@
+name: workspace-conf
+description: Lakehouse - Workspace Configuration
+backend: pulumi
+config:
+  databricks:host: ${vars.DATABRICKS_HOST}
+  databricks:azure_client_id: ${vars.AZURE_CLIENT_ID}
+  databricks:azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
+  databricks:azure_tenant_id: ${vars.AZURE_TENANT_ID}
+resources:
+  secretscopes: ${include.resources/secretscopes.yaml}
+  directories: ${include.resources/directories.yaml}
+  workspacefiles: ${include.resources/workspacefiles.yaml}
+  clusters: ${include.resources/clusters.yaml}
+  warehouses: ${include.resources/warehouses.yaml}
+pulumi_outputs:
+  directory-laktory-queries: folders/${resources.directory-laktory-queries.objectId}
+  warehouse-default-data-source-id: ${resources.warehouse-default.dataSourceId}
+  warehouse-default-id: ${resources.warehouse-default.id}
+environments:
+  dev:
+    variables:
+      env: dev

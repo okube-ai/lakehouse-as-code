@@ -1,5 +1,5 @@
 - display_name: neptune
-  application_id: ${var.neptune_client_id}
+  application_id: ${vars.neptune_client_id}
   group_ids:
     - domain-engineering
     - domain-finance

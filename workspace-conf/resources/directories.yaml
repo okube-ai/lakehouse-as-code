@@ -1,0 +1,4 @@
+directory-laktory-queries:
+  path: /.laktory/queries/
+directory-laktory-queries-views:
+  path: /.laktory/queries/views/
