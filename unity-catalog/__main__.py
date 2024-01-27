@@ -64,7 +64,6 @@ class Service:
             self.group_ids = {}
             for d in yaml.safe_load(fp):
                 g = models.Group.model_validate(d)
-                g.options.aliases = [f"urn:pulumi:global::unity-catalog::laktory:databricks:Group$databricks:index/group:Group::{g.resource_name}"]
                 g.to_pulumi()
                 self.group_ids[g.display_name] = pulumi_outputs[f"group-{g.display_name}.id"]
 
@@ -80,16 +79,6 @@ class Service:
             if u.display_name is None:
                 u.display_name = u.user_name
             u.group_ids = [f"${{resources.group-{g}.id}}" for g in u.group_ids]
-            u.options.aliases = [
-                f"urn:pulumi:global::unity-catalog::laktory:databricks:User$databricks:index/user:User::{u.resource_name}"
-            ]
-            i = 0
-            for role in u.roles:
-                i += 1
-                r = u.resources[i]
-                r.options.aliases = [
-                    f"urn:pulumi:global::unity-catalog::laktory:databricks:User$databricks:index/userRole:UserRole::{r.resource_name}",  # does not seem to match
-                ]
             u.to_pulumi()
             self.user_resources += u._pulumi_resources.values()
 
@@ -109,16 +98,6 @@ class Service:
                 )
             }
             sp.group_ids = [f"${{resources.group-{g}.id}}" for g in sp.group_ids]
-            sp.options.aliases = [
-                f"urn:pulumi:global::unity-catalog::laktory:databricks:ServicePrincipal$databricks:index/servicePrincipal:ServicePrincipal::{sp.resource_name}"
-            ]
-            i = 0
-            for role in sp.roles:
-                i += 1
-                r = sp.resources[i]
-                r.options.aliases = [
-                    f"urn:pulumi:global::unity-catalog::laktory:databricks:ServicePrincipal$databricks:index/servicePrincipalRole:ServicePrincipalRole::{r.resource_name}",
-                ]
             sp.to_pulumi()
             self.user_resources += sp._pulumi_resources.values()
 
@@ -319,52 +298,6 @@ class Service:
                 ).apply(lambda x: f"abfss://{x[0]}@{x[1]}.dfs.core.windows.net/")
 
             catalog.variables = variables
-            catalog.options.aliases = [
-                f"urn:pulumi:global::unity-catalog::laktory:databricks:Catalog$databricks:index/catalog:Catalog::{catalog.resource_name}"
-            ]
-            i = 0
-            if catalog.grants:
-                i += 1
-                r = catalog.resources[i]
-                r.options.aliases = [
-                    f"urn:pulumi:global::unity-catalog::laktory:databricks:Catalog$databricks:index/grants:Grants::{r.resource_name}"
-                ]
-            for s in catalog.schemas:
-                i += 1
-                r = catalog.resources[i]
-                r.options.aliases = [
-                    f"urn:pulumi:global::unity-catalog::laktory:databricks:Catalog$databricks:index/catalog:Catalog$laktory:databricks:Schema$databricks:index/schema:Schema::{r.resource_name}"
-                ]
-                if s.grants:
-                    i += 1
-                    r = catalog.resources[i]
-                    r.options.aliases = [
-                        f"urn:pulumi:global::unity-catalog::laktory:databricks:Catalog$databricks:index/catalog:Catalog$laktory:databricks:Schema$databricks:index/grants:Grants::{r.resource_name}"
-                    ]
-
-                for v in s.volumes:
-                    i += 1
-                    r = catalog.resources[i]
-                    r.options.aliases = [
-                        f"urn:pulumi:global::unity-catalog::laktory:databricks:Catalog$databricks:index/catalog:Catalog$laktory:databricks:Schema$databricks:index/schema:Schema$laktory:databricks:Volume$databricks:index/volume:Volume::{r.resource_name}"
-                    ]
-                    if v.grants:
-                        i += 1
-                        r = catalog.resources[i]
-                        r.options.aliases = [
-                            f"urn:pulumi:global::unity-catalog::laktory:databricks:Catalog$databricks:index/catalog:Catalog$laktory:databricks:Schema$databricks:index/schema:Schema$laktory:databricks:Volume$databricks:index/grants:Grants::{r.resource_name}"
-                        ]
-
-                for t in s.tables:
-                    i += 1
-                    r = catalog.resources[i]
-                    print(r)
-                    # NOT USED
-                    if t.grants:
-                        i += 1
-                        r = catalog.resources[i]
-                        print(r)
-                        # NOT USED
 
             catalog.to_pulumi(
                 opts=pulumi.ResourceOptions(

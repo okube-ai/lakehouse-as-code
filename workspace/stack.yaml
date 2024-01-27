@@ -1,4 +1,5 @@
 name: workspace
+organization: okube
 description: Lakehouse - Workspace
 backend: pulumi
 config:
