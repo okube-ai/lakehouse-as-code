@@ -1,11 +1,13 @@
 name: workspace
+organization: okube
 description: Lakehouse - Workspace
 backend: pulumi
-config:
-  databricks:host: ${vars.DATABRICKS_HOST}
-  databricks:azure_client_id: ${vars.AZURE_CLIENT_ID}
-  databricks:azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
-  databricks:azure_tenant_id: ${vars.AZURE_TENANT_ID}
+pulumi:
+  config:
+    databricks:host: ${vars.DATABRICKS_HOST}
+    databricks:azure_client_id: ${vars.AZURE_CLIENT_ID}
+    databricks:azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
+    databricks:azure_tenant_id: ${vars.AZURE_TENANT_ID}
 resources:
   notebooks: ${include.resources/notebooks.yaml}
   workspacefiles: ${include.resources/workspacefiles.yaml}
