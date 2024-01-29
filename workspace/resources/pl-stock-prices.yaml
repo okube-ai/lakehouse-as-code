@@ -3,6 +3,8 @@ name: pl-stock-prices
 catalog: ${vars.env}
 target: finance
 development: ${vars.is_dev}
+configuration:
+  pipeline_name: pl-stock-prices
 
 ## TODO: Uncomment for DEMO
 #continuous: True
