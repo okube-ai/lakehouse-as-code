@@ -1,0 +1,12 @@
+name: metastore-lakehouse
+cloud: azure
+storage_root: abfss://metastore@o3stglakehousedev.dfs.core.windows.net/
+region: eastus
+force_destroy: True
+owner: role-metastore-admins
+workspace_assignments:
+  - workspace_id: 4623853922539974
+
+options:
+  depends_on:
+    - ${resources.group-role-metastore-admins}

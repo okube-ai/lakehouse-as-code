@@ -11,6 +11,8 @@ resources:
   groups: ${include.resources/groups.yaml}
   users: ${include.resources/users.yaml}
   serviceprincipals: ${include.resources/serviceprincipals.yaml}
+  metastores:
+    metastore-lakehouse: ${include.resources/metastore.yaml}
 variables:
   neptune_client_id: 1f8005d3-5efa-476b-9eb5-11755fea1128
 #  sqlqueries: ${include.resources/sqlqueries.yaml}
