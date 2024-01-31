@@ -1,0 +1,12 @@
+group-domain-finance:
+  display_name: domain-finance
+group-domain-engineering:
+  display_name: domain-engineering
+group-role-analysts:
+  display_name: role-analysts
+group-role-engineers:
+  display_name: role-engineers
+group-role-metastore-admins:
+  display_name: role-metastore-admins
+group-role-workspace-admins:
+  display_name: role-workspace-admins

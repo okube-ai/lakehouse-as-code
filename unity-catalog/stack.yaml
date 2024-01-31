@@ -1,0 +1,29 @@
+name: unity-catalog
+organization: okube
+description: Lakehouse - Unity Catalog
+backend: pulumi
+pulumi:
+  config:
+    databricks:account_id: ${vars.DATABRICKS_ACCOUNT_ID}
+    databricks:auth_type: azure-cli
+    databricks:host: https://accounts.azuredatabricks.net
+resources:
+  groups: ${include.resources/groups.yaml}
+  users: ${include.resources/users.yaml}
+  serviceprincipals: ${include.resources/serviceprincipals.yaml}
+variables:
+  neptune_client_id: 1f8005d3-5efa-476b-9eb5-11755fea1128
+#  sqlqueries: ${include.resources/sqlqueries.yaml}
+#  pipelines:
+#    pl-stock-prices: ${include.resources/pl-stock-prices.yaml}
+#  jobs:
+#    job-stock-prices: ${include.resources/job-stock-prices.yaml}
+#
+#environments:
+#  dev:
+#    variables:
+#      env: dev
+#      is_dev: true
+#      sql_tasks_data_source_id: 5bc6297d-dc51-41dc-bac8-10e1e6d862be
+#      directory-laktory-queries-views: folders/911347488458284
+#      sql_tasks_warehouse_id: a6bc05a0fc5e55ae

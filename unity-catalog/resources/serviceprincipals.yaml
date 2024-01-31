@@ -1,4 +1,5 @@
-- display_name: neptune
+service-principal-neptune:
+  display_name: neptune
   application_id: ${vars.neptune_client_id}
   group_ids:
     - domain-engineering
