@@ -1,25 +1,25 @@
 group-domain-finance:
   display_name: domain-finance
   workspace_permission_assignments:
-    - workspace_id: 4623853922539974
+    - workspace_id: ${vars.workspace_id_dev}
 group-domain-engineering:
   display_name: domain-engineering
   workspace_permission_assignments:
-    - workspace_id: 4623853922539974
+    - workspace_id: ${vars.workspace_id_dev}
 group-role-analysts:
   display_name: role-analysts
   workspace_permission_assignments:
-    - workspace_id: 4623853922539974
+    - workspace_id: ${vars.workspace_id_dev}
 group-role-engineers:
   display_name: role-engineers
   workspace_permission_assignments:
-    - workspace_id: 4623853922539974
+    - workspace_id: ${vars.workspace_id_dev}
 group-role-metastore-admins:
   display_name: role-metastore-admins
   workspace_permission_assignments:
-    - workspace_id: 4623853922539974
+    - workspace_id: ${vars.workspace_id_dev}
 group-role-workspace-admins:
   display_name: role-workspace-admins
   workspace_permission_assignments:
-    - workspace_id: 4623853922539974
+    - workspace_id: ${vars.workspace_id_dev}
       permissions: [USER, ADMIN]
