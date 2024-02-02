@@ -2,9 +2,9 @@ service-principal-neptune:
   display_name: neptune
   application_id: ${vars.neptune_client_id}
   group_ids:
-    - domain-engineering
-    - domain-finance
-    - role-workspace-admins
-    - role-metastore-admins
+    - ${resources.group-domain-engineering.id}
+    - ${resources.group-domain-finance.id}
+    - ${resources.group-role-workspace-admins.id}
+    - ${resources.group-role-metastore-admins.id}
   roles:
     - account_admin

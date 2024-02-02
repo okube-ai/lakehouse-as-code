@@ -4,6 +4,7 @@ storage_root: ${vars.metastore_storage_location}
 region: eastus
 force_destroy: True
 owner: role-metastore-admins
+workspace_provider: ${resources.provider-workspace-neptune}
 workspace_assignments:
   - workspace_id: ${vars.workspace_id_dev}
 grants:
@@ -22,7 +23,7 @@ data_accesses:
     is_default: True
 #  - name: lakehouse-prd
 #    azure_managed_identity:
-#      connector_id: /subscriptions/c8b10a15-5bb2-4c3f-988a-8ec6e60614bb/resourceGroups/o3-rg-lakehouse-dev/providers/Microsoft.Databricks/accessConnectors/o3-dbksac-lakehouse-prd
+#      connector_id: /subscriptions/c8b10a15-5bb2-4c3f-988a-8ec6e60614bb/resourceGroups/o3-rg-lakehouse-prd/providers/Microsoft.Databricks/accessConnectors/o3-dbksac-lakehouse-prd
 #    force_destroy: False
 #    is_default: False
 options:
