@@ -3,3 +3,5 @@ external-location-landing-dev:
     credential_name: ${metastore-data-access-lakehouse-dev.name}
     force_destroy: True
     url: ${vars.landing_storage_location_dev}
+    options:
+        provider: ${resources.provider-workspace-neptune}
