@@ -1,4 +1,4 @@
-user-olivier@okube-ai:
+user-olivier-okube-ai:
   user_name: olivier@okube.ai
   group_ids:
     - ${resources.group-role-workspace-admins.id}
@@ -6,26 +6,17 @@ user-olivier@okube-ai:
     - ${resources.group-domain-finance.id}
   roles:
     - account_admin
-  options:
-    aliases:
-      - urn:pulumi:global::unity-catalog::databricks:index/user:User::user-olivier@okube.ai
 
-user-data-analyst@okube-ai:
+user-data-analyst-okube-ai:
   user_name: data.analyst@okube.ai
   group_ids:
   - ${resources.group-role-analysts.id}
   - ${resources.group-domain-finance.id}
   - ${resources.group-domain-engineering.id}
-  options:
-    aliases:
-      - urn:pulumi:global::unity-catalog::databricks:index/user:User::user-data.analyst@okube.ai
 
-user-data-engineer@okube-ai:
+user-data-engineer-okube-ai:
   user_name: data.engineer@okube.ai
   group_ids:
   - ${resources.group-role-engineers.id}
   - ${resources.group-domain-engineering.id}
-  options:
-    aliases:
-      - urn:pulumi:global::unity-catalog::databricks:index/user:User::user-data.engineer@okube.ai
 
