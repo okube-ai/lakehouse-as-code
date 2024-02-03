@@ -16,8 +16,6 @@ resources:
       azure_client_id: ${vars.AZURE_CLIENT_ID}
       azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
       azure_tenant_id: ${vars.AZURE_TENANT_ID}
-#      options:
-#        version: 1.26.0
   groups: ${include.resources/groups.yaml}
   users: ${include.resources/users.yaml}
   serviceprincipals: ${include.resources/serviceprincipals.yaml}
@@ -25,6 +23,7 @@ resources:
     metastore-lakehouse: ${include.resources/metastore.yaml}
   externallocations: ${include.resources/externallocations.yaml}
   catalogs: ${include.resources/catalogs.yaml}
+  # TODO: init scripts is challenging because terraform and pulumi do not share the same properties.
 
 variables:
   neptune_client_id: 1f8005d3-5efa-476b-9eb5-11755fea1128
