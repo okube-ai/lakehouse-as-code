@@ -1,0 +1,22 @@
+user-olivier-okube-ai:
+  user_name: olivier@okube.ai
+  group_ids:
+    - ${resources.group-role-workspace-admins.id}
+    - ${resources.group-role-metastore-admins.id}
+    - ${resources.group-domain-finance.id}
+  roles:
+    - account_admin
+
+user-data-analyst-okube-ai:
+  user_name: data.analyst@okube.ai
+  group_ids:
+  - ${resources.group-role-analysts.id}
+  - ${resources.group-domain-finance.id}
+  - ${resources.group-domain-engineering.id}
+
+user-data-engineer-okube-ai:
+  user_name: data.engineer@okube.ai
+  group_ids:
+  - ${resources.group-role-engineers.id}
+  - ${resources.group-domain-engineering.id}
+

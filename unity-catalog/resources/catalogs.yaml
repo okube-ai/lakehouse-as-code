@@ -1,8 +1,8 @@
 # --------------------------------------------------------------------------- #
 # dev                                                                         #
 # --------------------------------------------------------------------------- #
-
-- name: dev
+catalog-dev:
+  name: dev
   isolation_mode: OPEN
   grants:
     - principal: account users
@@ -34,7 +34,7 @@
       volumes:
         - name: landing
           volume_type: EXTERNAL
-          storage_location: ${vars.landing_storage_location}
+          storage_location: ${vars.landing_storage_location_dev}
           grants:
             - principal: account users # TODO: Review roles
               privileges:
@@ -42,12 +42,15 @@
             - principal: role-metastore-admins
               privileges:
                 - WRITE_VOLUME
+  options:
+    provider: ${resources.provider-workspace-neptune}
 
 # --------------------------------------------------------------------------- #
 # prod                                                                        #
 # --------------------------------------------------------------------------- #
 
-- name: prod
+catalog-prod:
+  name: prod
 #  storage_root: ${vars.prod_storage_root}  # TODO: Enable when ready
   isolation_mode: OPEN
   grants:
@@ -88,12 +91,15 @@
             - principal: role-metastore-admins
               privileges:
                 - WRITE_VOLUME
+  options:
+    provider: ${resources.provider-workspace-neptune}
 
 # --------------------------------------------------------------------------- #
 # sandbox                                                                     #
 # --------------------------------------------------------------------------- #
 
-- name: sandbox
+catalog-sandbox:
+  name: sandbox
   isolation_mode: OPEN
   grants:
     - principal: account users
@@ -111,12 +117,15 @@
         - CREATE_VOLUME
   schemas:
     - name: default
+  options:
+    provider: ${resources.provider-workspace-neptune}
 
 # --------------------------------------------------------------------------- #
 # libraries                                                                   #
 # --------------------------------------------------------------------------- #
 
-- name: libraries
+catalog-libraries:
+  name: libraries
   isolation_mode: OPEN
   grants:
     - principal: account users
@@ -131,3 +140,5 @@
     - name: default
       volumes:
         - name: init_scripts
+  options:
+    provider: ${resources.provider-workspace-neptune}

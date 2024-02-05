@@ -1,0 +1,33 @@
+name: unity-catalog
+organization: okube
+description: Lakehouse - Unity Catalog
+backend: pulumi
+
+pulumi:
+  config:
+    databricks:account_id: ${vars.DATABRICKS_ACCOUNT_ID}
+    databricks:auth_type: azure-cli
+    databricks:host: https://accounts.azuredatabricks.net
+
+resources:
+  providers:
+    provider-workspace-neptune:
+      host: ${vars.DATABRICKS_HOST}
+      azure_client_id: ${vars.AZURE_CLIENT_ID}
+      azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
+      azure_tenant_id: ${vars.AZURE_TENANT_ID}
+  groups: ${include.resources/groups.yaml}
+  users: ${include.resources/users.yaml}
+  serviceprincipals: ${include.resources/serviceprincipals.yaml}
+  metastores:
+    metastore-lakehouse: ${include.resources/metastore.yaml}
+  externallocations: ${include.resources/externallocations.yaml}
+  catalogs: ${include.resources/catalogs.yaml}
+  # TODO: init scripts is challenging because terraform and pulumi do not share the same properties.
+
+variables:
+  neptune_client_id: 1f8005d3-5efa-476b-9eb5-11755fea1128
+  workspace_id_dev: 4623853922539974
+  metastore_storage_location: abfss://metastore@o3stglakehousedev.dfs.core.windows.net/
+  landing_storage_location_dev: abfss://landing@o3stglakehousedev.dfs.core.windows.net/
+  landing_storage_location_prod: abfss://landing@o3stglakehouseprod.dfs.core.windows.net/
