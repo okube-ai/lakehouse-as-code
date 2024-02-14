@@ -1,6 +1,5 @@
-# Databricks notebook source
-# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@docs_update
-# MAGIC %pip install 'laktory==0.1.1'
+# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@hotfixes
+# MAGIC %pip install 'laktory==0.1.5'
 
 # COMMAND ----------
 import pyspark.sql.functions as F
@@ -35,9 +34,10 @@ for udf in pl.udfs:
 
 
 def define_table(table):
-    @dlt.table(
+    @dlt.table_or_view(
         name=table.name,
         comment=table.comment,
+        as_view=table.builder.as_dlt_view,
     )
     @dlt.expect_all(table.warning_expectations)
     @dlt.expect_all_or_drop(table.drop_expectations)
