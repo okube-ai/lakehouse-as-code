@@ -143,6 +143,7 @@ tables:
       table_source:
         name: brz_stock_metadata
         read_as_stream: False
+      as_dlt_view: True
     columns:
       - name: symbol
         type: string
