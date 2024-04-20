@@ -12,7 +12,7 @@ pulumi:
 resources:
   providers:
     provider-workspace-neptune:
-      host: ${vars.DATABRICKS_HOST}
+      host: ${vars.DATABRICKS_HOST}  # this is the account URL
       azure_client_id: ${vars.AZURE_CLIENT_ID}
       azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
       azure_tenant_id: ${vars.AZURE_TENANT_ID}
@@ -26,8 +26,10 @@ resources:
   # TODO: init scripts is challenging because terraform and pulumi do not share the same properties.
 
 variables:
-  neptune_client_id: 1f8005d3-5efa-476b-9eb5-11755fea1128
+  neptune_dev_client_id: 1f8005d3-5efa-476b-9eb5-11755fea1128
+  neptune_prd_client_id: 78f6cf4f-0c24-4977-92fc-562a60358466
   workspace_id_dev: 4623853922539974
   metastore_storage_location: abfss://metastore@o3stglakehousedev.dfs.core.windows.net/
+  metastore_prd_storage_location: abfss://metastore@o3stglakehouseprd.dfs.core.windows.net/
   landing_storage_location_dev: abfss://landing@o3stglakehousedev.dfs.core.windows.net/
-  landing_storage_location_prod: abfss://landing@o3stglakehouseprod.dfs.core.windows.net/
+  landing_storage_location_prd: abfss://landing@o3stglakehouseprd.dfs.core.windows.net/

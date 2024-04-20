@@ -51,7 +51,7 @@ catalog-dev:
 
 catalog-prod:
   name: prod
-#  storage_root: ${vars.prod_storage_root}  # TODO: Enable when ready
+  storage_root: ${vars.metastore_prd_storage_location}
   isolation_mode: OPEN
   grants:
     - principal: account users
@@ -82,8 +82,8 @@ catalog-prod:
     - name: sources
       volumes:
         - name: landing
-#          volume_type: EXTERNAL
-#          storage_location: ${vars.landing_storage_location}  # TODO: Enable when ready
+          volume_type: EXTERNAL
+          storage_location: ${vars.landing_storage_location_prd}
           grants:
             - principal: account users # TODO: Review roles
               privileges:
