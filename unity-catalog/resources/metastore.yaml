@@ -7,6 +7,7 @@ owner: role-metastore-admins
 workspace_provider: ${resources.provider-workspace-neptune}
 workspace_assignments:
   - workspace_id: ${vars.workspace_id_dev}
+  - workspace_id: ${vars.workspace_id_prd}
 grants:
   - principal: role-metastore-admins
     privileges:
