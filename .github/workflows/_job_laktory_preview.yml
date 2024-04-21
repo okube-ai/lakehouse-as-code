@@ -41,5 +41,5 @@ jobs:
 
       - name: laktory preview
         run: |
-          laktory preview -e $${{ inputs.env }}
+          laktory preview -e ${{ inputs.env }}
         working-directory: ${{ inputs.working-directory }}
