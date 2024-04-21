@@ -9,6 +9,9 @@ catalog-dev:
       privileges:
         - USE_CATALOG
         - USE_SCHEMA
+    - principal: role-metastore-admins
+      privileges:
+        - ALL_PRIVILEGES
   schemas:
     - name: finance
       grants:
@@ -49,8 +52,8 @@ catalog-dev:
 # prod                                                                        #
 # --------------------------------------------------------------------------- #
 
-catalog-prod:
-  name: prod
+catalog-prd:
+  name: prd
   storage_root: ${vars.metastore_prd_storage_location}
   isolation_mode: OPEN
   grants:
@@ -58,6 +61,9 @@ catalog-prod:
       privileges:
         - USE_CATALOG
         - USE_SCHEMA
+    - principal: role-metastore-admins
+      privileges:
+        - ALL_PRIVILEGES
   schemas:
     - name: finance
       grants:
