@@ -33,8 +33,10 @@ jobs:
 
       - name: laktory deploy
         run: |
-          laktory deploy -e dev --terraform_options "--yes"
+          laktory deploy -e dev --terraform-options "--yes"
         working-directory: ./workspace
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 #        env:
 #          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
 #          DATABRICKS_BUNDLE_ENV: dev
