@@ -38,7 +38,7 @@ jobs:
       - name: laktory deploy
         run: |
           set -e
-          laktory deploy -e dev --terraform-options "--yes"
+          laktory deploy -e dev --pulumi-options "--yes"
         working-directory: ./workspace
         continue-on-error: false
         env:
