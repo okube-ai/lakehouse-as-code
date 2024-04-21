@@ -35,7 +35,6 @@ jobs:
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-          DATABRICKS_BUNDLE_ENV: dev
 
   run-dev:
     runs-on: ubuntu-latest
@@ -63,4 +62,42 @@ jobs:
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-          DATABRICKS_BUNDLE_ENV: dev
+
+  approve-prd:
+    runs-on: ubuntu-latest
+    needs:
+      - run-dev
+    steps:
+
+      - uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: osoucy
+          minimum-approvals: 1
+
+  deploy-prd:
+    runs-on: ubuntu-latest
+    needs:
+      - approve-prd
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Setup python environment
+        run: |
+          pip install -r requirements.txt
+        working-directory: ./workspace
+
+      - name: laktory deploy
+        run: |
+          set -e
+          laktory deploy -e prd --pulumi-options "--yes"
+        working-directory: ./workspace
+        continue-on-error: false
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
