@@ -11,7 +11,7 @@ on:
 
 jobs:
   preview-dev:
-    users: ./.githb/workflows/_job_laktory_preview.yml
+    uses: ./.githb/workflows/_job_laktory_preview.yml
     with:
       env: dev
       working-directory: ./workspace
