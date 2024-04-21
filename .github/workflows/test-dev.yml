@@ -33,7 +33,7 @@ jobs:
 
       - name: laktory deploy
         run: |
-          laktory deploy -e dev -terraform_options "--yes"
+          laktory deploy -e dev --terraform_options "--yes"
         working-directory: ./workspace
 #        env:
 #          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
