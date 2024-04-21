@@ -4,8 +4,10 @@ on:
   workflow_call:
     inputs:
       env:
+        type: boolean
         required: true
       working-directory:
+        type: string
         required: false
         default: ./workspace
 
