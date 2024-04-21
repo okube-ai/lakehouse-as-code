@@ -26,8 +26,14 @@ jobs:
           pip install -r requirements.txt
         working-directory: ./workspace
 
-      - run: |
-          laktory deploy -e dev
+      - name: laktory preview
+        run: |
+          laktory preview -e dev
+        working-directory: ./workspace
+
+      - name: laktory deploy
+        run: |
+          laktory deploy -e dev -terraform_options "--yes"
         working-directory: ./workspace
 #        env:
 #          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
