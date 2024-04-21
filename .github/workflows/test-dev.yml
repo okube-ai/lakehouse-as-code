@@ -25,6 +25,12 @@ jobs:
         run: |
           pip install -r workspace/requirements.txt
 
+      - run: |
+          laktory deploy -e dev
+#        env:
+#          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+#          DATABRICKS_BUNDLE_ENV: dev
+
 #      - name: Run tests
 #        if: ${{ env.run_tests == 'true' && success()}}
 #        run: make dev test
