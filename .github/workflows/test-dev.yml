@@ -23,7 +23,7 @@ jobs:
 
       - name: Setup python environment
         run: |
-          pip install workspace/requirements.txt
+          pip install -r workspace/requirements.txt
 
 #      - name: Run tests
 #        if: ${{ env.run_tests == 'true' && success()}}
