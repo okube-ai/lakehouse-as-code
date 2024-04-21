@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       env:
-        type: boolean
+        type: string
         required: true
       working-directory:
         type: string
