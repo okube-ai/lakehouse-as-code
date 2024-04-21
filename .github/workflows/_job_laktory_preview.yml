@@ -3,6 +3,8 @@ name: laktory preview
 on:
   workflow_call:
     inputs:
+      env:
+        required: true
       working-directory:
         required: false
         default: ./workspace
@@ -37,5 +39,5 @@ jobs:
 
       - name: laktory preview
         run: |
-          laktory preview -e dev
+          laktory preview -e $${{ inputs.env }}
         working-directory: $${{ inputs.working-directory }}

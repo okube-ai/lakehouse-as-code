@@ -1,4 +1,4 @@
-name: preview
+name: preview-dev
 
 on:
   pull_request:
@@ -13,6 +13,7 @@ jobs:
   preview-dev:
     users: ./.githb/workflows/_job_laktory_preview.yml
     with:
+      env: dev
       working-directory: ./workspace
     secrets: inherit
 
