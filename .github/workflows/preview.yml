@@ -10,30 +10,11 @@ on:
       - main
 
 jobs:
-  preview:
-    runs-on: ubuntu-latest
-
-    steps:
-
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.9
-
-      - name: Setup python environment
-        run: |
-          pip install -r requirements.txt
-        working-directory: ./workspace
-
-      - name: laktory preview
-        run: |
-          set -e
-          laktory preview -e dev
-        working-directory: ./workspace
-        continue-on-error: false
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+  preview-dev:
+    users: ./.githb/workflows/_job_laktory_preview.yml
+    with:
+      working-directory: ./workspace
+    secrets: inherit
 
 #      - name: laktory deploy
 #        run: |
