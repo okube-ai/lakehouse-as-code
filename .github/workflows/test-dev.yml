@@ -24,9 +24,11 @@ jobs:
       - name: Setup python environment
         run: |
           pip install -r workspace/requirements.txt
+        working-directory: ./workspace
 
       - run: |
           laktory deploy -e dev
+        working-directory: ./workspace
 #        env:
 #          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
 #          DATABRICKS_BUNDLE_ENV: dev
