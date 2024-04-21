@@ -23,7 +23,7 @@ jobs:
 
       - name: Setup python environment
         run: |
-          pip install -r workspace/requirements.txt
+          pip install -r requirements.txt
         working-directory: ./workspace
 
       - run: |
