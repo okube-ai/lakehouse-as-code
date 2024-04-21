@@ -37,9 +37,9 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install -U git+https://github.com/okube-ai/laktory.git@cli_run
-        working-directory: $${{ inputs.working-directory }}
+        working-directory: ${{ inputs.working-directory }}
 
       - name: laktory preview
         run: |
           laktory preview -e $${{ inputs.env }}
-        working-directory: $${{ inputs.working-directory }}
+        working-directory: ${{ inputs.working-directory }}
