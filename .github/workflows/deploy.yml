@@ -1,0 +1,61 @@
+name: deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-dev:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Setup python environment
+        run: |
+          pip install -r requirements.txt
+        working-directory: ./workspace
+
+      - name: laktory deploy
+        run: |
+          set -e
+          laktory deploy -e dev --pulumi-options "--yes"
+        working-directory: ./workspace
+        continue-on-error: false
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_BUNDLE_ENV: dev
+
+  run-dev:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Setup python environment
+        run: |
+          pip install -r requirements.txt
+        working-directory: ./workspace
+
+      - name: laktory run
+        run: |
+          set -e
+          laktory run -p pl-stock-prices -a WAIT -e dev
+        working-directory: ./workspace
+        continue-on-error: false
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_BUNDLE_ENV: dev
