@@ -28,6 +28,7 @@ jobs:
 
       - name: laktory preview
         run: |
+          set -e
           laktory preview -e dev
         working-directory: ./workspace
         continue-on-error: false
@@ -36,6 +37,7 @@ jobs:
 
       - name: laktory deploy
         run: |
+          set -e
           laktory deploy -e dev --terraform-options "--yes"
         working-directory: ./workspace
         continue-on-error: false
