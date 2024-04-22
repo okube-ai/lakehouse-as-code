@@ -13,10 +13,10 @@ on:
       description: 'Log level'
       default: 'info'
 
-  jobs:
-    laktory-deploy-dev:
-      uses: ./.github/workflows/_job_laktory_deploy.yml
-      with:
-        env: dev
-        working-directory: ./workspace
-      secrets: inherit
+jobs:
+  laktory-deploy-dev:
+    uses: ./.github/workflows/_job_laktory_deploy.yml
+    with:
+      env: dev
+      working-directory: ./workspace
+    secrets: inherit

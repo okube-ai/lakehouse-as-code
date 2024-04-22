@@ -16,7 +16,7 @@ env:
 
 
 jobs:
-  laktory-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
 
