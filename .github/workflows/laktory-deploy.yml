@@ -20,6 +20,8 @@ jobs:
       env: dev
       working-directory: ./workspace
       databricks_host: adb-4623853922539974.14.azuredatabricks.net
+    secrets:
+      pulumi_access_token: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
       azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
-    secrets: inherit
+      azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}

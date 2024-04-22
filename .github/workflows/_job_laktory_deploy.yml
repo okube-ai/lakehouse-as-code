@@ -10,22 +10,21 @@ on:
         type: string
         required: false
         default: ./workspace
-      azure_client_id:
-        type: string
-        required: false
-      azure_client_secret:
-        type: string
-        required: false
       databricks_host:
         type: string
         required: true
+    secrets:
+      pulumi_access_token
+      azure_client_id
+      azure_client_secret
+      azure_tenant_id
 
 
 env:
-  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-  AZURE_CLIENT_ID: ${{ inputs.azure_client_id }}
-  AZURE_CLIENT_SECRET: ${{ inputs.azure_client_secret }}
-  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  PULUMI_ACCESS_TOKEN: ${{ secrets.pulumi_access_token }}
+  AZURE_CLIENT_ID: ${{ secrets.azure_client_id }}
+  AZURE_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
+  AZURE_TENANT_ID: ${{ secrets.azure_tenant_id }}
   DATABRICKS_HOST: ${{ inputs.working-databricks_host }}
 
 
