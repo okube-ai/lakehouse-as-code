@@ -29,7 +29,7 @@ env:
   AZURE_CLIENT_ID: ${{ secrets.azure_client_id }}
   AZURE_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
   AZURE_TENANT_ID: ${{ secrets.azure_tenant_id }}
-  DATABRICKS_HOST: ${{ inputs.working-databricks_host }}
+  DATABRICKS_HOST: ${{ inputs.databricks_host }}
 
 
 jobs:
