@@ -1,4 +1,4 @@
-name: preview-dev
+name: laktory-preview-dev
 
 on:
   pull_request:
@@ -10,7 +10,7 @@ on:
       - main
 
 jobs:
-  job1lak:
+  laktory-preview-dev:
     uses: ./.github/workflows/_job_laktory_preview.yml
     with:
       env: dev
