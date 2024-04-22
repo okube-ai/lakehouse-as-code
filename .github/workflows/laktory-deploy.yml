@@ -13,6 +13,9 @@ on:
       description: 'Log level'
       default: 'info'
 
+env:
+  MY_CUSTOM_ENV: roger
+
 jobs:
   laktory-deploy-dev:
     uses: ./.github/workflows/_job_laktory_deploy.yml
@@ -25,8 +28,6 @@ jobs:
       azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
       azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
       azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
-    env:
-      MY_CUSTOM_ENV: roger
 
   laktory-run-dev:
     needs: laktory-deploy-dev
