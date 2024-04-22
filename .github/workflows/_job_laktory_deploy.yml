@@ -1,0 +1,45 @@
+name: laktory deploy
+
+on:
+  workflow_call:
+    inputs:
+      env:
+        type: string
+        required: true
+      working-directory:
+        type: string
+        required: false
+        default: ./workspace
+
+env:
+  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: env vars
+        run: |
+          import os
+          for k, v in os.environ.items():
+            print(k, "|", v)
+        shell: python
+
+      - name: Setup python environment
+        run: |
+          pip install -r requirements.txt
+          pip install -U git+https://github.com/okube-ai/laktory.git@cli_run
+        working-directory: ${{ inputs.working-directory }}
+
+      - name: laktory deploy
+        run: |
+          laktory deploy -e ${{ inputs.env }} --yes
+        working-directory: ${{ inputs.working-directory }}

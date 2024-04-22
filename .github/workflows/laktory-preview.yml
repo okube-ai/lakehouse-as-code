@@ -1,4 +1,4 @@
-name: laktory-preview-dev
+name: laktory-preview
 
 on:
   pull_request:
