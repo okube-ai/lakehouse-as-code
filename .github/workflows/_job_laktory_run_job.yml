@@ -22,7 +22,7 @@ on:
         required: false
         default: 1200
       raise_exception:
-        type: bool
+        type: boolean
         description: Raise exception on failure
         required: false
         default: True
