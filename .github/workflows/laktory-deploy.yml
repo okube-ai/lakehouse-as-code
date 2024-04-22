@@ -16,8 +16,6 @@ on:
 jobs:
   laktory-deploy-dev:
     uses: ./.github/workflows/_job_laktory_deploy.yml
-    env:
-      MY_CUSTOM_ENV: this_is_the_way
     with:
       env: dev
       working-directory: ./workspace
