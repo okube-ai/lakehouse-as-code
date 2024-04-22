@@ -14,10 +14,14 @@ on:
         type: string
         required: true
     secrets:
-      pulumi_access_token
-      azure_client_id
-      azure_client_secret
-      azure_tenant_id
+      pulumi_access_token:
+        description: d
+      azure_client_id:
+        description: d
+      azure_client_secret:
+        description: d
+      azure_tenant_id:
+        description: d
 
 
 env:
