@@ -87,5 +87,9 @@ jobs:
 
       - name: laktory run
         run: |
-          laktory run -e ${{ inputs.env }} -p ${{ inputs.pipeline_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }} -r ${{ inputs.raise_exception }} -fr ${{ inputs.full_refresh }}
+          FR_OPTION=""
+          if [ "${{ inputs.full_refresh }}" = 'true' ]; then
+            FR_OPTION="--fr"
+          fi          
+          laktory run -e ${{ inputs.env }} -p ${{ inputs.pipeline_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }} -r ${{ inputs.raise_exception }} $FR_OPTION
         working-directory: ${{ inputs.working-directory }}
