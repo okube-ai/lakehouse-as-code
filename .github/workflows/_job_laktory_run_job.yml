@@ -1,4 +1,4 @@
-name: laktory deploy
+name: laktory run job
 
 on:
   workflow_call:
@@ -13,9 +13,10 @@ on:
       databricks_host:
         type: string
         required: true
+      job_name:
+        type: string
+        required: true
     secrets:
-      pulumi_access_token:
-        description: d
       azure_client_id:
         description: d
       azure_client_secret:
@@ -23,17 +24,14 @@ on:
       azure_tenant_id:
         description: d
 
-
 env:
-  PULUMI_ACCESS_TOKEN: ${{ secrets.pulumi_access_token }}
   AZURE_CLIENT_ID: ${{ secrets.azure_client_id }}
   AZURE_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
   AZURE_TENANT_ID: ${{ secrets.azure_tenant_id }}
   DATABRICKS_HOST: ${{ inputs.databricks_host }}
 
-
 jobs:
-  laktory-deploy:
+  laktory-run-job:
     runs-on: ubuntu-latest
     steps:
 
@@ -56,7 +54,7 @@ jobs:
           pip install -U git+https://github.com/okube-ai/laktory.git@cli_run
         working-directory: ${{ inputs.working-directory }}
 
-      - name: laktory deploy
+      - name: laktory run
         run: |
-          laktory deploy -e ${{ inputs.env }} --yes
+          laktory run -e ${{ inputs.env }} -j ${{ inputs.job_name }} -a WAIT
         working-directory: ${{ inputs.working-directory }}
