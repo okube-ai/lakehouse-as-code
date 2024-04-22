@@ -35,7 +35,6 @@ jobs:
       databricks_host: 'adb-4623853922539974.14.azuredatabricks.net'
       pipeline_name: pl-stock-prices
     secrets:
-      pulumi_access_token: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
       azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
       azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
@@ -55,6 +54,7 @@ jobs:
     secrets: inherit
 
   laktory-deploy-prd:
+    needs: prd-deploy-approval
     uses: ./.github/workflows/_job_laktory_deploy.yml
     with:
       env: prd
