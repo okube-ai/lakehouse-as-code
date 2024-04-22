@@ -31,7 +31,7 @@ env:
   DATABRICKS_HOST: ${{ inputs.databricks_host }}
 
 jobs:
-  laktory-run-job:
+  laktory-run-pipeline:
     runs-on: ubuntu-latest
     steps:
 
