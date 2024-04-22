@@ -13,9 +13,6 @@ on:
       databricks_host:
         type: string
         required: true
-      job_name:
-        type: string
-        required: true
     secrets:
       azure_client_id:
         required: False
