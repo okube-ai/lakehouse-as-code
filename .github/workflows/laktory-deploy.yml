@@ -13,9 +13,6 @@ on:
       description: 'Log level'
       default: 'info'
 
-env:
-  MY_CUSTOM_ENV: roger
-
 jobs:
   laktory-deploy-dev:
     uses: ./.github/workflows/_job_laktory_deploy.yml
@@ -25,48 +22,41 @@ jobs:
       env: dev
       working-directory: ./workspace
       databricks_host: 'adb-4623853922539974.14.azuredatabricks.net'
+    secrets: inherit
+
+  laktory-run-dev:
+    needs: laktory-deploy-dev
+    uses: ./.github/workflows/_job_laktory_run_pipeline.yml
+    with:
+      env: dev
+      working-directory: ./workspace
+      databricks_host: 'adb-4623853922539974.14.azuredatabricks.net'
+      pipeline_name: pl-stock-prices
+    secrets: inherit
+
+  laktory-preview-prd:
+    needs: laktory-run-dev
+    uses: ./.github/workflows/_job_laktory_preview.yml
+    with:
+      env: prd
+      working-directory: ./workspace
+    secrets: inherit
+
+  prd-deploy-approval:
+    needs: laktory-preview-prd
+    uses: ./.github/workflows/_job_release_approval.yml
+#    if: ${{ !failure() && github.event.inputs.final_release == 'true' }}
+    secrets: inherit
+
+  laktory-deploy-prd:
+    needs: prd-deploy-approval
+    uses: ./.github/workflows/_job_laktory_deploy.yml
+    with:
+      env: prd
+      working-directory: ./workspace
+      databricks_host: 'adb-1985337240298151.11.azuredatabricks.net'
     secrets:
       pulumi_access_token: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-      azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
-      azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+      azure_client_id: ${{ secrets.AZURE_CLIENT_ID_PRD }}
+      azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET_PRD }}
       azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
-#
-#  laktory-run-dev:
-#    needs: laktory-deploy-dev
-#    uses: ./.github/workflows/_job_laktory_run_pipeline.yml
-#    with:
-#      env: dev
-#      working-directory: ./workspace
-#      databricks_host: 'adb-4623853922539974.14.azuredatabricks.net'
-#      pipeline_name: pl-stock-prices
-#    secrets:
-#      azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
-#      azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
-#      azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
-#
-#  laktory-preview-prd:
-#    needs: laktory-run-dev
-#    uses: ./.github/workflows/_job_laktory_preview.yml
-#    with:
-#      env: prd
-#      working-directory: ./workspace
-#    secrets: inherit
-#
-#  prd-deploy-approval:
-#    needs: laktory-preview-prd
-#    uses: ./.github/workflows/_job_release_approval.yml
-##    if: ${{ !failure() && github.event.inputs.final_release == 'true' }}
-#    secrets: inherit
-#
-#  laktory-deploy-prd:
-#    needs: prd-deploy-approval
-#    uses: ./.github/workflows/_job_laktory_deploy.yml
-#    with:
-#      env: prd
-#      working-directory: ./workspace
-#      databricks_host: 'adb-1985337240298151.11.azuredatabricks.net'
-#    secrets:
-#      pulumi_access_token: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-#      azure_client_id: ${{ secrets.AZURE_CLIENT_ID_PRD }}
-#      azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET_PRD }}
-#      azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
