@@ -16,7 +16,7 @@ env:
 
 
 jobs:
-  preview:
+  laktory-preview:
     runs-on: ubuntu-latest
     steps:
 
