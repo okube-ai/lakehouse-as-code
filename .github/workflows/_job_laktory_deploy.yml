@@ -47,7 +47,7 @@ jobs:
         run: |
           import os
           for k, v in os.environ.items():
-            print(k, "|", v)
+            print(k, "|", " ".join(v))
         shell: python
 
       - name: Setup python environment
