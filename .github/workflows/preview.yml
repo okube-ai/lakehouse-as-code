@@ -10,7 +10,7 @@ on:
       - main
 
 jobs:
-  preview-dev:
+  job1lak:
     uses: ./.github/workflows/_job_laktory_preview.yml
     with:
       env: dev
