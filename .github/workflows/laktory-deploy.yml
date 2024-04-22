@@ -19,4 +19,7 @@ jobs:
     with:
       env: dev
       working-directory: ./workspace
+      databricks_host: adb-4623853922539974.14.azuredatabricks.net
+      azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
+      azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
     secrets: inherit
