@@ -17,7 +17,7 @@ on:
         type: string
         required: true
       timeout:
-        type: int
+        type: string
         description: Maximum allowed time (in seconds) for run.
         required: false
         default: 1200
@@ -25,7 +25,7 @@ on:
         type: boolean
         description: Raise exception on failure
         required: false
-        default: True
+        default: true
       current_run_action:
         type: string
         description: Action to take for currently running job or pipline
@@ -81,5 +81,9 @@ jobs:
 
       - name: laktory run
         run: |
-          laktory run -e ${{ inputs.env }} -j ${{ inputs.job_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }} -r ${{ inputs.raise_exception }}
+          EXCEPTION_OPTION=""
+          if [ "${{ inputs.raise_exception }}" = 'true' ]; then
+            EXCEPTION_OPTION="-r"
+          fi   
+          laktory run -e ${{ inputs.env }} -j ${{ inputs.job_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }} $EXCEPTION_OPTION
         working-directory: ${{ inputs.working-directory }}

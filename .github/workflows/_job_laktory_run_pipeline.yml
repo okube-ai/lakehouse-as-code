@@ -87,9 +87,14 @@ jobs:
 
       - name: laktory run
         run: |
-          FR_OPTION=""
+          EXCEPTION_OPTION=""
+          if [ "${{ inputs.raise_exception }}" = 'true' ]; then
+            EXCEPTION_OPTION="-r"
+          fi                    
+          REFRESH_OPTION=""
           if [ "${{ inputs.full_refresh }}" = 'true' ]; then
-            FR_OPTION="--fr"
+            REFRESH_OPTION="--fr"
           fi          
-          laktory run -e ${{ inputs.env }} -p ${{ inputs.pipeline_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }} -r ${{ inputs.raise_exception }} $FR_OPTION
+          
+          laktory run -e ${{ inputs.env }} -p ${{ inputs.pipeline_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }} $EXCEPTION_OPTION $REFRESH_OPTION
         working-directory: ${{ inputs.working-directory }}
