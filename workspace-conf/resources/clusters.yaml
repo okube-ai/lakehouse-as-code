@@ -1,6 +1,6 @@
 cluster-default:
   name: default
-  spark_version: 14.0.x-scala2.12
+  spark_version: 15.0.x-scala2.12
   data_security_mode: USER_ISOLATION
   node_type_id: Standard_DS3_v2
   autoscale:
@@ -10,7 +10,7 @@ cluster-default:
   autotermination_minutes: 30
   libraries:
     - pypi:
-        package: 'laktory==0.1.5'
+        package: 'laktory==0.1.10'
     - pypi:
         package: yfinance
   access_controls:

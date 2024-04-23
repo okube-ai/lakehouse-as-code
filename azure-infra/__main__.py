@@ -99,7 +99,7 @@ class Service:
 
         # Secrets
         for key, value in [
-            # ("azure-devops-token", self.pulumi_config.get_secret("azure_devops_token"))
+            ("neptune-client-secret",  self.app_secret.value)
         ]:
             self._set_secret(key, value)
 

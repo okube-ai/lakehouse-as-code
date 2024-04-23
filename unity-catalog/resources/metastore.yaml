@@ -7,6 +7,7 @@ owner: role-metastore-admins
 workspace_provider: ${resources.provider-workspace-neptune}
 workspace_assignments:
   - workspace_id: ${vars.workspace_id_dev}
+  - workspace_id: ${vars.workspace_id_prd}
 grants:
   - principal: role-metastore-admins
     privileges:
@@ -25,11 +26,15 @@ data_accesses:
       - principal: role-metastore-admins
         privileges:
           - CREATE_EXTERNAL_LOCATION
-#  - name: lakehouse-prd
-#    azure_managed_identity:
-#      connector_id: /subscriptions/c8b10a15-5bb2-4c3f-988a-8ec6e60614bb/resourceGroups/o3-rg-lakehouse-prd/providers/Microsoft.Databricks/accessConnectors/o3-dbksac-lakehouse-prd
-#    force_destroy: False
-#    is_default: False
+  - name: lakehouse-prd
+    azure_managed_identity:
+      access_connector_id: /subscriptions/c8b10a15-5bb2-4c3f-988a-8ec6e60614bb/resourceGroups/o3-rg-lakehouse-prd/providers/Microsoft.Databricks/accessConnectors/o3-dbksac-lakehouse-prd
+    force_destroy: False
+    is_default: False
+    grants:
+      - principal: role-metastore-admins
+        privileges:
+          - CREATE_EXTERNAL_LOCATION
 options:
   depends_on:
     - ${resources.group-role-metastore-admins}

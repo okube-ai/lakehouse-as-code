@@ -22,3 +22,6 @@ environments:
   dev:
     variables:
       env: dev
+  prd:
+    variables:
+      env: prd

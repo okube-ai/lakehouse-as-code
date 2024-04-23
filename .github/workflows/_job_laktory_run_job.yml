@@ -1,0 +1,88 @@
+name: laktory run job
+
+on:
+  workflow_call:
+    inputs:
+      env:
+        type: string
+        required: true
+      working-directory:
+        type: string
+        required: false
+        default: ./workspace
+      databricks_host:
+        type: string
+        required: true
+      job_name:
+        type: string
+        required: true
+      timeout:
+        type: string
+        description: Maximum allowed time (in seconds) for run.
+        required: false
+        default: 1200
+      raise_exception:
+        type: boolean
+        description: Raise exception on failure
+        required: false
+        default: true
+      current_run_action:
+        type: string
+        description: Action to take for currently running job or pipline
+        required: false
+        default: WAIT
+    secrets:
+      azure_client_id:
+        required: False
+      azure_client_secret:
+        required: False
+      azure_tenant_id:
+        required: False
+      databricks_account_id:
+        required: False
+      databricks_host:
+        required: False
+      databricks_token:
+        required: False
+
+# TODO: Figure out a way not to have to explicitly define each possible
+# environment variable
+env:
+  AZURE_CLIENT_ID: ${{ secrets.azure_client_id }}
+  AZURE_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
+  AZURE_TENANT_ID: ${{ secrets.azure_tenant_id }}
+  DATABRICKS_ACCOUNT_ID: ${{ secrets.databricks_account_id }}
+  DATABRICKS_HOST: ${{ inputs.databricks_host }}
+  DATABRICKS_TOKEN: ${{ secrets.databricks_token }}
+
+jobs:
+  laktory-run-job:
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: env vars
+        run: |
+          import os
+          for k, v in os.environ.items():
+            print(k, "|", v)
+        shell: python
+
+      - name: Setup python environment
+        run: |
+          pip install -r requirements.txt
+        working-directory: ${{ inputs.working-directory }}
+
+      - name: laktory run
+        run: |
+          EXCEPTION_OPTION=""
+          if [ "${{ inputs.raise_exception }}" = 'true' ]; then
+            EXCEPTION_OPTION="-r"
+          fi   
+          laktory run -e ${{ inputs.env }} -j ${{ inputs.job_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }} $EXCEPTION_OPTION
+        working-directory: ${{ inputs.working-directory }}
