@@ -36,7 +36,7 @@ jobs:
       - name: Setup python environment
         run: |
           pip install -r requirements.txt
-          pip install -U git+https://github.com/okube-ai/laktory.git@cli_run
+          pip install -U git+https://github.com/okube-ai/laktory.git@main
         working-directory: ${{ inputs.working-directory }}
 
       - name: laktory preview
