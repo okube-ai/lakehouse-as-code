@@ -1,6 +1,10 @@
 name: laktory-deploy
 
 on:
+#  pull_request:
+#    types:
+#      - opened
+#      - synchronize
   push:
     branches:
       - main
@@ -8,6 +12,8 @@ on:
     logLevel:
       description: 'Log level'
       default: 'info'
+    branches:
+      - main
 
 jobs:
   laktory-deploy-dev:
