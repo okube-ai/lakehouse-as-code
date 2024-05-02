@@ -2,12 +2,12 @@ sql-query-create-view-google-stocks:
   name: create-view-google-stocks
   query: |
     CREATE OR REPLACE VIEW
-      ${vars.env}.finance.slv_star_google_stock_prices 
+      ${vars.env}.finance.slv_google_stocks 
     AS 
       SELECT
         * 
       FROM 
-        ${vars.env}.finance.slv_star_stock_prices 
+        ${vars.env}.finance.slv_stocks 
       WHERE
         symbol = 'GOOGL'
   data_source_id: ${vars.sql_tasks_data_source_id}

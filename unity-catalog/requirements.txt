@@ -1,4 +1,4 @@
-laktory==0.1.10
+laktory==0.2.0
 pulumi>=3.0.0,<4.0.0
 pulumi-databricks
 pulumi-azure-native

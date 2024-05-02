@@ -1,5 +1,5 @@
-# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@hotfixes
-# MAGIC %pip install 'laktory==0.1.10'
+# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@sparkchain_doc
+# MAGIC %pip install 'laktory==0.2.0'
 
 # COMMAND ----------
 import pyspark.sql.functions as F
