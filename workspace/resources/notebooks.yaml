@@ -26,12 +26,6 @@ notebook-pipelines-dlt-slv-template:
     - group_name: account users
       permission_level: CAN_READ
 
-notebook-pipeline-dlt-slv-star-template:
-  source: ./notebooks/pipelines/dlt_slv_star_template.py
-  access_controls:
-    - group_name: account users
-      permission_level: CAN_READ
-
 notebook-pipelines-dlt-gld-template:
   source: ./notebooks/pipelines/dlt_gld_template.py
   access_controls:

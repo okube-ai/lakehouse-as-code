@@ -22,8 +22,6 @@ libraries:
   - notebook:
       path: /.laktory/pipelines/dlt_slv_template.py
   - notebook:
-      path: /.laktory/pipelines/dlt_slv_star_template.py
-  - notebook:
       path: /.laktory/pipelines/dlt_gld_template.py
   - notebook:
       path: /.laktory/pipelines/dlt_gld_stock_performances.py
@@ -71,55 +69,63 @@ tables:
       layer: SILVER
       table_source:
         name: brz_stock_prices
-    columns:
-      - name: created_at
-        type: timestamp
-        spark_func_name: coalesce
-        spark_func_args:
-          - data._created_at
+      spark_chain:
+        nodes:
+          - column:
+              name: created_at
+              type: timestamp
+            spark_func_name: coalesce
+            spark_func_args:
+              - data._created_at
 
-      - name: symbol
-        type: string
-        spark_func_name: coalesce
-        spark_func_args:
-          - data.symbol
+          - column:
+              name: symbol
+              type: string
+            spark_func_name: coalesce
+            spark_func_args:
+              - data.symbol
 
-      - name: name
-        type: string
-        spark_func_name: symbol_to_name
-        spark_func_args:
-          - data.symbol
+          - column:
+              name: name
+              type: string
+            spark_func_name: symbol_to_name
+            spark_func_args:
+              - data.symbol
 
-      - name: open
-        type: double
-        spark_func_name: coalesce
-        spark_func_args:
-          - data.open
+          - column:
+              name: open
+              type: double
+            spark_func_name: coalesce
+            spark_func_args:
+              - data.open
 
-      - name: close
-        type: double
-        spark_func_name: coalesce
-        spark_func_args:
-          - data.close
+          - column:
+              name: close
+              type: double
+            spark_func_name: coalesce
+            spark_func_args:
+              - data.close
 
-      - name: low
-        type: double
-        spark_func_name: coalesce
-        spark_func_args:
-          - data.low
+          - column:
+              name: low
+              type: double
+            spark_func_name: coalesce
+            spark_func_args:
+              - data.low
 
-      - name: high
-        type: double
-        spark_func_name: coalesce
-        spark_func_args:
-          - data.high
+          - column:
+              name: high
+              type: double
+            spark_func_name: coalesce
+            spark_func_args:
+              - data.high
 
-#      #TODO: Uncomment for demo
-#      - name: volume
-#        type: double
-#        spark_func_name: coalesce
-#        spark_func_args:
-#          - data.volume
+#          #TODO: Uncomment for demo
+#          - name: volume
+#            type: double
+#            spark_func_name: coalesce
+#            spark_func_args:
+#              - data.volume
 
   # ------------------------------------------------------------------------- #
   # Stock Metadata                                                            #
@@ -141,45 +147,53 @@ tables:
         name: brz_stock_metadata
         read_as_stream: False
       as_dlt_view: True
-    columns:
-      - name: symbol
-        type: string
-        spark_func_name: coalesce
-        spark_func_args:
-          - data.symbol
+      spark_chain:
+        nodes:
+          - column:
+              name: symbol
+              type: string
+            spark_func_name: coalesce
+            spark_func_args:
+              - data.symbol
 
-      - name: currency
-        type: string
-        spark_func_name: coalesce
-        spark_func_args:
-          - data.currency
+          - column:
+              name: currency
+              type: string
+            spark_func_name: coalesce
+            spark_func_args:
+              - data.currency
 
-      - name: first_traded
-        type: timestamp
-        spark_func_name: coalesce
-        spark_func_args:
-          - data.firstTradeDate
+          - column:
+              name: first_traded
+              type: timestamp
+            spark_func_name: coalesce
+            spark_func_args:
+              - data.firstTradeDate
 
   # ------------------------------------------------------------------------- #
-  # Silver Star                                                               #
+  # Silver Joins                                                              #
   # ------------------------------------------------------------------------- #
 
-  - name: slv_star_stock_prices
+  - name: slv_stocks
     builder:
-      layer: SILVER_STAR
+      layer: SILVER
+      drop_source_columns: False
       table_source:
         name: slv_stock_prices
         read_as_stream: True
-      joins:
-        - other:
-            name: slv_stock_metadata
-            read_as_stream: False
-            selects:
-              - symbol
-              - currency
-              - first_traded
-          "on":
-            - symbol
+      spark_chain:
+        nodes:
+          - spark_func_name: smart_join
+            spark_func_kwargs:
+              other:
+                name: slv_stock_metadata
+                read_as_stream: False
+                selects:
+                  - symbol
+                  - currency
+                  - first_traded
+              "on":
+                - symbol
 
   # ------------------------------------------------------------------------- #
   # Gold                                                                      #
@@ -189,40 +203,48 @@ tables:
     builder:
       layer: GOLD
       table_source:
-        name: slv_star_stock_prices
+        name: slv_stocks
         read_as_stream: True
-      aggregation:
-        groupby_columns:
-          - symbol
-        groupby_window:
-          time_column: _tstamp
-          window_duration: 1 day
-        agg_expressions:
-          - name: count
-            spark_func_name: count
-            spark_func_args:
-              - symbol
-          - name: low
-            spark_func_name: min
-            spark_func_args:
-              - low
-          - name: high
-            spark_func_name: max
-            spark_func_args:
-              - high
-          - name: open
-            spark_func_name: first
-            spark_func_args:
-              - open
-          - name: close
-            spark_func_name: last
-            spark_func_args:
-              - close
+      spark_chain:
+        nodes:
+          - spark_func_name: groupby_and_agg
+            spark_func_kwargs:
+              groupby_columns:
+                - symbol
+              groupby_window:
+                time_column: _tstamp
+                window_duration: 1 day
+              agg_expressions:
+                - column:
+                    name: count
+                  spark_func_name: count
+                  spark_func_args:
+                    - symbol
+                - column:
+                    name: low
+                  spark_func_name: min
+                  spark_func_args:
+                    - low
+                - column:
+                    name: high
+                  spark_func_name: max
+                  spark_func_args:
+                    - high
+                - column:
+                    name: open
+                  spark_func_name: first
+                  spark_func_args:
+                    - open
+                - column:
+                    name: close
+                  spark_func_name: last
+                  spark_func_args:
+                    - close
 
   - name: gld_stock_performances
     builder:
       layer: GOLD
       template: STOCK_PERFORMANCES
       table_source:
-        name: slv_star_stock_prices
+        name: slv_stocks
         read_as_stream: False
