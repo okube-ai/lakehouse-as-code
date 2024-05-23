@@ -1,62 +1,66 @@
 name: pl-stock-prices
 
-catalog: ${vars.env}
-target: finance
-development: ${vars.is_dev}
-configuration:
-  pipeline_name: pl-stock-prices
+engine: DLT
 
-## TODO: Uncomment for DEMO
-#continuous: True
+# --------------------------------------------------------------------------- #
+# DLT                                                                         #
+# --------------------------------------------------------------------------- #
 
-clusters:
-  - name : default
-    node_type_id: Standard_DS3_v2
-    autoscale:
-      min_workers: 1
-      max_workers: 2
+dlt:
+  resource_name: dlt-stock-prices
+  catalog: ${vars.env}
+  target: finance
+  development: ${vars.is_dev}
+  configuration:
+    pipeline_name: pl-stock-prices
 
-libraries:
-  - notebook:
-      path: /.laktory/pipelines/dlt_brz_template.py
-  - notebook:
-      path: /.laktory/pipelines/dlt_slv_template.py
-  - notebook:
-      path: /.laktory/pipelines/dlt_gld_template.py
-  - notebook:
-      path: /.laktory/pipelines/dlt_gld_stock_performances.py
+  ## TODO: Uncomment for DEMO
+  #continuous: True
+
+  clusters:
+    - name : default
+      node_type_id: Standard_DS3_v2
+      autoscale:
+        min_workers: 1
+        max_workers: 2
+
+  libraries:
+    - notebook:
+        path: /.laktory/pipelines/dlt_template.py
+#    - notebook:
+#        path: /.laktory/pipelines/dlt_gld_stock_performances.py
+
+  access_controls:
+    - group_name: account users
+      permission_level: CAN_VIEW
+    - group_name: role-engineers
+      permission_level: CAN_RUN
 
 udfs:
   - module_name: stock_functions
     function_name: symbol_to_name
 
-access_controls:
-  - group_name: account users
-    permission_level: CAN_VIEW
-  - group_name: role-engineers
-    permission_level: CAN_RUN
-
 # --------------------------------------------------------------------------- #
-# Tables                                                                      #
+# Nodes                                                                       #
 # --------------------------------------------------------------------------- #
 
-tables:
+nodes:
 
   # ------------------------------------------------------------------------- #
   # Stock Prices                                                              #
   # ------------------------------------------------------------------------- #
 
-  - name: brz_stock_prices
+  - id: brz_stock_prices
+    layer: BRONZE
     timestamp_key: data.created_at
-    builder:
-      layer: BRONZE
-      event_source:
-        name: stock_price
-        producer:
-          name: yahoo-finance
+    source:
+      path: /Volumes/${vars.env}/sources/landing/events/yahoo-finance/stock_price/
+      as_stream: true
+    sink:
+      table_name: brz_stock_prices
 
-
-  - name: slv_stock_prices
+  - id: slv_stock_prices
+    layer: SILVER
     timestamp_key: created_at
     expectations:
       - name: positive_price
@@ -65,60 +69,61 @@ tables:
       - name: recent_price
         expression: created_at > '2023-01-01'
         action: DROP
-    builder:
-      layer: SILVER
-      table_source:
-        name: brz_stock_prices
-      spark_chain:
-        nodes:
-          - column:
-              name: created_at
-              type: timestamp
-            spark_func_name: coalesce
-            spark_func_args:
-              - data._created_at
+    source:
+      node_id: brz_stock_prices
+      as_stream: true
+    sink:
+      table_name: slv_stock_prices
+    chain:
+      nodes:
+        - column:
+            name: created_at
+            type: timestamp
+          spark_func_name: coalesce
+          spark_func_args:
+            - data._created_at
 
-          - column:
-              name: symbol
-              type: string
-            spark_func_name: coalesce
-            spark_func_args:
-              - data.symbol
+        - column:
+            name: symbol
+            type: string
+          spark_func_name: coalesce
+          spark_func_args:
+            - data.symbol
 
-          - column:
-              name: name
-              type: string
-            spark_func_name: symbol_to_name
-            spark_func_args:
-              - data.symbol
+        - column:
+            name: name
+            type: string
+          spark_func_name: symbol_to_name
+          spark_func_args:
+            - data.symbol
 
-          - column:
-              name: open
-              type: double
-            spark_func_name: coalesce
-            spark_func_args:
-              - data.open
+        - column:
+            name: open
+            type: double
+          spark_func_name: coalesce
+          spark_func_args:
+            - data.open
 
-          - column:
-              name: close
-              type: double
-            spark_func_name: coalesce
-            spark_func_args:
-              - data.close
+        - column:
+            name: close
+            type: double
+          spark_func_name: coalesce
+          spark_func_args:
+            - data.close
 
-          - column:
-              name: low
-              type: double
-            spark_func_name: coalesce
-            spark_func_args:
-              - data.low
+        - column:
+            name: low
+            type: double
+          spark_func_name: coalesce
+          spark_func_args:
+            - data.low
 
-          - column:
-              name: high
-              type: double
-            spark_func_name: coalesce
-            spark_func_args:
-              - data.high
+        - column:
+            name: high
+            type: double
+          spark_func_name: coalesce
+          spark_func_args:
+            - data.high
 
 #          #TODO: Uncomment for demo
 #          - name: volume
@@ -131,120 +136,115 @@ tables:
   # Stock Metadata                                                            #
   # ------------------------------------------------------------------------- #
 
-  - name: brz_stock_metadata
-    builder:
-      layer: BRONZE
-      event_source:
-        name: stock_metadata
-        read_as_stream: False
-        producer:
-          name: yahoo-finance
+  - id: brz_stock_metadata
+    layer: BRONZE
+    source:
+      path: /Volumes/${vars.env}/sources/landing/events/yahoo-finance/stock_metadata/
+    sink:
+      table_name: brz_stock_metadata
 
-  - name: slv_stock_metadata
-    builder:
-      layer: SILVER
-      table_source:
-        name: brz_stock_metadata
-        read_as_stream: False
-      as_dlt_view: True
-      spark_chain:
-        nodes:
-          - column:
-              name: symbol
-              type: string
-            spark_func_name: coalesce
-            spark_func_args:
-              - data.symbol
+  - id: slv_stock_metadata
+    layer: SILVER
+    source:
+      node_id: brz_stock_metadata
+    chain:
+      nodes:
+        - column:
+            name: symbol
+            type: string
+          spark_func_name: coalesce
+          spark_func_args:
+            - data.symbol
 
-          - column:
-              name: currency
-              type: string
-            spark_func_name: coalesce
-            spark_func_args:
-              - data.currency
+        - column:
+            name: currency
+            type: string
+          spark_func_name: coalesce
+          spark_func_args:
+            - data.currency
 
-          - column:
-              name: first_traded
-              type: timestamp
-            spark_func_name: coalesce
-            spark_func_args:
-              - data.firstTradeDate
+        - column:
+            name: first_traded
+            type: timestamp
+          spark_func_name: coalesce
+          spark_func_args:
+            - data.firstTradeDate
 
   # ------------------------------------------------------------------------- #
   # Silver Joins                                                              #
   # ------------------------------------------------------------------------- #
 
-  - name: slv_stocks
-    builder:
-      layer: SILVER
-      drop_source_columns: False
-      table_source:
-        name: slv_stock_prices
-        read_as_stream: True
-      spark_chain:
-        nodes:
-          - spark_func_name: smart_join
-            spark_func_kwargs:
-              other:
-                name: slv_stock_metadata
-                read_as_stream: False
-                selects:
-                  - symbol
-                  - currency
-                  - first_traded
-              "on":
+  - id: slv_stocks
+    layer: SILVER
+    drop_source_columns: False
+    source:
+      node_id: slv_stock_prices
+      as_stream: true
+    sink:
+      table_name: slv_stocks
+    chain:
+      nodes:
+        - spark_func_name: smart_join
+          spark_func_kwargs:
+            other:
+              node_id: slv_stock_metadata
+              selects:
                 - symbol
+                - currency
+                - first_traded
+            "on":
+              - symbol
 
   # ------------------------------------------------------------------------- #
   # Gold                                                                      #
   # ------------------------------------------------------------------------- #
 
-  - name: gld_stock_prices_by_1d
-    builder:
-      layer: GOLD
-      table_source:
-        name: slv_stocks
-        read_as_stream: True
-      spark_chain:
-        nodes:
-          - spark_func_name: groupby_and_agg
-            spark_func_kwargs:
-              groupby_columns:
-                - symbol
-              groupby_window:
-                time_column: _tstamp
-                window_duration: 1 day
-              agg_expressions:
-                - column:
-                    name: count
-                  spark_func_name: count
-                  spark_func_args:
-                    - symbol
-                - column:
-                    name: low
-                  spark_func_name: min
-                  spark_func_args:
-                    - low
-                - column:
-                    name: high
-                  spark_func_name: max
-                  spark_func_args:
-                    - high
-                - column:
-                    name: open
-                  spark_func_name: first
-                  spark_func_args:
-                    - open
-                - column:
-                    name: close
-                  spark_func_name: last
-                  spark_func_args:
-                    - close
+  - id: gld_stock_prices_by_1d
+    layer: GOLD
+    source:
+      node_id: slv_stocks
+      as_stream: True
+    sink:
+      table_name: gld_stock_prices_by_1d
+    chain:
+      nodes:
+        - spark_func_name: groupby_and_agg
+          spark_func_kwargs:
+            groupby_columns:
+              - symbol
+            groupby_window:
+              time_column: _tstamp
+              window_duration: 1 day
+            agg_expressions:
+              - column:
+                  name: count
+                spark_func_name: count
+                spark_func_args:
+                  - symbol
+              - column:
+                  name: low
+                spark_func_name: min
+                spark_func_args:
+                  - low
+              - column:
+                  name: high
+                spark_func_name: max
+                spark_func_args:
+                  - high
+              - column:
+                  name: open
+                spark_func_name: first
+                spark_func_args:
+                  - open
+              - column:
+                  name: close
+                spark_func_name: last
+                spark_func_args:
+                  - close
 
-  - name: gld_stock_performances
-    builder:
-      layer: GOLD
-      template: STOCK_PERFORMANCES
-      table_source:
-        name: slv_stocks
-        read_as_stream: False
+  - id: gld_stock_performances
+    layer: GOLD
+    source:
+      node_id: slv_stocks
+    sink:
+      table_name: gld_stock_performances

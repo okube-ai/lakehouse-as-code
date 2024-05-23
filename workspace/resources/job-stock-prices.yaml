@@ -30,7 +30,7 @@ tasks:
       - task_key: ingest
       - task_key: ingest-metadata
     pipeline_task:
-      pipeline_id: ${resources.pl-stock-prices.id}
+      pipeline_id: ${resources.dlt-stock-prices.id}
 
   - task_key: view
     sql_task:

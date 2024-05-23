@@ -9,12 +9,12 @@ pulumi:
     databricks:azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
     databricks:azure_tenant_id: ${vars.AZURE_TENANT_ID}
 resources:
-  notebooks: ${include.resources/notebooks.yaml}
-  workspacefiles: ${include.resources/workspacefiles.yaml}
-  sqlqueries: ${include.resources/sqlqueries.yaml}
+  databricks_notebooks: ${include.resources/notebooks.yaml}
+  databricks_workspacefiles: ${include.resources/workspacefiles.yaml}
+  databricks_sqlqueries: ${include.resources/sqlqueries.yaml}
   pipelines:
     pl-stock-prices: ${include.resources/pl-stock-prices.yaml}
-  jobs:
+  databricks_jobs:
     job-stock-prices: ${include.resources/job-stock-prices.yaml}
 
 environments:
