@@ -18,4 +18,3 @@ job = dispatcher.resources["job-stock-prices"]
 
 # Run job
 job.run(current_run_action="CANCEL")
-
