@@ -65,7 +65,9 @@ class Service:
             for d in yaml.safe_load(fp):
                 g = models.Group.model_validate(d)
                 g.to_pulumi()
-                self.group_ids[g.display_name] = pulumi_outputs[f"group-{g.display_name}.id"]
+                self.group_ids[g.display_name] = pulumi_outputs[
+                    f"group-{g.display_name}.id"
+                ]
 
         # ------------------------------------------------------------------- #
         # Users                                                               #

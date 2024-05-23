@@ -98,9 +98,7 @@ class Service:
         pulumi.export("keyvault-url", self.keyvault.properties.vault_uri)
 
         # Secrets
-        for key, value in [
-            ("neptune-client-secret",  self.app_secret.value)
-        ]:
+        for key, value in [("neptune-client-secret", self.app_secret.value)]:
             self._set_secret(key, value)
 
         # RBAC - Olivier - Key Vault Administrator

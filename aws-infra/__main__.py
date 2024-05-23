@@ -10,6 +10,7 @@ import pulumi_databricks as databricks
 # Service                                                                     #
 # --------------------------------------------------------------------------- #
 
+
 class Service:
 
     def __init__(self):
@@ -35,7 +36,9 @@ class Service:
         # Stacks
         self.dev_stack = None
         if self.env == "prod":
-            self.dev_stack = pulumi.StackReference(f"taigamotors/dna-lakehouse-infra/dev")
+            self.dev_stack = pulumi.StackReference(
+                f"taigamotors/dna-lakehouse-infra/dev"
+            )
 
     def run(self):
 
@@ -73,7 +76,7 @@ class Service:
         self.rg = azure_native.resources.ResourceGroup(
             f"tg-rg-{self.service}",
             location="canadacentral",
-            resource_group_name=f"tg-rg-{self.service}-{self.env}"
+            resource_group_name=f"tg-rg-{self.service}-{self.env}",
         )
 
     def set_keyvault(self):
@@ -96,14 +99,22 @@ class Service:
         # Secrets
         for key, value in [
             ("ion-api-client-id", self.pulumi_config.get_secret("ion_api_client_id")),
-            ("ion-api-client-secret", self.pulumi_config.get_secret("ion_api_client_secret")),
+            (
+                "ion-api-client-secret",
+                self.pulumi_config.get_secret("ion_api_client_secret"),
+            ),
             ("ion-api-username", self.pulumi_config.get_secret("ion_api_username")),
             ("ion-api-password", self.pulumi_config.get_secret("ion_api_password")),
-            ("salesforce-username", self.pulumi_config.get_secret("salesforce_username")),
-            ("salesforce-password", self.pulumi_config.get_secret("salesforce_password")),
+            (
+                "salesforce-username",
+                self.pulumi_config.get_secret("salesforce_username"),
+            ),
+            (
+                "salesforce-password",
+                self.pulumi_config.get_secret("salesforce_password"),
+            ),
             ("salesforce-token", self.pulumi_config.get_secret("salesforce_token")),
-            ("azure-devops-token", self.pulumi_config.get_secret("azure_devops_token"))
-
+            ("azure-devops-token", self.pulumi_config.get_secret("azure_devops_token")),
         ]:
             self._set_secret(key, value)
 
@@ -159,14 +170,14 @@ class Service:
             "landing",
             name="landing",
             storage_account_name=self.storage_account.name,
-            container_access_type="private"
+            container_access_type="private",
         )
 
         self.container_metastore = azure.storage.Container(
             "metastore",
             name="metastore",
             storage_account_name=self.storage_account.name,
-            container_access_type="private"
+            container_access_type="private",
         )
 
         # RBAC - Databricks App - Storage Blob Data Contributor
@@ -194,29 +205,36 @@ class Service:
             storage_account_id=self.storage_account.id,
             ssh_password_enabled=True,
             home_directory="landing/",
-            permission_scopes=[azure.storage.LocalUserPermissionScopeArgs(
-                permissions=azure.storage.LocalUserPermissionScopePermissionsArgs(
-                    create=True,
-                    delete=True,
-                    list=True,
-                    read=True,
-                    write=True,
-                ),
-                service="blob",
-                resource_name=self.container_landing.name,
-            )])
+            permission_scopes=[
+                azure.storage.LocalUserPermissionScopeArgs(
+                    permissions=azure.storage.LocalUserPermissionScopePermissionsArgs(
+                        create=True,
+                        delete=True,
+                        list=True,
+                        read=True,
+                        write=True,
+                    ),
+                    service="blob",
+                    resource_name=self.container_landing.name,
+                )
+            ],
+        )
 
         # Save secrets
-        secret = self._set_secret("lakehouse-sa-conn-str",
-                                  self.storage_account.primary_connection_string.apply(lambda x: x))
-        secret = self._set_secret("iondesk-sftp-password", user.password.apply(lambda x: x))
+        secret = self._set_secret(
+            "lakehouse-sa-conn-str",
+            self.storage_account.primary_connection_string.apply(lambda x: x),
+        )
+        secret = self._set_secret(
+            "iondesk-sftp-password", user.password.apply(lambda x: x)
+        )
 
     def set_databricks_account_provider(self):
         self.databricks_account_provider = databricks.Provider(
             "azure-account-provider",
             host="https://accounts.azuredatabricks.net",
             account_id="c7de928e-0d28-40ab-bf79-bed6798bbf13",
-            auth_type="azure-cli"
+            auth_type="azure-cli",
         )
 
     def set_databricks_users(self):
@@ -280,7 +298,9 @@ class Service:
             "azure-workspace-provider",
             host=self.workspace.workspace_url,
             azure_client_id=self.pulumi_config.get("databricks_app_client_id"),
-            azure_client_secret=self.pulumi_config.get_secret("databricks_app_client_secret")
+            azure_client_secret=self.pulumi_config.get_secret(
+                "databricks_app_client_secret"
+            ),
         )
 
     def set_databricks_metastore(self):
@@ -428,7 +448,9 @@ class Service:
             app = databricks.SecretScope(
                 "dbks-secret-scope-salesforce-prod",
                 name="salesforce-prod",
-                opts=pulumi.ResourceOptions(provider=self.databricks_workspace_provider),
+                opts=pulumi.ResourceOptions(
+                    provider=self.databricks_workspace_provider
+                ),
             )
 
             databricks.Secret(
@@ -436,7 +458,9 @@ class Service:
                 key="username",
                 string_value=self.pulumi_config.get_secret("salesforce_username_prod"),
                 scope=app.id,
-                opts=pulumi.ResourceOptions(provider=self.databricks_workspace_provider),
+                opts=pulumi.ResourceOptions(
+                    provider=self.databricks_workspace_provider
+                ),
             )
 
             databricks.Secret(
@@ -444,7 +468,9 @@ class Service:
                 key="password",
                 string_value=self.pulumi_config.get_secret("salesforce_password_prod"),
                 scope=app.id,
-                opts=pulumi.ResourceOptions(provider=self.databricks_workspace_provider),
+                opts=pulumi.ResourceOptions(
+                    provider=self.databricks_workspace_provider
+                ),
             )
 
             databricks.Secret(
@@ -452,7 +478,9 @@ class Service:
                 key="token",
                 string_value=self.pulumi_config.get_secret("salesforce_token_prod"),
                 scope=app.id,
-                opts=pulumi.ResourceOptions(provider=self.databricks_workspace_provider),
+                opts=pulumi.ResourceOptions(
+                    provider=self.databricks_workspace_provider
+                ),
             )
 
     def set_databricks_mount(self):
