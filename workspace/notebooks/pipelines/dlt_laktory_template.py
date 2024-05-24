@@ -1,4 +1,4 @@
-# MAGIC %pip install git+https://github.com/okube-ai/laktory.git@pipeline_generate_dlt
+# MAGIC %pip install git+https://github.com/okube-ai/laktory.git@pipeline_engines
 # MAGIC #%pip install 'laktory==0.2.1'
 
 # COMMAND ----------
@@ -69,7 +69,7 @@ def define_cdc_table(node):
         comment=node.comment,
     )
 
-    df = dlt.apply_changes(**node.builder.apply_changes_kwargs)
+    df = dlt.apply_changes(**node.apply_changes_kwargs)
 
     return df
 
@@ -85,7 +85,6 @@ for node in pl.nodes:
         continue
 
     if node.is_from_cdc:
-        pass
         df = define_cdc_table(node)
         display(df)
 

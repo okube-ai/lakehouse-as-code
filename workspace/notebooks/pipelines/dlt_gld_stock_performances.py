@@ -1,4 +1,4 @@
-# MAGIC %pip install git+https://github.com/okube-ai/laktory.git@pipeline_generate_dlt
+# MAGIC %pip install git+https://github.com/okube-ai/laktory.git@pipeline_engines
 # MAGIC #%pip install 'laktory==0.2.1'
 
 # COMMAND ----------
