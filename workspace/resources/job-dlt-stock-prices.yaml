@@ -1,4 +1,4 @@
-name: job-stock-prices
+name: job-dlt-stock-prices
 clusters:
   - name: main
     spark_version: 14.0.x-scala2.12

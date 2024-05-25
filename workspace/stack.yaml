@@ -13,10 +13,10 @@ resources:
   databricks_workspacefiles: ${include.resources/workspacefiles.yaml}
   databricks_sqlqueries: ${include.resources/sqlqueries.yaml}
   pipelines:
-    pl-stock-prices: ${include.resources/pl-stock-prices.yaml}
     dlt-stock-prices: ${include.resources/dlt-stock-prices.yaml}
+    pl-stock-prices: ${include.resources/pl-stock-prices.yaml}
   databricks_jobs:
-    job-stock-prices: ${include.resources/job-stock-prices.yaml}
+    job-stock-prices: ${include.resources/job-dlt-stock-prices.yaml}
 
 environments:
   dev:

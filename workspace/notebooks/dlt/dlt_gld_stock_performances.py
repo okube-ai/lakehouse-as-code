@@ -23,15 +23,6 @@ with open(filepath, "r") as fp:
     pl = models.Pipeline.model_validate_json(fp.read())
 
 
-# Import User Defined Functions
-sys.path.append("/Workspace/pipelines/")
-udfs = []
-for udf in pl.udfs:
-    if udf.module_path:
-        sys.path.append(os.path.abspath(udf.module_path))
-    module = importlib.import_module(udf.module_name)
-    udfs += [getattr(module, udf.function_name)]
-
 # --------------------------------------------------------------------------- #
 # Tables                                                                      #
 # --------------------------------------------------------------------------- #
@@ -39,11 +30,11 @@ for udf in pl.udfs:
 
 def define_table(node):
     @dlt.table(
-        name=node.id,
+        name=node.name,
         comment=node.description,
     )
     def get_df():
-        logger.info(f"Building {node.id} node")
+        logger.info(f"Building {node.name} node")
 
         # Read Source
         df = node.source.read(spark)

@@ -26,9 +26,9 @@ dlt:
 
   libraries:
     - notebook:
-        path: /.laktory/pipelines/dlt_laktory_template.py
+        path: /.laktory/dlt/dlt_laktory_pl.py
     - notebook:
-        path: /.laktory/pipelines/dlt_gld_stock_performances.py
+        path: /.laktory/dlt/dlt_gld_stock_performances.py
 
   access_controls:
     - group_name: account users
@@ -50,7 +50,7 @@ nodes:
   # Stock Prices                                                              #
   # ------------------------------------------------------------------------- #
 
-  - id: brz_stock_prices
+  - name: brz_stock_prices
     layer: BRONZE
     timestamp_key: data.created_at
     source:
@@ -59,7 +59,7 @@ nodes:
     sink:
       table_name: brz_stock_prices
 
-  - id: slv_stock_prices
+  - name: slv_stock_prices
     layer: SILVER
     timestamp_key: created_at
     expectations:
@@ -70,7 +70,7 @@ nodes:
         expression: created_at > '2023-01-01'
         action: DROP
     source:
-      node_id: brz_stock_prices
+      node_name: brz_stock_prices
       as_stream: true
     sink:
       table_name: slv_stock_prices
@@ -136,17 +136,17 @@ nodes:
   # Stock Metadata                                                            #
   # ------------------------------------------------------------------------- #
 
-  - id: brz_stock_metadata
+  - name: brz_stock_metadata
     layer: BRONZE
     source:
       path: /Volumes/${vars.env}/sources/landing/events/yahoo-finance/stock_metadata/
     sink:
       table_name: brz_stock_metadata
 
-  - id: slv_stock_metadata
+  - name: slv_stock_metadata
     layer: SILVER
     source:
-      node_id: brz_stock_metadata
+      node_name: brz_stock_metadata
     chain:
       nodes:
         - column:
@@ -174,11 +174,11 @@ nodes:
   # Silver Joins                                                              #
   # ------------------------------------------------------------------------- #
 
-  - id: slv_stocks
+  - name: slv_stocks
     layer: SILVER
     drop_source_columns: False
     source:
-      node_id: slv_stock_prices
+      node_name: slv_stock_prices
       as_stream: true
     sink:
       table_name: slv_stocks
@@ -187,7 +187,7 @@ nodes:
         - spark_func_name: smart_join
           spark_func_kwargs:
             other:
-              node_id: slv_stock_metadata
+              node_name: slv_stock_metadata
               selects:
                 - symbol
                 - currency
@@ -199,10 +199,10 @@ nodes:
   # Gold                                                                      #
   # ------------------------------------------------------------------------- #
 
-  - id: gld_stock_prices_by_1d
+  - name: gld_stock_prices_by_1d
     layer: GOLD
     source:
-      node_id: slv_stocks
+      node_name: slv_stocks
       as_stream: True
     sink:
       table_name: gld_stock_prices_by_1d
@@ -242,10 +242,10 @@ nodes:
                 spark_func_args:
                   - close
 
-  - id: gld_stock_performances
+  - name: gld_stock_performances
     layer: GOLD
     dlt_template: STOCK_PERFORMANCES
     source:
-      node_id: slv_stocks
+      node_name: slv_stocks
     sink:
       table_name: gld_stock_performances
