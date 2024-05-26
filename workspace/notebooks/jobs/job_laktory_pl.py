@@ -1,22 +1,20 @@
 # COMMAND ----------
 dbutils.widgets.text("pipeline_name", "pl-stock-prices")
-
-# COMMAND ----------
-# MAGIC %pip install git+https://github.com/okube-ai/laktory.git@pipeline_engines
-# MAGIC #%pip install 'laktory==0.2.1'
+dbutils.widgets.text("node_name", "")
 
 # COMMAND ----------
 import importlib
 import sys
 import os
 import pyspark.sql.functions as F
+# MAGIC %pip install git+https://github.com/okube-ai/laktory.git@pipeline_engines
+# MAGIC #%pip install 'laktory==0.2.1'
 
-from laktory import dlt
+# COMMAND ----------
 from laktory import models
 from laktory import get_logger
 from laktory import settings
 
-dlt.spark = spark
 logger = get_logger(__name__)
 
 # --------------------------------------------------------------------------- #
@@ -24,13 +22,14 @@ logger = get_logger(__name__)
 # --------------------------------------------------------------------------- #
 
 pl_name = dbutils.widgets.get("pipeline_name")
+node_name = dbutils.widgets.get("node_name")
 filepath = f"/Workspace{settings.workspace_laktory_root}pipelines/{pl_name}.json"
 with open(filepath, "r") as fp:
     pl = models.Pipeline.model_validate_json(fp.read())
 
 
 # Import User Defined Functions
-sys.path.append("/Workspace/pipelines/")
+sys.path.append(f"/Workspace{settings.workspace_laktory_root}pipelines/")
 udfs = []
 for udf in pl.udfs:
     if udf.module_path:
@@ -42,4 +41,7 @@ for udf in pl.udfs:
 # Execution                                                                   #
 # --------------------------------------------------------------------------- #
 
-pl.execute(spark=spark, udfs=udfs)
+if node_name:
+    pl.nodes_dict[node_name].execute(spark=spark, udfs=udfs)
+else:
+    pl.execute(spark=spark, udfs=udfs)
