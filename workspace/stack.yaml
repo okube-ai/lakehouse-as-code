@@ -13,8 +13,13 @@ resources:
   databricks_workspacefiles: ${include.resources/workspacefiles.yaml}
   databricks_sqlqueries: ${include.resources/sqlqueries.yaml}
   pipelines:
+
     dlt-stock-prices: ${include.resources/dlt-stock-prices.yaml}
+
+    # This is an alternate version of the same pipeline, but using
+    # a job as an orchestrator instead of DLT
     pl-stock-prices: ${include.resources/pl-stock-prices.yaml}
+
   databricks_jobs:
     job-stock-prices: ${include.resources/job-dlt-stock-prices.yaml}
 

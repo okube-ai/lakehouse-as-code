@@ -1,5 +1,5 @@
 name: pl-stock-prices
-engine: DATABRICKS_JOB
+orchestrator: DATABRICKS_JOB
 databricks_job:
   name: job-pl-stock-prices
   clusters:
@@ -50,7 +50,7 @@ nodes:
     sink:
       path: /Volumes/${vars.env}/sources/landing/tables/slv_stock_prices/
       mode: OVERWRITE
-    chain:
+    transformer:
       nodes:
         - column:
             name: created_at
@@ -120,7 +120,7 @@ nodes:
     sink:
       path: /Volumes/${vars.env}/sources/landing/tables/slv_stock_metadata/
       mode: OVERWRITE
-    chain:
+    transformer:
       nodes:
         - column:
             name: symbol
@@ -156,7 +156,7 @@ nodes:
     sink:
       path: /Volumes/${vars.env}/sources/landing/tables/slv_stocks/
       mode: OVERWRITE
-    chain:
+    transformer:
       nodes:
         - spark_func_name: smart_join
           spark_func_kwargs:
@@ -181,7 +181,7 @@ nodes:
     sink:
       path: /Volumes/${vars.env}/sources/landing/tables/gld_stock_prices_by_1d/
       mode: OVERWRITE
-    chain:
+    transformer:
       nodes:
         - spark_func_name: groupby_and_agg
           spark_func_kwargs:

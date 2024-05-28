@@ -16,13 +16,13 @@ resources:
       azure_client_id: ${vars.AZURE_CLIENT_ID}
       azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
       azure_tenant_id: ${vars.AZURE_TENANT_ID}
-  groups: ${include.resources/groups.yaml}
-  users: ${include.resources/users.yaml}
-  serviceprincipals: ${include.resources/serviceprincipals.yaml}
-  metastores:
+  databricks_groups: ${include.resources/groups.yaml}
+  databricks_users: ${include.resources/users.yaml}
+  databricks_serviceprincipals: ${include.resources/serviceprincipals.yaml}
+  databricks_metastores:
     metastore-lakehouse: ${include.resources/metastore.yaml}
-  externallocations: ${include.resources/externallocations.yaml}
-  catalogs: ${include.resources/catalogs.yaml}
+  databricks_externallocations: ${include.resources/externallocations.yaml}
+  databricks_catalogs: ${include.resources/catalogs.yaml}
   # TODO: init scripts is challenging because terraform and pulumi do not share the same properties.
 
 variables:
