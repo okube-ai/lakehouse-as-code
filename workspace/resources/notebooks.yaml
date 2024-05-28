@@ -14,26 +14,20 @@ notebook-job-ingest-stock-metadata:
     - group_name: role-engineers
       permission_level: CAN_RUN
 
-notebook-pipelines-dlt-brz-template:
-  source: ./notebooks/pipelines/dlt_brz_template.py
+notebook-dlt-laktory-pl:
+  source: ./notebooks/dlt/dlt_laktory_pl.py
   access_controls:
     - group_name: account users
       permission_level: CAN_READ
 
-notebook-pipelines-dlt-slv-template:
-  source: ./notebooks/pipelines/dlt_slv_template.py
+notebook-job-laktory-pl:
+  source: ./notebooks/jobs/job_laktory_pl.py
   access_controls:
     - group_name: account users
       permission_level: CAN_READ
 
-notebook-pipelines-dlt-gld-template:
-  source: ./notebooks/pipelines/dlt_gld_template.py
-  access_controls:
-    - group_name: account users
-      permission_level: CAN_READ
-
-notebook-pipelines-dlt-gld-stock-performances:
-  source: ./notebooks/pipelines/dlt_gld_stock_performances.py
+notebook-dlt-gld-stock-performances:
+  source: ./notebooks/dlt/dlt_gld_stock_performances.py
   access_controls:
     - group_name: account users
       permission_level: CAN_READ

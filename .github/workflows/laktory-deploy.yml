@@ -22,12 +22,12 @@ jobs:
 
   laktory-run-dev:
     needs: laktory-deploy-dev
-    uses: ./.github/workflows/_job_laktory_run_pipeline.yml
+    uses: ./.github/workflows/_job_laktory_run_dlt.yml
     with:
       env: dev
       working-directory: ./workspace
       databricks_host: 'adb-4623853922539974.14.azuredatabricks.net'
-      pipeline_name: pl-stock-prices
+      dlt_name: dlt-stock-prices
     secrets: inherit
 
   laktory-preview-prd:

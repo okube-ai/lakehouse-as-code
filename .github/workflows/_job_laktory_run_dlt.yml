@@ -1,4 +1,4 @@
-name: laktory run pipeline
+name: laktory run DLT pipeline
 
 on:
   workflow_call:
@@ -13,7 +13,7 @@ on:
       databricks_host:
         type: string
         required: true
-      pipeline_name:
+      dlt_name:
         type: string
         required: true
       timeout:
@@ -62,7 +62,7 @@ env:
   DATABRICKS_TOKEN: ${{ secrets.databricks_token }}
 
 jobs:
-  laktory-run-pipeline:
+  laktory-run-dlt:
     runs-on: ubuntu-latest
     steps:
 
@@ -95,5 +95,5 @@ jobs:
             REFRESH_OPTION="--fr"
           fi          
           
-          laktory run -e ${{ inputs.env }} -p ${{ inputs.pipeline_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }} $EXCEPTION_OPTION $REFRESH_OPTION
+          laktory run -e ${{ inputs.env }} --dlt ${{ inputs.dlt_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }} $EXCEPTION_OPTION $REFRESH_OPTION
         working-directory: ${{ inputs.working-directory }}

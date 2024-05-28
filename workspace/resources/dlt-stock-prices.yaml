@@ -1,14 +1,40 @@
-name: pl-stock-prices
-orchestrator: DATABRICKS_JOB
-databricks_job:
-  name: job-pl-stock-prices
+name: dlt-stock-prices
+
+orchestrator: DLT
+
+# --------------------------------------------------------------------------- #
+# DLT                                                                         #
+# --------------------------------------------------------------------------- #
+
+dlt:
+  resource_name: dlt-stock-prices
+  catalog: ${vars.env}
+  target: finance
+  development: ${vars.is_dev}
+  configuration:
+    pipeline_name: dlt-stock-prices
+
+  ## TODO: Uncomment for DEMO
+  #continuous: True
+
   clusters:
-    - name: node-cluster
+    - name : default
+      node_type_id: Standard_DS3_v2
       autoscale:
         min_workers: 1
         max_workers: 2
-      spark_version: 15.2.x-scala2.12
-      node_type_id: Standard_DS3_v2
+
+  libraries:
+    - notebook:
+        path: /.laktory/dlt/dlt_laktory_pl.py
+    - notebook:
+        path: /.laktory/dlt/dlt_gld_stock_performances.py
+
+  access_controls:
+    - group_name: account users
+      permission_level: CAN_VIEW
+    - group_name: role-engineers
+      permission_level: CAN_RUN
 
 udfs:
   - module_name: stock_functions
@@ -29,10 +55,9 @@ nodes:
     timestamp_key: data.created_at
     source:
       path: /Volumes/${vars.env}/sources/landing/events/yahoo-finance/stock_price/
-      as_stream: false
+      as_stream: true
     sink:
-      path: /Volumes/${vars.env}/sources/landing/tables/brz_stock_prices/
-      mode: OVERWRITE
+      table_name: brz_stock_prices
 
   - name: slv_stock_prices
     layer: SILVER
@@ -46,10 +71,9 @@ nodes:
         action: DROP
     source:
       node_name: brz_stock_prices
-      as_stream: false
+      as_stream: true
     sink:
-      path: /Volumes/${vars.env}/sources/landing/tables/slv_stock_prices/
-      mode: OVERWRITE
+      table_name: slv_stock_prices
     transformer:
       nodes:
         - column:
@@ -101,6 +125,13 @@ nodes:
           spark_func_args:
             - data.high
 
+#          #TODO: Uncomment for demo
+#          - name: volume
+#            type: double
+#            spark_func_name: coalesce
+#            spark_func_args:
+#              - data.volume
+
   # ------------------------------------------------------------------------- #
   # Stock Metadata                                                            #
   # ------------------------------------------------------------------------- #
@@ -110,16 +141,12 @@ nodes:
     source:
       path: /Volumes/${vars.env}/sources/landing/events/yahoo-finance/stock_metadata/
     sink:
-      path: /Volumes/${vars.env}/sources/landing/tables/brz_stock_metadata/
-      mode: OVERWRITE
+      table_name: brz_stock_metadata
 
   - name: slv_stock_metadata
     layer: SILVER
     source:
       node_name: brz_stock_metadata
-    sink:
-      path: /Volumes/${vars.env}/sources/landing/tables/slv_stock_metadata/
-      mode: OVERWRITE
     transformer:
       nodes:
         - column:
@@ -152,10 +179,9 @@ nodes:
     drop_source_columns: False
     source:
       node_name: slv_stock_prices
-      as_stream: false
+      as_stream: true
     sink:
-      path: /Volumes/${vars.env}/sources/landing/tables/slv_stocks/
-      mode: OVERWRITE
+      table_name: slv_stocks
     transformer:
       nodes:
         - spark_func_name: smart_join
@@ -177,10 +203,9 @@ nodes:
     layer: GOLD
     source:
       node_name: slv_stocks
-      as_stream: false
+      as_stream: True
     sink:
-      path: /Volumes/${vars.env}/sources/landing/tables/gld_stock_prices_by_1d/
-      mode: OVERWRITE
+      table_name: gld_stock_prices_by_1d
     transformer:
       nodes:
         - spark_func_name: groupby_and_agg
@@ -216,3 +241,11 @@ nodes:
                 spark_func_name: last
                 spark_func_args:
                   - close
+
+  - name: gld_stock_performances
+    layer: GOLD
+    dlt_template: STOCK_PERFORMANCES
+    source:
+      node_name: slv_stocks
+    sink:
+      table_name: gld_stock_performances

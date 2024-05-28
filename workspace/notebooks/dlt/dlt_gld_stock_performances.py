@@ -1,16 +1,16 @@
-# Databricks notebook source
-# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@sparkchain_doc
-# MAGIC %pip install 'laktory==0.2.1'
+# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@pipeline_engines
+# MAGIC %pip install 'laktory==0.3.1'
 
 # COMMAND ----------
-import pyspark.sql.functions as F
 import importlib
 import sys
 import os
+import pyspark.sql.functions as F
 
 from laktory import dlt
-from laktory import read_metadata
+from laktory import models
 from laktory import get_logger
+from laktory import settings
 
 spark.conf.set("spark.sql.session.timeZone", "UTC")
 dlt.spark = spark
@@ -18,16 +18,9 @@ logger = get_logger(__name__)
 
 # Read pipeline definition
 pl_name = spark.conf.get("pipeline_name", "pl-stock-prices")
-pl = read_metadata(pipeline=pl_name)
-
-# Import User Defined Functions
-sys.path.append("/Workspace/pipelines/")
-udfs = []
-for udf in pl.udfs:
-    if udf.module_path:
-        sys.path.append(os.path.abspath(udf.module_path))
-    module = importlib.import_module(udf.module_name)
-    udfs += [getattr(module, udf.function_name)]
+filepath = f"/Workspace{settings.workspace_laktory_root}pipelines/{pl_name}.json"
+with open(filepath, "r") as fp:
+    pl = models.Pipeline.model_validate_json(fp.read())
 
 
 # --------------------------------------------------------------------------- #
@@ -35,16 +28,16 @@ for udf in pl.udfs:
 # --------------------------------------------------------------------------- #
 
 
-def define_table(table):
+def define_table(node):
     @dlt.table(
-        name=table.name,
-        comment=table.comment,
+        name=node.name,
+        comment=node.description,
     )
     def get_df():
-        logger.info(f"Building {table.name} table")
+        logger.info(f"Building {node.name} node")
 
         # Read Source
-        df = table.builder.read_source(spark)
+        df = node.source.read(spark)
         df.printSchema()
 
         # ------------------------------------------------------------------- #
@@ -79,9 +72,12 @@ def define_table(table):
 # Execution                                                                   #
 # --------------------------------------------------------------------------- #
 
-# Build tables
-for table in pl.tables:
-    if table.builder.template == "STOCK_PERFORMANCES":
-        wrapper = define_table(table)
-        df = dlt.get_df(wrapper)
-        display(df)
+# Build nodes
+for node in pl.nodes:
+
+    if node.dlt_template != "STOCK_PERFORMANCES":
+        continue
+
+    wrapper = define_table(node)
+    df = dlt.get_df(wrapper)
+    display(df)
