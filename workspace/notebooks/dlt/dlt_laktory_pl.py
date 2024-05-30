@@ -1,5 +1,5 @@
 # MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@pipeline_engines
-# MAGIC %pip install 'laktory==0.3.1'
+# MAGIC %pip install 'laktory==0.3.3'
 
 # COMMAND ----------
 import importlib
@@ -16,7 +16,7 @@ dlt.spark = spark
 logger = get_logger(__name__)
 
 # Read pipeline definition
-pl_name = spark.conf.get("pipeline_name", "pl-stock-prices")
+pl_name = spark.conf.get("pipeline_name", "dlt-stock-prices")
 filepath = f"/Workspace{settings.workspace_laktory_root}pipelines/{pl_name}.json"
 with open(filepath, "r") as fp:
     pl = models.Pipeline.model_validate_json(fp.read())
