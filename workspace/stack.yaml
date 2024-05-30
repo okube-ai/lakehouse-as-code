@@ -32,7 +32,7 @@ environments:
           nodes:
             0:
               source:
-                limit: 2
+                limit: 100
   dev:
     variables:
       env: dev
