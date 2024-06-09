@@ -1,0 +1,212 @@
+name: pl-stock-prices
+
+# --------------------------------------------------------------------------- #
+# Nodes                                                                       #
+# --------------------------------------------------------------------------- #
+
+nodes:
+
+  # ------------------------------------------------------------------------- #
+  # Stock Prices                                                              #
+  # ------------------------------------------------------------------------- #
+
+  - name: brz_stock_prices
+    timestamp_key: created_at
+    layer: BRONZE
+    source:
+      path: ./data/stock_prices.json
+      dataframe_type: POLARS
+      format: JSON
+      multiline: True
+      as_stream: false
+    sink:
+      path: ./data/brz_stock_prices.parquet
+      format: PARQUET
+
+  - name: slv_stock_prices
+    layer: SILVER
+    timestamp_key: created_at
+    expectations:
+      - name: positive_price
+        expression: open > 0
+        action: FAIL
+      - name: recent_price
+        expression: created_at > '2023-01-01'
+        action: DROP
+    source:
+      node_name: brz_stock_prices
+      as_stream: false
+    sink:
+      path: ./data/slv_stock_prices.parquet
+      format: PARQUET
+    transformer:
+      nodes:
+        - column:
+            name: created_at
+            type: timestamp
+          polars_func_name: laktory.sql_expr
+          polars_func_args:
+            - data._created_at
+
+        - column:
+            name: symbol
+            type: string
+          polars_func_name: laktory.sql_expr
+          polars_func_args:
+            - data.symbol
+
+        - column:
+            name: name
+            type: string
+          polars_func_name: laktory.sql_expr
+          polars_func_args:
+            - data.symbol
+
+        - column:
+            name: open
+            type: double
+          polars_func_name: laktory.sql_expr
+          polars_func_args:
+            - data.open
+
+        - column:
+            name: close
+            type: double
+          polars_func_name: laktory.sql_expr
+          polars_func_args:
+            - data.close
+
+        - column:
+            name: low
+            type: double
+          polars_func_name: laktory.sql_expr
+          polars_func_args:
+            - data.low
+
+        - column:
+            name: high
+            type: double
+          polars_func_name: laktory.sql_expr
+          polars_func_args:
+            - data.high
+
+  # ------------------------------------------------------------------------- #
+  # Stock Metadata                                                            #
+  # ------------------------------------------------------------------------- #
+
+  - name: brz_stock_metadata
+    layer: BRONZE
+    source:
+      path: ./data/stock_metadata.json
+      dataframe_type: POLARS
+      format: JSON
+      multiline: True
+      as_stream: false
+    sink:
+      path: ./data/brz_stock_metadata.parquet
+      format: PARQUET
+
+  - name: slv_stock_metadata
+    layer: SILVER
+    source:
+      node_name: brz_stock_metadata
+    sink:
+      path: ./data/slv_stock_metadata.parquet
+      format: PARQUET
+    transformer:
+      nodes:
+        - column:
+            name: symbol
+            type: string
+          polars_func_name: laktory.sql_expr
+          polars_func_args:
+            - data.symbol
+
+        - column:
+            name: currency
+            type: string
+          polars_func_name: laktory.sql_expr
+          polars_func_args:
+            - data.currency
+
+        - column:
+            name: first_traded
+            type: timestamp
+          polars_func_name: laktory.sql_expr
+          polars_func_args:
+            - data.firstTradeDate
+
+  # ------------------------------------------------------------------------- #
+  # Silver Joins                                                              #
+  # ------------------------------------------------------------------------- #
+
+  - name: slv_stocks
+    layer: SILVER
+    drop_source_columns: False
+    source:
+      node_name: slv_stock_prices
+      as_stream: false
+    sink:
+      path: ./data/slv_stocks.parquet
+      format: PARQUET
+    transformer:
+      nodes:
+        - polars_func_name: laktory.smart_join
+          polars_func_kwargs:
+            other:
+              node_name: slv_stock_metadata
+              selects:
+                - symbol
+                - currency
+                - first_traded
+            "on":
+              - symbol
+        - polars_func_name: with_columns
+          polars_func_kwargs:
+            day_id: col("created_at").dt.truncate("1d")
+
+  # ------------------------------------------------------------------------- #
+  # Gold                                                                      #
+  # ------------------------------------------------------------------------- #
+
+  - name: gld_stocks_prices_by_1d
+    layer: GOLD
+    source:
+      node_name: slv_stocks
+      as_stream: false
+    sink:
+      path: ./data/gld_stocks_prices_by_1d.parquet
+      format: PARQUET
+    transformer:
+      nodes:
+        - polars_func_name: laktory.groupby_and_agg
+          polars_func_kwargs:
+            groupby_columns:
+              - symbol
+              - day_id
+            agg_expressions:
+              - column:
+                  name: count
+                polars_func_name: count
+                polars_func_args:
+                  - symbol
+              - column:
+                  name: low
+                polars_func_name: min
+                polars_func_args:
+                  - low
+              - column:
+                  name: high
+                polars_func_name: max
+                polars_func_args:
+                  - high
+              - column:
+                  name: open
+                polars_func_name: first
+                polars_func_args:
+                  - open
+              - column:
+                  name: close
+                polars_func_name: last
+                polars_func_args:
+                  - close
