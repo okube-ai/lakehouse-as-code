@@ -1,5 +1,5 @@
-# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@pipeline_engines
-# MAGIC %pip install 'laktory==0.3.3'
+# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@polars_expresssions_chain
+# MAGIC %pip install 'laktory==0.4.0'
 
 # COMMAND ----------
 import importlib
@@ -74,7 +74,6 @@ def define_table(node):
 
 # Build nodes
 for node in pl.nodes:
-
     if node.dlt_template != "STOCK_PERFORMANCES":
         continue
 

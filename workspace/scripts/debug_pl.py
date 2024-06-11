@@ -51,4 +51,3 @@ pl.execute(spark=spark, write_sinks=False, udfs=udfs)
 
 df = pl.nodes_dict["slv_stocks"].output_df
 df.display()
-
