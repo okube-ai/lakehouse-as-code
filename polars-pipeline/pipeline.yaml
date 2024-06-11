@@ -40,55 +40,42 @@ nodes:
       path: ./data/slv_stock_prices.parquet
       format: PARQUET
     transformer:
+      polars: True
       nodes:
-        - column:
+        - with_column:
             name: created_at
             type: timestamp
-          polars_func_name: laktory.sql_expr
-          polars_func_args:
-            - data._created_at
+            expr: pl.expr.laktory.sql_expr('data._created_at')
 
-        - column:
+        - with_column:
             name: symbol
             type: string
-          polars_func_name: laktory.sql_expr
-          polars_func_args:
-            - data.symbol
+            expr: pl.expr.laktory.sql_expr('data.symbol')
 
-        - column:
+        - with_column:
             name: name
             type: string
-          polars_func_name: laktory.sql_expr
-          polars_func_args:
-            - data.symbol
+            expr: pl.expr.laktory.sql_expr('data.symbol')
 
-        - column:
+        - with_column:
             name: open
             type: double
-          polars_func_name: laktory.sql_expr
-          polars_func_args:
-            - data.open
+            expr: pl.expr.laktory.sql_expr('data.open')
 
-        - column:
+        - with_column:
             name: close
             type: double
-          polars_func_name: laktory.sql_expr
-          polars_func_args:
-            - data.close
+            expr: pl.expr.laktory.sql_expr('data.close')
 
-        - column:
+        - with_column:
             name: low
             type: double
-          polars_func_name: laktory.sql_expr
-          polars_func_args:
-            - data.low
+            expr: pl.expr.laktory.sql_expr('data.low')
 
-        - column:
+        - with_column:
             name: high
             type: double
-          polars_func_name: laktory.sql_expr
-          polars_func_args:
-            - data.high
+            expr: pl.expr.laktory.sql_expr('data.high')
 
   # ------------------------------------------------------------------------- #
   # Stock Metadata                                                            #
@@ -114,27 +101,22 @@ nodes:
       path: ./data/slv_stock_metadata.parquet
       format: PARQUET
     transformer:
+      polars: True
       nodes:
-        - column:
+        - with_column:
             name: symbol
             type: string
-          polars_func_name: laktory.sql_expr
-          polars_func_args:
-            - data.symbol
+            expr: pl.expr.laktory.sql_expr('data.symbol')
 
-        - column:
+        - with_column:
             name: currency
             type: string
-          polars_func_name: laktory.sql_expr
-          polars_func_args:
-            - data.currency
+            expr: pl.expr.laktory.sql_expr('data.currency')
 
-        - column:
+        - with_column:
             name: first_traded
             type: timestamp
-          polars_func_name: laktory.sql_expr
-          polars_func_args:
-            - data.firstTradeDate
+            sql_expr: data.firstTradeDate
 
   # ------------------------------------------------------------------------- #
   # Silver Joins                                                              #
@@ -150,9 +132,10 @@ nodes:
       path: ./data/slv_stocks.parquet
       format: PARQUET
     transformer:
+      polars: True
       nodes:
-        - polars_func_name: laktory.smart_join
-          polars_func_kwargs:
+        - func_name: laktory.smart_join
+          func_kwargs:
             other:
               node_name: slv_stock_metadata
               selects:
@@ -161,8 +144,8 @@ nodes:
                 - first_traded
             "on":
               - symbol
-        - polars_func_name: with_columns
-          polars_func_kwargs:
+        - func_name: with_columns
+          func_kwargs:
             day_id: col("created_at").dt.truncate("1d")
 
   # ------------------------------------------------------------------------- #
@@ -179,34 +162,19 @@ nodes:
       format: PARQUET
     transformer:
       nodes:
-        - polars_func_name: laktory.groupby_and_agg
-          polars_func_kwargs:
+        - func_name: laktory.groupby_and_agg
+          func_kwargs:
             groupby_columns:
               - symbol
               - day_id
             agg_expressions:
-              - column:
-                  name: count
-                polars_func_name: count
-                polars_func_args:
-                  - symbol
-              - column:
-                  name: low
-                polars_func_name: min
-                polars_func_args:
-                  - low
-              - column:
-                  name: high
-                polars_func_name: max
-                polars_func_args:
-                  - high
-              - column:
-                  name: open
-                polars_func_name: first
-                polars_func_args:
-                  - open
-              - column:
-                  name: close
-                polars_func_name: last
-                polars_func_args:
-                  - close
+              - name: count
+                expr: pl.col('symbol').count()
+              - name: low
+                expr: pl.col('low').min()
+              - name: high
+                expr: pl.col('high').max()
+              - name: open
+                expr: pl.col('open').first()
+              - name: close
+                expr: pl.col('close').last()
