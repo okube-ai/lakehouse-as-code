@@ -1,4 +1,5 @@
 name: pl-stock-prices
+dataframe_type: POLARS
 
 # --------------------------------------------------------------------------- #
 # Nodes                                                                       #
@@ -15,7 +16,6 @@ nodes:
     layer: BRONZE
     source:
       path: ./data/stock_prices.json
-      dataframe_type: POLARS
       format: JSON
       multiline: True
       as_stream: false
@@ -85,7 +85,6 @@ nodes:
     layer: BRONZE
     source:
       path: ./data/stock_metadata.json
-      dataframe_type: POLARS
       format: JSON
       multiline: True
       as_stream: false
@@ -144,9 +143,9 @@ nodes:
                 - first_traded
             "on":
               - symbol
-        - func_name: with_columns
-          func_kwargs:
-            day_id: col("created_at").dt.truncate("1d")
+        - with_column:
+            name: day_id
+            expr: pl.col("created_at").dt.truncate("1d")
 
   # ------------------------------------------------------------------------- #
   # Gold                                                                      #
