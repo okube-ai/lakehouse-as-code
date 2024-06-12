@@ -52,54 +52,40 @@ nodes:
       mode: OVERWRITE
     transformer:
       nodes:
-        - column:
+        - with_column:
             name: created_at
             type: timestamp
-          spark_func_name: coalesce
-          spark_func_args:
-            - data._created_at
+            expr: F.col('data._created_at')
 
-        - column:
+        - with_column:
             name: symbol
             type: string
-          spark_func_name: coalesce
-          spark_func_args:
-            - data.symbol
+            expr: F.col('data.symbol')
 
-        - column:
+        - with_column:
             name: name
             type: string
-          spark_func_name: symbol_to_name
-          spark_func_args:
-            - data.symbol
+            expr: F.col('data.symbol')
 
-        - column:
+        - with_column:
             name: open
             type: double
-          spark_func_name: coalesce
-          spark_func_args:
-            - data.open
+            expr: F.col('data.open')
 
-        - column:
+        - with_column:
             name: close
             type: double
-          spark_func_name: coalesce
-          spark_func_args:
-            - data.close
+            expr: F.col('data.close')
 
-        - column:
+        - with_column:
             name: low
             type: double
-          spark_func_name: coalesce
-          spark_func_args:
-            - data.low
+            expr: F.col('data.low')
 
-        - column:
+        - with_column:
             name: high
             type: double
-          spark_func_name: coalesce
-          spark_func_args:
-            - data.high
+            expr: F.col('data.high')
 
   # ------------------------------------------------------------------------- #
   # Stock Metadata                                                            #
@@ -122,26 +108,20 @@ nodes:
       mode: OVERWRITE
     transformer:
       nodes:
-        - column:
+        - with_column:
             name: symbol
             type: string
-          spark_func_name: coalesce
-          spark_func_args:
-            - data.symbol
+            expr: F.col('data.symbol')
 
-        - column:
+        - with_column:
             name: currency
             type: string
-          spark_func_name: coalesce
-          spark_func_args:
-            - data.currency
+            expr: F.col('data.currency')
 
-        - column:
+        - with_column:
             name: first_traded
             type: timestamp
-          spark_func_name: coalesce
-          spark_func_args:
-            - data.firstTradeDate
+            expr: F.col('data.firstTradeDate')
 
   # ------------------------------------------------------------------------- #
   # Silver Joins                                                              #
@@ -158,8 +138,8 @@ nodes:
       mode: OVERWRITE
     transformer:
       nodes:
-        - spark_func_name: smart_join
-          spark_func_kwargs:
+        - func_name: laktory.smart_join
+          func_kwargs:
             other:
               node_name: slv_stock_metadata
               selects:
@@ -183,36 +163,21 @@ nodes:
       mode: OVERWRITE
     transformer:
       nodes:
-        - spark_func_name: groupby_and_agg
-          spark_func_kwargs:
+        - func_name: laktory.groupby_and_agg
+          func_kwargs:
             groupby_columns:
               - symbol
             groupby_window:
               time_column: _tstamp
               window_duration: 1 day
             agg_expressions:
-              - column:
-                  name: count
-                spark_func_name: count
-                spark_func_args:
-                  - symbol
-              - column:
-                  name: low
-                spark_func_name: min
-                spark_func_args:
-                  - low
-              - column:
-                  name: high
-                spark_func_name: max
-                spark_func_args:
-                  - high
-              - column:
-                  name: open
-                spark_func_name: first
-                spark_func_args:
-                  - open
-              - column:
-                  name: close
-                spark_func_name: last
-                spark_func_args:
-                  - close
+              - name: count
+                expr: F.count('symbol')
+              - name: low
+                expr: F.min('low')
+              - name: high
+                expr: F.max('high')
+              - name: open
+                expr: F.first('open')
+              - name: close
+                expr: F.last('close')

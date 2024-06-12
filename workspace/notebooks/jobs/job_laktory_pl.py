@@ -3,12 +3,14 @@ dbutils.widgets.text("pipeline_name", "pl-stock-prices")
 dbutils.widgets.text("node_name", "")
 
 # COMMAND ----------
+# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@node_reader
+# MAGIC %pip install 'laktory==0.4.3'
+
+# COMMAND ----------
 import importlib
 import sys
 import os
 import pyspark.sql.functions as F
-# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@pipeline_engines
-# MAGIC %pip install 'laktory==0.3.3'
 
 # COMMAND ----------
 from laktory import models
