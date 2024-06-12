@@ -10,7 +10,7 @@ cluster-default:
   autotermination_minutes: 30
   libraries:
     - pypi:
-        package: 'laktory==0.4.0'
+        package: 'laktory==0.4.3'
     - pypi:
         package: yfinance
   access_controls:

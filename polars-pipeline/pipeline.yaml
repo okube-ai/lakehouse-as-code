@@ -40,7 +40,6 @@ nodes:
       path: ./data/slv_stock_prices.parquet
       format: PARQUET
     transformer:
-      polars: True
       nodes:
         - with_column:
             name: created_at
@@ -100,7 +99,6 @@ nodes:
       path: ./data/slv_stock_metadata.parquet
       format: PARQUET
     transformer:
-      polars: True
       nodes:
         - with_column:
             name: symbol
@@ -131,7 +129,6 @@ nodes:
       path: ./data/slv_stocks.parquet
       format: PARQUET
     transformer:
-      polars: True
       nodes:
         - func_name: laktory.smart_join
           func_kwargs:
