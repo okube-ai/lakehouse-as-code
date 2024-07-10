@@ -1,0 +1,20 @@
+- name: finance
+  grants:
+    - principal: domain-finance
+      privileges:
+        - SELECT
+- name: engineering
+  grants:
+    - principal: domain-engineering
+      privileges:
+        - SELECT
+- name: sandbox
+  grants:
+    - principal: account users
+      privileges:
+        - SELECT
+        - MODIFY
+        - CREATE_FUNCTION
+        - CREATE_MATERIALIZED_VIEW
+        - CREATE_MODEL
+        - CREATE_TABLE
