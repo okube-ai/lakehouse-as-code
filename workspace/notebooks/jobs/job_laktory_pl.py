@@ -3,8 +3,8 @@ dbutils.widgets.text("pipeline_name", "pl-stock-prices")
 dbutils.widgets.text("node_name", "")
 
 # COMMAND ----------
-# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@node_reader
-# MAGIC %pip install 'laktory==0.4.3'
+# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@node_reader transformers llama-index-core llama-index-llms-langchain 'pdfminer.six'
+# MAGIC %pip install 'laktory==0.4.10' transformers llama-index-core llama-index-llms-langchain 'pdfminer.six'
 
 # COMMAND ----------
 import importlib
@@ -12,7 +12,6 @@ import sys
 import os
 import pyspark.sql.functions as F
 
-# COMMAND ----------
 from laktory import models
 from laktory import get_logger
 from laktory import settings
@@ -37,6 +36,8 @@ for udf in pl.udfs:
     if udf.module_path:
         sys.path.append(os.path.abspath(udf.module_path))
     module = importlib.import_module(udf.module_name)
+    module = importlib.reload(module)
+    globals()[udf.module_name] = module
     udfs += [getattr(module, udf.function_name)]
 
 # --------------------------------------------------------------------------- #

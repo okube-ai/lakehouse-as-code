@@ -15,6 +15,8 @@ spark = DatabricksSession.builder.getOrCreate()
 
 udf_dirpath = "../workspacefiles/pipelines/"
 
+node_name = "slv_stock_prices"
+
 
 # --------------------------------------------------------------------------- #
 # Get Pipeline                                                                #
@@ -24,7 +26,8 @@ udf_dirpath = "../workspacefiles/pipelines/"
 with open(stack_filepath, "r") as fp:
     stack = models.Stack.model_validate_yaml(fp)
 
-pl = stack.get_env("debug").resources.pipelines["dlt-stock-prices"]
+# pl = stack.get_env("debug").resources.pipelines["dlt-stock-prices"]
+pl = stack.get_env("debug").resources.pipelines["pl-stock-prices"]
 
 
 # --------------------------------------------------------------------------- #
@@ -43,11 +46,14 @@ for udf in pl.udfs:
 # Execute Pipeline                                                            #
 # --------------------------------------------------------------------------- #
 
-pl.execute(spark=spark, write_sinks=False, udfs=udfs)
+if node_name:
+    pl.nodes_dict[node_name].execute(spark=spark, write_sink=True, udfs=udfs)
+else:
+    pl.execute(spark=spark, write_sinks=False, udfs=udfs)
 
 # --------------------------------------------------------------------------- #
 # Display Results                                                             #
 # --------------------------------------------------------------------------- #
 
-df = pl.nodes_dict["slv_stocks"].output_df
+df = pl.nodes_dict["slv_stock_prices"].output_df
 df.laktory.display()

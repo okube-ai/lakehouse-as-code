@@ -3,6 +3,11 @@
     - principal: domain-finance
       privileges:
         - SELECT
+- name: databricks
+  grants:
+    - principal: account users
+      privileges:
+        - SELECT
 - name: engineering
   grants:
     - principal: domain-engineering
