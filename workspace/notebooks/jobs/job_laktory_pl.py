@@ -1,10 +1,11 @@
 # COMMAND ----------
 dbutils.widgets.text("pipeline_name", "pl-stock-prices")
 dbutils.widgets.text("node_name", "")
+dbutils.widgets.text("refresh", "False")
 
 # COMMAND ----------
-# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@node_reader transformers llama-index-core llama-index-llms-langchain 'pdfminer.six'
-# MAGIC %pip install 'laktory==0.4.10' transformers llama-index-core llama-index-llms-langchain 'pdfminer.six'
+# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@main langchain 'pdfminer.six'
+# MAGIC %pip install 'laktory==0.4.10' langchain 'pdfminer.six'
 
 # COMMAND ----------
 import importlib
