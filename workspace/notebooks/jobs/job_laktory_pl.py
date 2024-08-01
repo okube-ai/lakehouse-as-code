@@ -4,8 +4,8 @@ dbutils.widgets.text("node_name", "")
 dbutils.widgets.text("refresh", "False")
 
 # COMMAND ----------
-# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@main langchain 'pdfminer.six'
-# MAGIC %pip install 'laktory==0.4.10' langchain 'pdfminer.six'
+# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@main langchain langchain_community 'pdfminer.six'
+# MAGIC %pip install 'laktory==0.4.10' langchain langchain_community 'pdfminer.six'
 
 # COMMAND ----------
 import importlib
