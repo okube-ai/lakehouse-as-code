@@ -1,10 +1,11 @@
 # COMMAND ----------
 dbutils.widgets.text("pipeline_name", "pl-stock-prices")
 dbutils.widgets.text("node_name", "")
+dbutils.widgets.text("full_refresh", "False")
 
 # COMMAND ----------
-# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@node_reader transformers llama-index-core llama-index-llms-langchain 'pdfminer.six'
-# MAGIC %pip install 'laktory==0.4.10' transformers llama-index-core llama-index-llms-langchain 'pdfminer.six'
+# MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@main langchain langchain_community 'pdfminer.six'
+# MAGIC %pip install 'laktory==0.4.11' langchain langchain_community 'pdfminer.six'
 
 # COMMAND ----------
 import importlib
@@ -24,6 +25,7 @@ logger = get_logger(__name__)
 
 pl_name = dbutils.widgets.get("pipeline_name")
 node_name = dbutils.widgets.get("node_name")
+full_refresh = dbutils.widgets.get("full_refresh").lower() == "true"
 filepath = f"/Workspace{settings.workspace_laktory_root}pipelines/{pl_name}.json"
 with open(filepath, "r") as fp:
     pl = models.Pipeline.model_validate_json(fp.read())
@@ -45,6 +47,6 @@ for udf in pl.udfs:
 # --------------------------------------------------------------------------- #
 
 if node_name:
-    pl.nodes_dict[node_name].execute(spark=spark, udfs=udfs)
+    pl.nodes_dict[node_name].execute(spark=spark, udfs=udfs, full_refresh=full_refresh)
 else:
-    pl.execute(spark=spark, udfs=udfs)
+    pl.execute(spark=spark, udfs=udfs, full_refresh=full_refresh)

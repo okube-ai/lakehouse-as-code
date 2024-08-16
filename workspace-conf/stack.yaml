@@ -15,7 +15,6 @@ pulumi:
 resources:
   databricks_secretscopes: ${include.resources/secretscopes.yaml}
   databricks_directories: ${include.resources/directories.yaml}
-  databricks_workspacefiles: ${include.resources/workspacefiles.yaml}
   databricks_clusters: ${include.resources/clusters.yaml}
   databricks_warehouses: ${include.resources/warehouses.yaml}
 environments:
