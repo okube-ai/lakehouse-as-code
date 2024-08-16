@@ -1,7 +1,7 @@
 # COMMAND ----------
 dbutils.widgets.text("pipeline_name", "pl-stock-prices")
 dbutils.widgets.text("node_name", "")
-dbutils.widgets.text("refresh", "False")
+dbutils.widgets.text("full_refresh", "False")
 
 # COMMAND ----------
 # MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@main langchain langchain_community 'pdfminer.six'
@@ -25,7 +25,7 @@ logger = get_logger(__name__)
 
 pl_name = dbutils.widgets.get("pipeline_name")
 node_name = dbutils.widgets.get("node_name")
-refresh = dbutils.widgets.get("refresh").lower() == "true"
+refresh = dbutils.widgets.get("full_refresh").lower() == "true"
 filepath = f"/Workspace{settings.workspace_laktory_root}pipelines/{pl_name}.json"
 with open(filepath, "r") as fp:
     pl = models.Pipeline.model_validate_json(fp.read())
