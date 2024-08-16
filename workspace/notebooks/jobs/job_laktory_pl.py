@@ -5,7 +5,7 @@ dbutils.widgets.text("full_refresh", "False")
 
 # COMMAND ----------
 # MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@main langchain langchain_community 'pdfminer.six'
-# MAGIC %pip install 'laktory==0.4.10' langchain langchain_community 'pdfminer.six'
+# MAGIC %pip install 'laktory==0.4.11' langchain langchain_community 'pdfminer.six'
 
 # COMMAND ----------
 import importlib
