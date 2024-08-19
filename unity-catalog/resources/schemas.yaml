@@ -5,9 +5,10 @@
         - SELECT
 - name: databricks
   grants:
-    - principal: account users
+    - principal: domain-chatabricks
       privileges:
         - SELECT
+        - EXECUTE
 - name: engineering
   grants:
     - principal: domain-engineering

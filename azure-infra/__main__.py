@@ -23,8 +23,11 @@ class Service:
 
         # Resources
         self.app = None
+        self.app_intelli5 = None
         self.app_secret = None
+        self.app_secret_intelli5 = None
         self.sp = None
+        self.sp_intelli5 = None
         self.me = None
         self.rg = None
         self.keyvault = None
@@ -36,6 +39,7 @@ class Service:
     def run(self):
         # Service principals
         self.set_service_principal()
+        self.set_service_principal_intelli5()
 
         # Resources Group
         self.set_resource_group()
@@ -72,6 +76,25 @@ class Service:
         )
         pulumi.export("neptune-client-secret", self.app_secret.value)
 
+    def set_service_principal_intelli5(self):
+        self.app_intelli5 = azuread.Application(
+            "aad-app-intelli5", display_name=f"Intelli5{self.env.title()}"
+        )
+        pulumi.export("intelli5-object-id", self.app_intelli5.object_id)
+        pulumi.export("intelli5-client-id", self.app_intelli5.application_id)
+
+        self.sp_intelli5 = azuread.ServicePrincipal(
+            "aad-sp-intelli5",
+            application_id=self.app_intelli5.application_id,
+        )
+
+        self.app_secret_intelli5 = azuread.ApplicationPassword(
+            "aad-app-secret-intelli5",
+            application_object_id=self.app_intelli5.object_id,
+            end_date_relative=f"{24*30*6}h",
+        )
+        pulumi.export("intelli5-client-secret", self.app_secret_intelli5.value)
+
     def set_resource_group(self):
         k = f"{self.org}-rg-{self.service}"
         self.rg = azure_native.resources.ResourceGroup(
@@ -98,7 +121,10 @@ class Service:
         pulumi.export("keyvault-url", self.keyvault.properties.vault_uri)
 
         # Secrets
-        for key, value in [("neptune-client-secret", self.app_secret.value)]:
+        for key, value in [
+            ("neptune-client-secret", self.app_secret.value),
+            ("intelli5-client-secret", self.app_secret.value)
+        ]:
             self._set_secret(key, value)
 
         # RBAC - Olivier - Key Vault Administrator
