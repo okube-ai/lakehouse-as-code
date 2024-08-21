@@ -1,3 +1,10 @@
+group-domain-chatabricks:
+  display_name: domain-chatabricks
+  workspace_permission_assignments:
+    - workspace_id: ${vars.workspace_id_dev}
+      principal_id: 866578451593552  # Required as a workaround for Pulumi who can't cast string (output) into int (input)
+    - workspace_id: ${vars.workspace_id_prd}
+      principal_id: 866578451593552  # Required as a workaround for Pulumi who can't cast string (output) into int (input)
 group-domain-finance:
   display_name: domain-finance
   workspace_permission_assignments:
