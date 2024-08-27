@@ -72,7 +72,7 @@ class Service:
         self.app_secret = azuread.ApplicationPassword(
             "aad-app-secret-neptune",
             application_object_id=self.app.object_id,
-            end_date_relative=f"{24*30*6}h",
+            end_date_relative=f"{24*30*12}h",
         )
         pulumi.export("neptune-client-secret", self.app_secret.value)
 
@@ -123,7 +123,7 @@ class Service:
         # Secrets
         for key, value in [
             ("neptune-client-secret", self.app_secret.value),
-            ("intelli5-client-secret", self.app_secret.value)
+            ("intelli5-client-secret", self.app_secret_intelli5.value)
         ]:
             self._set_secret(key, value)
 
