@@ -26,6 +26,7 @@ resources:
   # TODO: init scripts is challenging because terraform and pulumi do not share the same properties.
 
 variables:
+  databricks_host: https://accounts.azuredatabricks.net
   neptune_dev_client_id: 1f8005d3-5efa-476b-9eb5-11755fea1128
   neptune_prd_client_id: 78f6cf4f-0c24-4977-92fc-562a60358466
   intelli5_dev_client_id: 861e3a1c-5245-4065-80a3-71373f401147
