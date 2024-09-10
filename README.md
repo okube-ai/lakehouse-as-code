@@ -13,5 +13,5 @@ This repository acts as a comprehensive template on how to deploy a lakehouse as
 4 pulumi projects:
 - `{cloud_provider}_infra`: Deploy the required resources on your cloud provider
 - `unity-catalog`: Setup users, groups, catalogs, schemas and manage grants
-- `workspace-conf`: Setup secrets, clusters and warehouses
-- `workspace`: The data workflows to build your lakehouse.
+- `workspace`: Setup secrets, clusters and warehouses and common files/notebooks
+- `workflows`: The data workflows to build your lakehouse

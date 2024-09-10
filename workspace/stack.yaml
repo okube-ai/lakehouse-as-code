@@ -1,6 +1,6 @@
-name: workspace-conf
+name: workspace
 organization: okube
-description: Lakehouse - Workspace Configuration
+description: Lakehouse - Workspace
 backend: pulumi
 pulumi:
   config:
