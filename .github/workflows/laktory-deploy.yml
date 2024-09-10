@@ -16,7 +16,7 @@ jobs:
     uses: ./.github/workflows/_job_laktory_deploy.yml
     with:
       env: dev
-      working-directory: ./workspace
+      working-directory: ./workflows
       databricks_host: 'adb-4623853922539974.14.azuredatabricks.net'
     secrets: inherit
 
@@ -25,7 +25,7 @@ jobs:
     uses: ./.github/workflows/_job_laktory_run_dlt.yml
     with:
       env: dev
-      working-directory: ./workspace
+      working-directory: ./workflows
       databricks_host: 'adb-4623853922539974.14.azuredatabricks.net'
       dlt_name: dlt-stock-prices
     secrets: inherit
@@ -35,7 +35,7 @@ jobs:
     uses: ./.github/workflows/_job_laktory_preview.yml
     with:
       env: prd
-      working-directory: ./workspace
+      working-directory: ./workflows
     secrets: inherit
 
   prd-deploy-approval:
@@ -49,7 +49,7 @@ jobs:
     uses: ./.github/workflows/_job_laktory_deploy.yml
     with:
       env: prd
-      working-directory: ./workspace
+      working-directory: ./workflows
       databricks_host: 'adb-1985337240298151.11.azuredatabricks.net'
     secrets:
       pulumi_access_token: ${{ secrets.PULUMI_ACCESS_TOKEN }}

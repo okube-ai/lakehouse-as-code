@@ -1,6 +1,6 @@
-name: workspace
+name: workflows
 organization: okube
-description: Lakehouse - Workspace
+description: Lakehouse - Workflows
 backend: pulumi
 pulumi:
   config:

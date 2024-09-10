@@ -14,5 +14,5 @@ jobs:
     uses: ./.github/workflows/_job_laktory_preview.yml
     with:
       env: dev
-      working-directory: ./workspace
+      working-directory: ./workflows
     secrets: inherit

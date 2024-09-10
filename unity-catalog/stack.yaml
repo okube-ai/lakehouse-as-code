@@ -23,7 +23,6 @@ resources:
     metastore-lakehouse: ${include.resources/metastore.yaml}
   databricks_externallocations: ${include.resources/externallocations.yaml}
   databricks_catalogs: ${include.resources/catalogs.yaml}
-  # TODO: init scripts is challenging because terraform and pulumi do not share the same properties.
 
 variables:
   databricks_host: https://accounts.azuredatabricks.net
