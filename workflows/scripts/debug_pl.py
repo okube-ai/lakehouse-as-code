@@ -11,7 +11,7 @@ from laktory import models
 
 stack_filepath = "../stack.yaml"
 
-spark = DatabricksSession.builder.getOrCreate()
+spark = DatabricksSession.builder.clusterId("0827-053207-9t2qtwo8").getOrCreate()
 
 udf_dirpath = "../workspacefiles/pipelines/"
 
@@ -55,5 +55,5 @@ else:
 # Display Results                                                             #
 # --------------------------------------------------------------------------- #
 
-df = pl.nodes_dict["slv_stock_prices"].output_df
+df = pl.nodes_dict[node_name].output_df
 df.laktory.display()
