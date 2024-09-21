@@ -1,11 +1,10 @@
 user-olivier-okube-ai:
-  user_name: olivier@okube.ai
+  lookup_existing:
+    user_id: "7450234719887892"
   group_ids:
     - ${resources.group-role-workspace-admins.id}
     - ${resources.group-role-metastore-admins.id}
     - ${resources.group-domain-finance.id}
-  roles:
-    - account_admin
 
 user-data-analyst-okube-ai:
   user_name: data.analyst@okube.ai

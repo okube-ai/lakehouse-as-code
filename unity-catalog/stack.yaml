@@ -5,9 +5,11 @@ backend: pulumi
 
 pulumi:
   config:
-    databricks:account_id: ${vars.DATABRICKS_ACCOUNT_ID}
-    databricks:auth_type: azure-cli
     databricks:host: https://accounts.azuredatabricks.net
+    databricks:account_id: ${vars.DATABRICKS_ACCOUNT_ID}
+    databricks:azure_tenant_id: ${vars.AZURE_TENANT_ID}
+    databricks:azure_client_id: ${vars.AZURE_CLIENT_ID}
+    databricks:azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
 
 resources:
   providers:
