@@ -123,7 +123,7 @@ class Service:
         # Secrets
         for key, value in [
             ("neptune-client-secret", self.app_secret.value),
-            ("intelli5-client-secret", self.app_secret_intelli5.value)
+            ("intelli5-client-secret", self.app_secret_intelli5.value),
         ]:
             self._set_secret(key, value)
 
