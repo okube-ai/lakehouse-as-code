@@ -13,10 +13,20 @@ pulumi:
     warehouse-default-data-source-id: ${resources.warehouse-default.dataSourceId}
     warehouse-default-id: ${resources.warehouse-default.id}
 resources:
+
+  # Secret scopes and secret values
   databricks_secretscopes: ${include.resources/secretscopes.yaml}
+
+  # Directories
   databricks_directories: ${include.resources/directories.yaml}
+
+  # Clusters
   databricks_clusters: ${include.resources/clusters.yaml}
+
+  # Warehouses
   databricks_warehouses: ${include.resources/warehouses.yaml}
+
+# Environment Specific Settings
 environments:
   dev:
     variables:
