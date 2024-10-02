@@ -5,30 +5,48 @@ backend: pulumi
 
 pulumi:
   config:
+
+    # Account Provider
     databricks:host: https://accounts.azuredatabricks.net
     databricks:account_id: ${vars.DATABRICKS_ACCOUNT_ID}
     databricks:azure_tenant_id: ${vars.AZURE_TENANT_ID}
     databricks:azure_client_id: ${vars.AZURE_CLIENT_ID}
     databricks:azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
 
+# List of Resources to deploy
 resources:
+
   providers:
+
+    # Dev Workspace Provider
     provider-databricks-dev:
       host: ${vars.DATABRICKS_HOST_DEV}
       azure_client_id: ${vars.AZURE_CLIENT_ID}
       azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
       azure_tenant_id: ${vars.AZURE_TENANT_ID}
+
+    # Prod Workspace Provider
     provider-databricks-prd:
       host: ${vars.DATABRICKS_HOST_PRD}
       azure_client_id: ${vars.AZURE_CLIENT_ID}
       azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
       azure_tenant_id: ${vars.AZURE_TENANT_ID}
+
+  # Account Groups
   databricks_groups: ${include.resources/groups.yaml}
+
+  # Account Users
   databricks_users: ${include.resources/users.yaml}
   databricks_serviceprincipals: ${include.resources/serviceprincipals.yaml}
+
+  # Metastore
   databricks_metastores:
     metastore-lakehouse: ${include.resources/metastore.yaml}
+
+  # External Locations
   databricks_externallocations: ${include.resources/externallocations.yaml}
+
+  # Catalogs
   databricks_catalogs: ${include.resources/catalogs.yaml}
 
 variables:

@@ -10,6 +10,7 @@ delta_sharing_organization_name: okube
 workspace_assignments:
   - workspace_id: ${vars.workspace_id_dev}
   - workspace_id: ${vars.workspace_id_prd}
+grants_provider: ${resources.provider-databricks-dev}
 grants:
   - principal: role-metastore-admins
     privileges:
@@ -18,13 +19,15 @@ grants:
       - CREATE_EXTERNAL_LOCATION
       - CREATE_STORAGE_CREDENTIAL
       - MANAGE_ALLOWLIST
-grants_provider: ${resources.provider-databricks-dev}
 data_accesses:
   - name: lakehouse-dev
     azure_managed_identity:
       access_connector_id: /subscriptions/c8b10a15-5bb2-4c3f-988a-8ec6e60614bb/resourceGroups/o3-rg-lakehouse-dev/providers/Microsoft.Databricks/accessConnectors/o3-dbksac-lakehouse-dev
     force_destroy: True
     is_default: True
+    options:
+      ignore_changes:
+        - is_default  # This is required as state default state does not get saved on Databricks/IaC side
     grants:
       - principal: role-metastore-admins
         privileges:

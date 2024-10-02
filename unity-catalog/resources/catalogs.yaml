@@ -36,7 +36,7 @@ catalog-dev:
 catalog-prd:
   name: prd
   storage_root: ${vars.metastore_prd_storage_location}
-  isolation_mode: OPEN
+  isolation_mode: ISOLATED
   grants:
     - principal: account users
       privileges:
