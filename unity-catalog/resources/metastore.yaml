@@ -7,7 +7,6 @@ owner: role-metastore-admins
 delta_sharing_scope: INTERNAL_AND_EXTERNAL
 delta_sharing_recipient_token_lifetime_in_seconds: 0
 delta_sharing_organization_name: okube
-workspace_provider: ${resources.provider-workspace-neptune}
 workspace_assignments:
   - workspace_id: ${vars.workspace_id_dev}
   - workspace_id: ${vars.workspace_id_prd}
@@ -19,6 +18,7 @@ grants:
       - CREATE_EXTERNAL_LOCATION
       - CREATE_STORAGE_CREDENTIAL
       - MANAGE_ALLOWLIST
+grants_provider: ${resources.provider-databricks-dev}
 data_accesses:
   - name: lakehouse-dev
     azure_managed_identity:

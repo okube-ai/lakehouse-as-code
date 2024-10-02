@@ -128,7 +128,7 @@ class Service:
 
         # Explicit dependency is required to ensure role-metastore-admins is the owner/admin of the metastore
         self.workspace_provider = databricks.Provider(
-            "provider-workspace-neptune",
+            "provider-databricks-dev",
             host=self.infra_stacks["dev"].get_output("dbks-ws-host"),
             azure_client_id=self.infra_stacks["dev"].get_output("neptune-client-id"),
             azure_client_secret=self.infra_stacks["dev"].get_output(

@@ -1,6 +1,6 @@
 name: unity-catalog
 organization: okube
-description: Lakehouse - Unity Catalog
+description: Lakehouse - Unity Catalog Configuration
 backend: pulumi
 
 pulumi:
@@ -13,8 +13,13 @@ pulumi:
 
 resources:
   providers:
-    provider-workspace-neptune:
-      host: ${vars.DATABRICKS_HOST}
+    provider-databricks-dev:
+      host: ${vars.DATABRICKS_HOST_DEV}
+      azure_client_id: ${vars.AZURE_CLIENT_ID}
+      azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
+      azure_tenant_id: ${vars.AZURE_TENANT_ID}
+    provider-databricks-prd:
+      host: ${vars.DATABRICKS_HOST_PRD}
       azure_client_id: ${vars.AZURE_CLIENT_ID}
       azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
       azure_tenant_id: ${vars.AZURE_TENANT_ID}

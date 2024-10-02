@@ -27,7 +27,7 @@ catalog-dev:
               privileges:
                 - WRITE_VOLUME
   options:
-    provider: ${resources.provider-workspace-neptune}
+    provider: ${resources.provider-databricks-dev}
 
 # --------------------------------------------------------------------------- #
 # prod                                                                        #
@@ -60,7 +60,7 @@ catalog-prd:
               privileges:
                 - WRITE_VOLUME
   options:
-    provider: ${resources.provider-workspace-neptune}
+    provider: ${resources.provider-databricks-dev}
 
 # --------------------------------------------------------------------------- #
 # sandbox                                                                     #
@@ -86,7 +86,7 @@ catalog-sandbox:
   schemas:
     - name: default
   options:
-    provider: ${resources.provider-workspace-neptune}
+    provider: ${resources.provider-databricks-dev}
 
 # --------------------------------------------------------------------------- #
 # libraries                                                                   #
@@ -109,4 +109,4 @@ catalog-libraries:
       volumes:
         - name: init_scripts
   options:
-    provider: ${resources.provider-workspace-neptune}
+    provider: ${resources.provider-databricks-dev}
