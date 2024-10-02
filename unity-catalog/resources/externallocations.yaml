@@ -12,7 +12,7 @@ external-location-landing-prd:
     force_destroy: True
     url: ${vars.landing_storage_location_prd}
     options:
-        provider: ${resources.provider-databricks-dev}
+        provider: ${resources.provider-databricks-prd}
 
 external-location-metastore-prd:
     name: external-location-metastore-prd
@@ -20,4 +20,4 @@ external-location-metastore-prd:
     force_destroy: True
     url: ${vars.metastore_prd_storage_location}
     options:
-        provider: ${resources.provider-databricks-dev}
+        provider: ${resources.provider-databricks-prd}

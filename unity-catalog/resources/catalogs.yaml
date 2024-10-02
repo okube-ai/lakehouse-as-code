@@ -60,7 +60,7 @@ catalog-prd:
               privileges:
                 - WRITE_VOLUME
   options:
-    provider: ${resources.provider-databricks-dev}
+    provider: ${resources.provider-databricks-prd}
 
 # --------------------------------------------------------------------------- #
 # sandbox                                                                     #
