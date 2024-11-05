@@ -1,5 +1,5 @@
 # MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@node_reader
-# MAGIC %pip install 'laktory==0.4.11'
+# MAGIC %pip install 'laktory==0.5.0'
 
 # COMMAND ----------
 import importlib
