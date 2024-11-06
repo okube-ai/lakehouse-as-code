@@ -23,8 +23,15 @@ resources:
   # Clusters
   databricks_clusters: ${include.resources/clusters.yaml}
 
+  # Cluster Policies
+  databricks_clusterpolicies: ${include.resources/clusterpolicies.yaml}
+
   # Warehouses
   databricks_warehouses: ${include.resources/warehouses.yaml}
+
+  # Repos
+  databricks_repos: ${include.resources/repos.yaml}
+
 
 # Environment Specific Settings
 environments:

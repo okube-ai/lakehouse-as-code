@@ -61,3 +61,7 @@ variables:
   metastore_prd_storage_location: abfss://metastore@o3stglakehouseprd.dfs.core.windows.net/
   landing_storage_location_dev: abfss://landing@o3stglakehousedev.dfs.core.windows.net/
   landing_storage_location_prd: abfss://landing@o3stglakehouseprd.dfs.core.windows.net/
+
+
+environments:
+  global: {}
