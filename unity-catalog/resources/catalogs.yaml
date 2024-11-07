@@ -26,6 +26,18 @@ catalog-dev:
             - principal: role-metastore-admins
               privileges:
                 - WRITE_VOLUME
+    - name: sinks
+      volumes:
+        - name: tables
+          volume_type: EXTERNAL
+          storage_location: ${vars.tables_storage_location_dev}
+          grants:
+            - principal: account users # TODO: Review roles
+              privileges:
+                - READ_VOLUME
+            - principal: role-metastore-admins
+              privileges:
+                - WRITE_VOLUME
   options:
     provider: ${resources.provider-databricks-dev}
 
@@ -46,12 +58,24 @@ catalog-prd:
       privileges:
         - ALL_PRIVILEGES
   schemas:
-    -< ${include.resources/schemas.yaml}      
+    -< ${include.resources/schemas.yaml}
     - name: sources
       volumes:
         - name: landing
           volume_type: EXTERNAL
           storage_location: ${vars.landing_storage_location_prd}
+          grants:
+            - principal: account users # TODO: Review roles
+              privileges:
+                - READ_VOLUME
+            - principal: role-metastore-admins
+              privileges:
+                - WRITE_VOLUME
+    - name: sinks
+      volumes:
+        - name: tables
+          volume_type: EXTERNAL
+          storage_location: ${vars.tables_storage_location_prd}
           grants:
             - principal: account users # TODO: Review roles
               privileges:
