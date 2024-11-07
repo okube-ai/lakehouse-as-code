@@ -28,9 +28,9 @@ nodes:
       path: /Volumes/${vars.env}/sources/landing/events/yahoo-finance/stock_price/
       as_stream: true
     sinks:
-    - catalog_name: ${vars.env}
+    - table_name: brz_stock_prices
       schema_name: finance
-      table_name: brz_stock_prices
+      catalog_name: ${vars.env}
       mode: APPEND
     - path: /Volumes/${vars.env}/sinks/tables/brz_stock_prices/
       mode: APPEND
@@ -49,13 +49,10 @@ nodes:
       node_name: brz_stock_prices
       as_stream: true
     sinks:
-    - catalog_name: ${vars.env}
+    - table_name: slv_stock_prices
       schema_name: finance
-      table_name: brz_stock_prices
+      catalog_name: ${vars.env}
       mode: APPEND
-    - path: /Volumes/${vars.env}/sinks/tables/slv_stock_prices/
-      mode: APPEND
-      is_primary: False
     transformer:
       nodes:
         - sql_expr: |
@@ -83,18 +80,18 @@ nodes:
     source:
       path: /Volumes/${vars.env}/sources/landing/events/yahoo-finance/stock_metadata/
     sinks:
-    - catalog_name: ${vars.env}
+    - table_name: brz_stock_metadata
       schema_name: finance
-      table_name: brz_stock_metadata
+      catalog_name: ${vars.env}
       mode: OVERWRITE
 
   - name: slv_stock_metadata
     source:
       node_name: brz_stock_metadata
     sinks:
-    - catalog_name: ${vars.env}
+    - table_name: slv_stock_metadata
       schema_name: finance
-      table_name: slv_stock_metadata
+      catalog_name: ${vars.env}
       mode: OVERWRITE
     drop_source_columns: True
     transformer:
@@ -124,9 +121,9 @@ nodes:
       node_name: slv_stock_prices
       as_stream: false
     sinks:
-    - catalog_name: ${vars.env}
+    - table_name: slv_stocks
       schema_name: finance
-      table_name: slv_stocks
+      catalog_name: ${vars.env}
       mode: OVERWRITE
     transformer:
       nodes:
@@ -150,9 +147,9 @@ nodes:
       node_name: slv_stocks
       as_stream: false
     sinks:
-    - catalog_name: ${vars.env}
+    - table_name: gld_stock_prices_by_1d
       schema_name: finance
-      table_name: gld_stock_prices_by_1d
+      catalog_name: ${vars.env}
       mode: OVERWRITE
     transformer:
       nodes:

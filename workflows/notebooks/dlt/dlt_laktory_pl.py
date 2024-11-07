@@ -29,6 +29,7 @@ for udf in pl.udfs:
     if udf.module_path:
         sys.path.append(os.path.abspath(udf.module_path))
     module = importlib.import_module(udf.module_name)
+    module = importlib.reload(module)
     udfs += [getattr(module, udf.function_name)]
 
 # --------------------------------------------------------------------------- #
@@ -36,20 +37,43 @@ for udf in pl.udfs:
 # --------------------------------------------------------------------------- #
 
 
-def define_table(node):
+def define_table(node, sink):
+
+    # Get Expectations
+    dlt_warning_expectations = {}
+    dlt_drop_expectations = {}
+    dlt_fail_expectations = {}
+    if sink and not sink.is_quarantine:
+        dlt_warning_expectations = node.dlt_warning_expectations
+        dlt_drop_expectations = node.dlt_drop_expectations
+        dlt_fail_expectations = node.dlt_fail_expectations
+
+    # Get Name
+    name = node.name
+    if sink is not None:
+        name = sink.table_name
+
     @dlt.table_or_view(
-        name=node.name,
+        name=name,
         comment=node.description,
-        as_view=node.sink is None,
+        as_view=sink is None,
     )
-    @dlt.expect_all(node.warning_expectations)
-    @dlt.expect_all_or_drop(node.drop_expectations)
-    @dlt.expect_all_or_fail(node.fail_expectations)
+    @dlt.expect_all(dlt_warning_expectations)
+    @dlt.expect_all_or_drop(dlt_drop_expectations)
+    @dlt.expect_all_or_fail(dlt_fail_expectations)
     def get_df():
-        logger.info(f"Building {node.name} node")
+
+        sink_str = ""
+        if sink is not None:
+            sink_str = f" | sink: {sink.full_name}"
+        logger.info(f"Building {node.name} node{sink_str}")
 
         # Execute node
-        df = node.execute(spark=spark, udfs=udfs)
+        node.execute(spark=spark, udfs=udfs)
+        if sink and sink.is_quarantine:
+            df = node.quarantine_df
+        else:
+            df = node.output_df
         df.printSchema()
 
         # Return
@@ -80,14 +104,22 @@ def define_cdc_table(node):
 
 # Build nodes
 for node in pl.nodes:
+
     if node.dlt_template != "DEFAULT":
         continue
 
     if node.is_from_cdc:
         df = define_cdc_table(node)
         display(df)
+        continue
 
-    else:
-        wrapper = define_table(node)
+    if node.sinks is None or node.sinks == []:
+        wrapper = define_table(node, None)
         df = dlt.get_df(wrapper)
         display(df)
+
+    else:
+        for sink in node.sinks:
+            wrapper = define_table(node, sink)
+            df = dlt.get_df(wrapper)
+            display(df)

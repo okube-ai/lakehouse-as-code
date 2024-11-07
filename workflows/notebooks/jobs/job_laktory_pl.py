@@ -5,7 +5,7 @@ dbutils.widgets.text("full_refresh", "False")
 
 # COMMAND ----------
 # MAGIC #%pip install git+https://github.com/okube-ai/laktory.git@main mlflow langchain langchain_community 'pdfminer.six'
-# MAGIC %pip install 'laktory==0.5.0' mlflow langchain langchain_community 'pdfminer.six'  # TODO: Allow customization by job / task
+# MAGIC %pip install 'laktory==0.5.0'  # TODO: Allow customization by job / task
 # MAGIC %restart_python
 
 # COMMAND ----------
