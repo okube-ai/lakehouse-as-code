@@ -2,50 +2,36 @@ group-domain-chatabricks:
   display_name: domain-chatabricks
   workspace_permission_assignments:
     - workspace_id: ${vars.workspace_id_dev}
-      principal_id: 866578451593552  # Required as a workaround for Pulumi who can't cast string (output) into int (input)
     - workspace_id: ${vars.workspace_id_prd}
-      principal_id: 866578451593552  # Required as a workaround for Pulumi who can't cast string (output) into int (input)
 group-domain-finance:
   display_name: domain-finance
   workspace_permission_assignments:
     - workspace_id: ${vars.workspace_id_dev}
-      principal_id: 579332609985612  # Required as a workaround for Pulumi who can't cast string (output) into int (input)
     - workspace_id: ${vars.workspace_id_prd}
-      principal_id: 579332609985612  # Required as a workaround for Pulumi who can't cast string (output) into int (input)
 group-domain-engineering:
   display_name: domain-engineering
   workspace_permission_assignments:
     - workspace_id: ${vars.workspace_id_dev}
-      principal_id: 866578451593552  # Required as a workaround for Pulumi who can't cast string (output) into int (input)
     - workspace_id: ${vars.workspace_id_prd}
-      principal_id: 866578451593552  # Required as a workaround for Pulumi who can't cast string (output) into int (input)
 group-role-analysts:
   display_name: role-analysts
   workspace_permission_assignments:
     - workspace_id: ${vars.workspace_id_dev}
-      principal_id: 175363979031668  # Required as a workaround for Pulumi who can't cast string (output) into int (input)
     - workspace_id: ${vars.workspace_id_prd}
-      principal_id: 175363979031668  # Required as a workaround for Pulumi who can't cast string (output) into int (input)
 group-role-engineers:
   display_name: role-engineers
   workspace_permission_assignments:
     - workspace_id: ${vars.workspace_id_dev}
-      principal_id: 570686172021854  # Required as a workaround for Pulumi who can't cast string (output) into int (input)
     - workspace_id: ${vars.workspace_id_prd}
-      principal_id: 570686172021854  # Required as a workaround for Pulumi who can't cast string (output) into int (input)
 group-role-metastore-admins:
   display_name: role-metastore-admins
   workspace_permission_assignments:
     - workspace_id: ${vars.workspace_id_dev}
-      principal_id: 149847506783696  # Required as a workaround for Pulumi who can't cast string (output) into int (input)
     - workspace_id: ${vars.workspace_id_prd}
-      principal_id: 149847506783696  # Required as a workaround for Pulumi who can't cast string (output) into int (input)
 group-role-workspace-admins:
   display_name: role-workspace-admins
   workspace_permission_assignments:
     - workspace_id: ${vars.workspace_id_dev}
-      principal_id: 446179510203391  # Required as a workaround for Pulumi who can't cast string (output) into int (input)
       permissions: [ADMIN]
     - workspace_id: ${vars.workspace_id_prd}
-      principal_id: 446179510203391  # Required as a workaround for Pulumi who can't cast string (output) into int (input)
       permissions: [ADMIN]

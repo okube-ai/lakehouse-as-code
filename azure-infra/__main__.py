@@ -33,6 +33,7 @@ class Service:
         self.keyvault = None
         self.storage_account = None
         self.container_landing = None
+        self.container_tables = None
         self.container_metastore = None
         self.workspace = None
 
@@ -169,6 +170,19 @@ class Service:
         pulumi.export(
             "container-landing-account-name",
             self.container_landing.storage_account_name,
+        )
+
+        self.container_tables = azure.storage.Container(
+            "tables",
+            name="tables",
+            storage_account_name=self.storage_account.name,
+            container_access_type="private",
+        )
+        pulumi.export("container-tables-id", self.container_tables.id)
+        pulumi.export("container-tables-name", self.container_tables.name)
+        pulumi.export(
+            "container-tables-account-name",
+            self.container_tables.storage_account_name,
         )
 
         self.container_metastore = azure.storage.Container(

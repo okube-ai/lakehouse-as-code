@@ -1,29 +1,52 @@
 name: unity-catalog
 organization: okube
-description: Lakehouse - Unity Catalog
+description: Lakehouse - Unity Catalog Configuration
 backend: pulumi
 
 pulumi:
   config:
+
+    # Account Provider
     databricks:host: https://accounts.azuredatabricks.net
     databricks:account_id: ${vars.DATABRICKS_ACCOUNT_ID}
     databricks:azure_tenant_id: ${vars.AZURE_TENANT_ID}
     databricks:azure_client_id: ${vars.AZURE_CLIENT_ID}
     databricks:azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
 
+# List of Resources to deploy
 resources:
+
   providers:
-    provider-workspace-neptune:
-      host: ${vars.DATABRICKS_HOST}
+
+    # Dev Workspace Provider
+    provider-databricks-dev:
+      host: ${vars.DATABRICKS_HOST_DEV}
       azure_client_id: ${vars.AZURE_CLIENT_ID}
       azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
       azure_tenant_id: ${vars.AZURE_TENANT_ID}
+
+    # Prod Workspace Provider
+    provider-databricks-prd:
+      host: ${vars.DATABRICKS_HOST_PRD}
+      azure_client_id: ${vars.AZURE_CLIENT_ID}
+      azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
+      azure_tenant_id: ${vars.AZURE_TENANT_ID}
+
+  # Account Groups
   databricks_groups: ${include.resources/groups.yaml}
+
+  # Account Users
   databricks_users: ${include.resources/users.yaml}
   databricks_serviceprincipals: ${include.resources/serviceprincipals.yaml}
+
+  # Metastore
   databricks_metastores:
     metastore-lakehouse: ${include.resources/metastore.yaml}
+
+  # External Locations
   databricks_externallocations: ${include.resources/externallocations.yaml}
+
+  # Catalogs
   databricks_catalogs: ${include.resources/catalogs.yaml}
 
 variables:
@@ -36,5 +59,11 @@ variables:
   workspace_id_prd: 1985337240298151
   metastore_storage_location: abfss://metastore@o3stglakehousedev.dfs.core.windows.net/
   metastore_prd_storage_location: abfss://metastore@o3stglakehouseprd.dfs.core.windows.net/
+  tables_storage_location_dev: abfss://tables@o3stglakehousedev.dfs.core.windows.net/
+  tables_storage_location_prd: abfss://tables@o3stglakehouseprd.dfs.core.windows.net/
   landing_storage_location_dev: abfss://landing@o3stglakehousedev.dfs.core.windows.net/
   landing_storage_location_prd: abfss://landing@o3stglakehouseprd.dfs.core.windows.net/
+
+
+environments:
+  global: {}

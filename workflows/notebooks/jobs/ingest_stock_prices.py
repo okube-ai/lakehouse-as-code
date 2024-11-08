@@ -31,6 +31,14 @@ for s in symbols:
     events = []
     df = yf.download(s, t0, t1, interval="1h")
     for _, row in df.iterrows():
+
+        # Corrupt some data to showcase expectations
+        if _.date() == date(2024, 4, 1):
+            row["Open"] *= -1
+            row["Close"] *= -1
+            row["High"] *= -1
+            row["Low"] *= -1
+
         events += [
             DataEvent(
                 name="stock_price",

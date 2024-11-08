@@ -2,13 +2,11 @@ name: pl-stock-prices
 orchestrator: DATABRICKS_JOB
 databricks_job:
   name: job-pl-stock-prices
-  clusters:
-    - name: node-cluster
-      autoscale:
-        min_workers: 1
-        max_workers: 2
-      spark_version: 15.2.x-scala2.12
-      node_type_id: Standard_DS3_v2
+
+workspacefile:
+  access_controls:
+    - group_name: account users
+      permission_level: CAN_READ
 
 udfs:
   - module_name: stock_functions
@@ -25,31 +23,41 @@ nodes:
   # ------------------------------------------------------------------------- #
 
   - name: brz_stock_prices
-    layer: BRONZE
     timestamp_key: data.created_at
     source:
       path: /Volumes/${vars.env}/sources/landing/events/yahoo-finance/stock_price/
-      as_stream: false
-    sink:
-      path: /Volumes/${vars.env}/sources/landing/tables/brz_stock_prices/
-      mode: OVERWRITE
+      as_stream: true
+    sinks:
+    - table_name: brz_stock_prices
+      schema_name: finance
+      catalog_name: ${vars.env}
+      mode: APPEND
+    - path: /Volumes/${vars.env}/sinks/tables/brz_stock_prices/
+      mode: APPEND
+      is_primary: False
 
   - name: slv_stock_prices
-    layer: SILVER
     timestamp_key: created_at
     expectations:
       - name: positive_price
-        expression: open > 0
-        action: FAIL
+        expr: open > 0
+        action: QUARANTINE
       - name: recent_price
-        expression: created_at > '2023-01-01'
+        expr: created_at > '2023-01-01'
         action: DROP
     source:
       node_name: brz_stock_prices
-      as_stream: false
-    sink:
-      path: /Volumes/${vars.env}/sources/landing/tables/slv_stock_prices/
-      mode: OVERWRITE
+      as_stream: true
+    sinks:
+    - table_name: slv_stock_prices
+      schema_name: finance
+      catalog_name: ${vars.env}
+      mode: APPEND
+    - table_name: slv_stock_prices_quarantine
+      schema_name: finance
+      catalog_name: ${vars.env}
+      mode: APPEND
+      is_quarantine: True
     transformer:
       nodes:
         - sql_expr: |
@@ -74,20 +82,23 @@ nodes:
   # ------------------------------------------------------------------------- #
 
   - name: brz_stock_metadata
-    layer: BRONZE
     source:
       path: /Volumes/${vars.env}/sources/landing/events/yahoo-finance/stock_metadata/
-    sink:
-      path: /Volumes/${vars.env}/sources/landing/tables/brz_stock_metadata/
+    sinks:
+    - table_name: brz_stock_metadata
+      schema_name: finance
+      catalog_name: ${vars.env}
       mode: OVERWRITE
 
   - name: slv_stock_metadata
-    layer: SILVER
     source:
       node_name: brz_stock_metadata
-    sink:
-      path: /Volumes/${vars.env}/sources/landing/tables/slv_stock_metadata/
+    sinks:
+    - table_name: slv_stock_metadata
+      schema_name: finance
+      catalog_name: ${vars.env}
       mode: OVERWRITE
+    drop_source_columns: True
     transformer:
       nodes:
         - with_column:
@@ -110,13 +121,14 @@ nodes:
   # ------------------------------------------------------------------------- #
 
   - name: slv_stocks
-    layer: SILVER
     drop_source_columns: False
     source:
       node_name: slv_stock_prices
       as_stream: false
-    sink:
-      path: /Volumes/${vars.env}/sources/landing/tables/slv_stocks/
+    sinks:
+    - table_name: slv_stocks
+      schema_name: finance
+      catalog_name: ${vars.env}
       mode: OVERWRITE
     transformer:
       nodes:
@@ -136,12 +148,13 @@ nodes:
   # ------------------------------------------------------------------------- #
 
   - name: gld_stock_prices_by_1d
-    layer: GOLD
     source:
       node_name: slv_stocks
       as_stream: false
-    sink:
-      path: /Volumes/${vars.env}/sources/landing/tables/gld_stock_prices_by_1d/
+    sinks:
+    - table_name: gld_stock_prices_by_1d
+      schema_name: finance
+      catalog_name: ${vars.env}
       mode: OVERWRITE
     transformer:
       nodes:
@@ -150,7 +163,7 @@ nodes:
             groupby_columns:
               - symbol
             groupby_window:
-              time_column: _tstamp
+              time_column: created_at
               window_duration: 1 day
             agg_expressions:
               - name: count

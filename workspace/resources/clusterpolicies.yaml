@@ -1,0 +1,16 @@
+cluster-policy-okube:
+  name: okube
+  definition:
+    dbus_per_hour:
+      type: range
+      maxValue: 10
+    autotermination_minutes:
+      type: fixed
+      value: 30
+      hidden: True
+  libraries:
+  - pypi:
+      package: laktory==0.5.1
+  access_controls:
+    - group_name: role-engineers
+      permission_level: CAN_USE

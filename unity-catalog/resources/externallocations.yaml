@@ -4,15 +4,31 @@ external-location-landing-dev:
     force_destroy: True
     url: ${vars.landing_storage_location_dev}
     options:
-        provider: ${resources.provider-workspace-neptune}
+        provider: ${resources.provider-databricks-dev}
 
 external-location-landing-prd:
     name: external-location-landing-prd
-    credential_name: ${metastore-data-access-lakehouse-prd.name}
+    credential_name: ${resources.metastore-data-access-lakehouse-prd.name}
     force_destroy: True
     url: ${vars.landing_storage_location_prd}
     options:
-        provider: ${resources.provider-workspace-neptune}
+        provider: ${resources.provider-databricks-prd}
+
+external-location-tables-dev:
+    name: external-location-tables-dev
+    credential_name: ${resources.metastore-data-access-lakehouse-dev.name}
+    force_destroy: True
+    url: ${vars.tables_storage_location_dev}
+    options:
+        provider: ${resources.provider-databricks-dev}
+
+external-location-tables-prd:
+    name: external-location-tables-prd
+    credential_name: ${resources.metastore-data-access-lakehouse-prd.name}
+    force_destroy: True
+    url: ${vars.tables_storage_location_prd}
+    options:
+        provider: ${resources.provider-databricks-prd}
 
 external-location-metastore-prd:
     name: external-location-metastore-prd
@@ -20,4 +36,4 @@ external-location-metastore-prd:
     force_destroy: True
     url: ${vars.metastore_prd_storage_location}
     options:
-        provider: ${resources.provider-workspace-neptune}
+        provider: ${resources.provider-databricks-prd}

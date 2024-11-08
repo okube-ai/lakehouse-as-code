@@ -9,13 +9,10 @@ orchestrator: DLT
 dlt:
   resource_name: dlt-stock-prices
   catalog: ${vars.env}
-  target: finance
+  target: finance_dlt
   development: ${vars.is_dev}
   configuration:
     pipeline_name: dlt-stock-prices
-
-  ## TODO: Uncomment for DEMO
-  #continuous: True
 
   clusters:
     - name : default
@@ -27,8 +24,8 @@ dlt:
   libraries:
     - notebook:
         path: /.laktory/dlt/dlt_laktory_pl.py
-    - notebook:
-        path: /.laktory/dlt/dlt_gld_stock_performances.py
+#    - notebook:
+#        path: /.laktory/dlt/dlt_gld_stock_performances.py
 
   access_controls:
     - group_name: account users
@@ -51,88 +48,63 @@ nodes:
   # ------------------------------------------------------------------------- #
 
   - name: brz_stock_prices
-    layer: BRONZE
     timestamp_key: data.created_at
     source:
       path: /Volumes/${vars.env}/sources/landing/events/yahoo-finance/stock_price/
       as_stream: true
-    sink:
-      table_name: brz_stock_prices
+    sinks:
+    - table_name: brz_stock_prices
 
   - name: slv_stock_prices
-    layer: SILVER
     timestamp_key: created_at
     expectations:
       - name: positive_price
-        expression: open > 0
-        action: FAIL
+        expr: open > 0
+        action: QUARANTINE
       - name: recent_price
-        expression: created_at > '2023-01-01'
+        expr: created_at > '2023-01-01'
         action: DROP
     source:
       node_name: brz_stock_prices
       as_stream: true
-    sink:
-      table_name: slv_stock_prices
+    sinks:
+    - table_name: slv_stock_prices
+    - table_name: slv_stock_prices_quarantine
+      is_quarantine: True
     transformer:
       nodes:
-        - with_column:
-            name: created_at
-            type: timestamp
-            expr: F.col('data._created_at')
-
-        - with_column:
-            name: symbol
-            type: string
-            expr: F.col('data.symbol')
-
-        - with_column:
-            name: name
-            type: string
-            expr: F.col('data.symbol')
-
-        - with_column:
-            name: open
-            type: double
-            expr: F.col('data.open')
-
-        - with_column:
-            name: close
-            type: double
-            expr: F.col('data.close')
-
-        - with_column:
-            name: low
-            type: double
-            expr: F.col('data.low')
-
-        - with_column:
-            name: high
-            type: double
-            expr: F.col('data.high')
-
-#         #TODO: Uncomment for demo
-#        - with_column:
-#            name: volume
-#            type: double
-#            expr: F.col('data.volume')
-
+        - sql_expr: |
+            SELECT
+              data.created_at AS created_at,
+              data.symbol AS symbol,
+              data.open AS open,
+              data.close AS close,
+              data.high AS high,
+              data.low AS low,
+              data.volume AS volume
+            FROM
+              {df}
+        - func_name: drop_duplicates
+          func_kwargs:
+            subset:
+              - symbol
+              - created_at
 
   # ------------------------------------------------------------------------- #
   # Stock Metadata                                                            #
   # ------------------------------------------------------------------------- #
 
   - name: brz_stock_metadata
-    layer: BRONZE
     source:
       path: /Volumes/${vars.env}/sources/landing/events/yahoo-finance/stock_metadata/
-    sink:
-      table_name: brz_stock_metadata
+    sinks:
+    - table_name: brz_stock_metadata
 
   - name: slv_stock_metadata
-    layer: SILVER
     source:
       node_name: brz_stock_metadata
+    sinks: []
+    drop_source_columns: True
     transformer:
       nodes:
         - with_column:
@@ -155,13 +127,12 @@ nodes:
   # ------------------------------------------------------------------------- #
 
   - name: slv_stocks
-    layer: SILVER
     drop_source_columns: False
     source:
       node_name: slv_stock_prices
-      as_stream: true
-    sink:
-      table_name: slv_stocks
+      as_stream: false
+    sinks:
+    - table_name: slv_stocks
     transformer:
       nodes:
         - func_name: laktory.smart_join
@@ -180,12 +151,11 @@ nodes:
   # ------------------------------------------------------------------------- #
 
   - name: gld_stock_prices_by_1d
-    layer: GOLD
     source:
       node_name: slv_stocks
-      as_stream: True
-    sink:
-      table_name: gld_stock_prices_by_1d
+      as_stream: false
+    sinks:
+    - table_name: gld_stock_prices_by_1d
     transformer:
       nodes:
         - func_name: laktory.groupby_and_agg
@@ -193,7 +163,7 @@ nodes:
             groupby_columns:
               - symbol
             groupby_window:
-              time_column: _tstamp
+              time_column: created_at
               window_duration: 1 day
             agg_expressions:
               - name: count
@@ -206,11 +176,3 @@ nodes:
                 expr: F.first('open')
               - name: close
                 expr: F.last('close')
-
-  - name: gld_stock_performances
-    layer: GOLD
-    dlt_template: STOCK_PERFORMANCES
-    source:
-      node_name: slv_stocks
-    sink:
-      table_name: gld_stock_performances

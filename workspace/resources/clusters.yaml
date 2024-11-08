@@ -14,6 +14,7 @@ cluster-default:
     - group_name: role-analysts
       permission_level: CAN_RESTART
   is_pinned: True
+  no_wait: True
   spark_env_vars:
     AZURE_KEYVAULT_URL: "{{secrets/azure/keyvault-url}}"
     AZURE_TENANT_ID: "{{secrets/azure/tenant-id}}"
