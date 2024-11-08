@@ -41,7 +41,7 @@ nodes:
     expectations:
       - name: positive_price
         expr: open > 0
-        action: FAIL
+        action: QUARANTINE
       - name: recent_price
         expr: created_at > '2023-01-01'
         action: DROP
@@ -53,6 +53,11 @@ nodes:
       schema_name: finance
       catalog_name: ${vars.env}
       mode: APPEND
+    - table_name: slv_stock_prices_quarantine
+      schema_name: finance
+      catalog_name: ${vars.env}
+      mode: APPEND
+      is_quarantine: True
     transformer:
       nodes:
         - sql_expr: |

@@ -14,7 +14,7 @@ tasks:
       notebook_path: /.laktory/jobs/ingest_stock_prices.py
     libraries:
       - pypi:
-          package: 'laktory==0.5.0'
+          package: 'laktory==0.5.1'
       - pypi:
           package: yfinance
 
@@ -24,7 +24,7 @@ tasks:
       notebook_path: /.laktory/jobs/ingest_stock_metadata.py
     libraries:
       - pypi:
-          package: 'laktory==0.5.0'
+          package: 'laktory==0.5.1'
       - pypi:
           package: yfinance
 
