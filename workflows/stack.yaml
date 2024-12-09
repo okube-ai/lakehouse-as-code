@@ -11,7 +11,7 @@ pulumi:
 resources:
   databricks_notebooks: ${include.resources/notebooks.yaml}
   databricks_workspacefiles: ${include.resources/workspacefiles.yaml}
-  databricks_sqlqueries: ${include.resources/sqlqueries.yaml}
+  databricks_queries: ${include.resources/queries.yaml}
   pipelines:
     pl-stock-prices: ${include.resources/pl-stock-prices.yaml}
     dlt-stock-prices: ${include.resources/dlt-stock-prices.yaml}
@@ -37,13 +37,9 @@ environments:
     variables:
       env: dev
       is_dev: true
-      sql_tasks_data_source_id: 5bc6297d-dc51-41dc-bac8-10e1e6d862be
-      directory-laktory-queries-views: folders/911347488458284
       sql_tasks_warehouse_id: a6bc05a0fc5e55ae
   prd:
     variables:
       env: prd
       is_dev: false
-      sql_tasks_data_source_id: 4ff83987-b623-4ae9-a14b-c807f26ede19
-      directory-laktory-queries-views: folders/2999609640742580
       sql_tasks_warehouse_id: 5beb0035099473f4

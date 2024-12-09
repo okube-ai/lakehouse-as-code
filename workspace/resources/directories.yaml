@@ -1,4 +1,6 @@
 directory-laktory-queries:
   path: /.laktory/queries/
+directory-laktory-alerts:
+  path: /.laktory/alerts/
 directory-laktory-queries-views:
   path: /.laktory/queries/views/
