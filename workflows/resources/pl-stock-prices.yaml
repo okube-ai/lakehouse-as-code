@@ -143,6 +143,18 @@ nodes:
             "on":
               - symbol
 
+  - name: slv_stocks_aapl
+    source:
+      node_name: slv_stocks
+    sinks:
+    - table_name: slv_stocks_aapl
+      schema_name: finance
+      catalog_name: ${vars.env}
+      table_type: VIEW
+    transformer:
+      nodes:
+        - sql_expr: "SELECT * FROM {df} WHERE symbol = 'AAPL'"
+
   # ------------------------------------------------------------------------- #
   # Gold                                                                      #
   # ------------------------------------------------------------------------- #
