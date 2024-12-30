@@ -8,9 +8,9 @@ cluster-policy-okube:
       type: fixed
       value: 30
       hidden: True
-  libraries:
-  - pypi:
-      package: laktory==0.5.7
+#  libraries:
+#  - pypi:
+#      package: laktory==0.5.10
   access_controls:
     - group_name: role-engineers
       permission_level: CAN_USE

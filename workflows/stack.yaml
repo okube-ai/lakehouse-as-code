@@ -16,10 +16,9 @@ resources:
     pl-stock-prices: ${include.resources/pl-stock-prices.yaml}
     dlt-stock-prices: ${include.resources/dlt-stock-prices.yaml}
 
+  databricks_jobs:
     # This is an alternate version of the same pipeline, but using
     # a job as an orchestrator instead of DLT
-
-  databricks_jobs:
     job-dlt-stock-prices: ${include.resources/job-dlt-stock-prices.yaml}
 
 environments:
