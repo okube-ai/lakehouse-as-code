@@ -1,18 +1,16 @@
 name: dlt-stock-prices
 
-orchestrator: DLT
+orchestrator: DATABRICKS_DLT
 
 # --------------------------------------------------------------------------- #
 # DLT                                                                         #
 # --------------------------------------------------------------------------- #
 
-dlt:
+databricks_dlt:
   resource_name: dlt-stock-prices
   catalog: ${vars.env}
   target: finance_dlt
   development: ${vars.is_dev}
-  configuration:
-    pipeline_name: dlt-stock-prices
 
   clusters:
     - name : default
@@ -32,6 +30,9 @@ dlt:
       permission_level: CAN_VIEW
     - group_name: role-engineers
       permission_level: CAN_RUN
+
+dependencies:
+  - laktory==0.5.10
 
 udfs:
   - module_name: stock_functions

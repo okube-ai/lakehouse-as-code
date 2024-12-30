@@ -1,12 +1,22 @@
 name: pl-stock-prices
 orchestrator: DATABRICKS_JOB
 databricks_job:
-  name: job-pl-stock-prices
+  clusters:
+    - name: node-cluster
+      autoscale:
+        min_workers: 1
+        max_workers: 2
+      spark_version: 15.4.x-scala2.12
+      node_type_id: Standard_DS3_v2
 
-workspacefile:
-  access_controls:
-    - group_name: account users
-      permission_level: CAN_READ
+  config_file:
+    access_controls:
+      - group_name: account users
+        permission_level: CAN_READ
+
+dependencies:
+  - laktory==0.5.10
+#  - "git+https://github.com/okube-ai/laktory.git@install_laktory_in_job"
 
 udfs:
   - module_name: stock_functions
@@ -142,6 +152,18 @@ nodes:
                 - first_traded
             "on":
               - symbol
+
+  - name: slv_stocks_aapl
+    source:
+      node_name: slv_stocks
+    sinks:
+    - table_name: slv_stocks_aapl
+      schema_name: finance
+      catalog_name: ${vars.env}
+      table_type: VIEW
+    transformer:
+      nodes:
+        - sql_expr: "SELECT * FROM {df} WHERE symbol = 'AAPL'"
 
   # ------------------------------------------------------------------------- #
   # Gold                                                                      #

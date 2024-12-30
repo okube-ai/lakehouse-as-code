@@ -1,1 +1,1 @@
-pip install 'laktory==0.5.7'
+pip install 'laktory==0.5.10'
