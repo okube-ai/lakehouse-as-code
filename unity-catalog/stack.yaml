@@ -33,21 +33,21 @@ resources:
       azure_tenant_id: ${vars.AZURE_TENANT_ID}
 
   # Account Groups
-  databricks_groups: ${include.resources/groups.yaml}
+  databricks_groups: !use resources/groups.yaml
 
   # Account Users
-  databricks_users: ${include.resources/users.yaml}
-  databricks_serviceprincipals: ${include.resources/serviceprincipals.yaml}
+  databricks_users: !use resources/users.yaml
+  databricks_serviceprincipals: !use resources/serviceprincipals.yaml
 
   # Metastore
   databricks_metastores:
-    metastore-lakehouse: ${include.resources/metastore.yaml}
+    metastore-lakehouse: !use resources/metastore.yaml
 
   # External Locations
-  databricks_externallocations: ${include.resources/externallocations.yaml}
+  databricks_externallocations: !use resources/externallocations.yaml
 
   # Catalogs
-  databricks_catalogs: ${include.resources/catalogs.yaml}
+  databricks_catalogs: !use resources/catalogs.yaml
 
 variables:
   databricks_host: https://accounts.azuredatabricks.net

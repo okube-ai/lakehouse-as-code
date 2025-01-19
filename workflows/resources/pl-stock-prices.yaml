@@ -15,8 +15,7 @@ databricks_job:
         permission_level: CAN_READ
 
 dependencies:
-  - laktory==0.5.10
-#  - "git+https://github.com/okube-ai/laktory.git@install_laktory_in_job"
+  - ${vars.laktory_package}
 
 udfs:
   - module_name: stock_functions
