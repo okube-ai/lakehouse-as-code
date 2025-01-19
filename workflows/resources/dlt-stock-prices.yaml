@@ -32,7 +32,7 @@ databricks_dlt:
       permission_level: CAN_RUN
 
 dependencies:
-  - laktory==0.5.10
+  - ${vars.laktory_package}
 
 udfs:
   - module_name: stock_functions

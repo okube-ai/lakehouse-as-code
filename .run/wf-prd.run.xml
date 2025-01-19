@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="wf-prd" type="ShConfigurationType">
-    <option name="SCRIPT_TEXT" value="source ./read_env.sh secrets/.env.prd" />
+    <option name="SCRIPT_TEXT" value="source .venv/bin/activate; source ./read_env.sh secrets/.env.prd" />
     <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
     <option name="SCRIPT_PATH" value="" />
     <option name="SCRIPT_OPTIONS" value="" />
