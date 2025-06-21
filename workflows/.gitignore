@@ -6,4 +6,3 @@ secrets/*.*
 
 # Outputs
 Pulumi.yaml
-tmp-*

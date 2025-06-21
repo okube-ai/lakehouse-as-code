@@ -2,7 +2,7 @@ service-principal-neptune-dev:
   display_name: neptune-dev
   application_id: ${vars.neptune_dev_client_id}
   group_ids:
-    - ${resources.group-domain-engineering.id}
+    - ${resources.group-domain-market.id}
     - ${resources.group-domain-finance.id}
     - ${resources.group-role-workspace-admins.id}
     - ${resources.group-role-metastore-admins.id}
@@ -12,7 +12,7 @@ service-principal-neptune-prd:
   display_name: neptune-prd
   application_id: ${vars.neptune_prd_client_id}
   group_ids:
-    - ${resources.group-domain-engineering.id}
+    - ${resources.group-domain-market.id}
     - ${resources.group-domain-finance.id}
     - ${resources.group-role-workspace-admins.id}
     - ${resources.group-role-metastore-admins.id}
