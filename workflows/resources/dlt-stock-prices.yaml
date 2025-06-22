@@ -18,8 +18,6 @@ orchestrator:
   libraries:
     - notebook:
         path: /.laktory/dlt/dlt_laktory_pl.py
-#    - notebook:
-#        path: /.laktory/dlt/dlt_gld_stock_performances.py
 
   access_controls:
     - group_name: account users

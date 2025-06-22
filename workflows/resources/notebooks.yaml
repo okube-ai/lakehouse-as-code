@@ -30,9 +30,3 @@ notebook-job-laktory-pl:
     - group_name: account users
       permission_level: CAN_READ
 
-notebook-dlt-gld-stock-performances:
-  source: ./notebooks/dlt/dlt_gld_stock_performances.py
-  dirpath: dlt/
-  access_controls:
-    - group_name: account users
-      permission_level: CAN_READ

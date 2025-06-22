@@ -37,7 +37,7 @@ def define_table(node, sink):
         dlt_fail_expectations = node.dlt_fail_expectations
 
     table_or_view = dlt.table
-    if isinstance(sink, lk.models.DLTViewDataSink):
+    if isinstance(sink, lk.models.PipelineViewDataSink):
         table_or_view = dlt.view
 
     @table_or_view(
@@ -58,6 +58,7 @@ def define_table(node, sink):
         # Return
         return df.to_native()
 
+
 # --------------------------------------------------------------------------- #
 # CDC tables                                                                  #
 # --------------------------------------------------------------------------- #
@@ -69,9 +70,7 @@ def define_cdc_table(node, sink):
         comment=node.comment,
     )
 
-    dlt.apply_changes(
-        source=node.source.table_name, **sink.dlt_apply_changes_kwargs
-    )
+    dlt.apply_changes(source=node.source.table_name, **sink.dlt_apply_changes_kwargs)
 
 
 # --------------------------------------------------------------------------- #

@@ -15,14 +15,11 @@ resources:
   pipelines:
     pl-stock-prices: !use resources/pl-stock-prices.yaml
     dlt-stock-prices: !use resources/dlt-stock-prices.yaml
-
   databricks_jobs:
-    # This is an alternate version of the same pipeline, but using
-    # a job as an orchestrator instead of DLT
     job-dlt-stock-prices: !use resources/job-dlt-stock-prices.yaml
 variables:
-  laktory_package: laktory==0.7.2
-  #  - "git+https://github.com/okube-ai/laktory.git@install_laktory_in_job"
+#  laktory_package: laktory==0.7.2
+    laktory_package: "git+https://github.com/okube-ai/laktory.git@feat/lac-working"
 
 environments:
   debug:
