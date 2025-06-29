@@ -8,10 +8,11 @@ pulumi:
     databricks:azure_client_id: ${vars.AZURE_CLIENT_ID}
     databricks:azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
     databricks:azure_tenant_id: ${vars.AZURE_TENANT_ID}
+    databricks:auth_type: azure-client-secret
 resources:
   databricks_notebooks: !use resources/notebooks.yaml
-  databricks_workspacefiles: !use resources/workspacefiles.yaml
   databricks_queries: !use resources/queries.yaml
+  databricks_pythonpackages: !use resources/pythonpackages.yaml
   pipelines:
     pl-stock-prices: !use resources/pl-stock-prices.yaml
     dlt-stock-prices: !use resources/dlt-stock-prices.yaml
@@ -19,19 +20,14 @@ resources:
     job-dlt-stock-prices: !use resources/job-dlt-stock-prices.yaml
 variables:
 #  laktory_package: laktory==0.7.2
-    laktory_package: "git+https://github.com/okube-ai/laktory.git@feat/lac-working"
+    laktory_package: "git+https://github.com/okube-ai/laktory.git@realease/0-8-0"
+    wheel_filepath: /Workspace${vars.workspace_laktory_root}wheels/lake-0.0.1-py3-none-any.whl
 
 environments:
   debug:
     variables:
       env: dev
-#    resources:
-#      pipelines:
-#        dlt-stock-prices:
-#          nodes:
-#            0:
-#              source:
-#                limit: 100
+
   dev:
     variables:
       env: dev

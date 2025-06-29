@@ -1,3 +1,7 @@
+# COMMAND ----------
+# MAGIC %pip yfinance
+
+# COMMAND ----------
 import yfinance as yf
 
 from laktory.models import DataEvent

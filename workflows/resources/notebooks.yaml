@@ -22,11 +22,3 @@ notebook-dlt-laktory-pl:
   access_controls:
     - group_name: account users
       permission_level: CAN_READ
-
-notebook-job-laktory-pl:
-  source: ./notebooks/jobs/job_laktory_pl.py
-  dirpath: jobs/
-  access_controls:
-    - group_name: account users
-      permission_level: CAN_READ
-

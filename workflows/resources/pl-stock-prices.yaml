@@ -1,4 +1,9 @@
 name: pl-stock-prices
+
+dependencies:
+  - ${vars.laktory_package}
+  - ${vars.wheel_filepath}
+
 orchestrator:
   type: DATABRICKS_JOB
   config_file:
@@ -7,13 +12,6 @@ orchestrator:
         permission_level: CAN_READ
       - group_name: role-engineers
         permission_level: CAN_RUN
-
-dependencies:
-  - ${vars.laktory_package}
-
-#udfs:
-#  - module_name: stock_functions
-#    function_name: symbol_to_name
 
 # --------------------------------------------------------------------------- #
 # Nodes                                                                       #
@@ -106,6 +104,7 @@ nodes:
         - func_name: select
           func_kwargs:
             symbol: nw.col("data.symbol").cast(nw.dtypes.String())
+            name: nw.col("data.symbol").lake.symbol_to_name().cast(nw.dtypes.String())
             currency: nw.col("data.currency").cast(nw.dtypes.String())
             first_traded: nw.col("data.firstTradeDate").cast(nw.dtypes.Datetime(time_zone="UTC"))
 
@@ -130,6 +129,7 @@ nodes:
               node_name: slv_stock_metadata
               selects:
                 - symbol
+                - name
                 - currency
                 - first_traded
             "on":

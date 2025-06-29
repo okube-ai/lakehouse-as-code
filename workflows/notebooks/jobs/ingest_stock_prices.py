@@ -1,3 +1,7 @@
+# COMMAND ----------
+# MAGIC %pip yfinance
+
+# COMMAND ----------
 import os
 import yfinance as yf
 from datetime import datetime
