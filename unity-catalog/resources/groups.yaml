@@ -8,8 +8,13 @@ group-domain-finance:
   workspace_permission_assignments:
     - workspace_id: ${vars.workspace_id_dev}
     - workspace_id: ${vars.workspace_id_prd}
-group-domain-engineering:
-  display_name: domain-engineering
+group-domain-market:
+  display_name: domain-market
+  workspace_permission_assignments:
+    - workspace_id: ${vars.workspace_id_dev}
+    - workspace_id: ${vars.workspace_id_prd}
+group-domain-yahoo:
+  display_name: domain-yahoo
   workspace_permission_assignments:
     - workspace_id: ${vars.workspace_id_dev}
     - workspace_id: ${vars.workspace_id_prd}

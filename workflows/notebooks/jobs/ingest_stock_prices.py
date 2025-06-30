@@ -1,16 +1,26 @@
+# COMMAND ----------
+dbutils.widgets.text("env", "dev")
+
+# COMMAND ----------
+# MAGIC %pip install yfinance /Workspace/.laktory/wheels/lake-0.0.1-py3-none-any.whl
+# MAGIC %restart_python
+
+# COMMAND ----------
 import os
 import yfinance as yf
 from datetime import datetime
 from datetime import date
 from datetime import timedelta
 
-from laktory.models import DataEvent
-from laktory.models import DataProducer
+from lake import DataEvent
+from lake import DataProducer
 
 
 # --------------------------------------------------------------------------- #
 # Setup                                                                       #
 # --------------------------------------------------------------------------- #
+
+env = dbutils.widgets.get("env")
 
 symbols = [
     "AAPL",
@@ -43,6 +53,7 @@ for s in symbols:
             DataEvent(
                 name="stock_price",
                 producer=DataProducer(name="yahoo-finance"),
+                events_root=f"/Volumes/{env}/sources/landing/events/",
                 data={
                     "created_at": _,
                     "symbol": s,

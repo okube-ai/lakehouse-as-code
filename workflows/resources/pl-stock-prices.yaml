@@ -1,25 +1,17 @@
 name: pl-stock-prices
-orchestrator: DATABRICKS_JOB
-databricks_job:
-  clusters:
-    - name: node-cluster
-      autoscale:
-        min_workers: 1
-        max_workers: 2
-      spark_version: 15.4.x-scala2.12
-      node_type_id: Standard_DS3_v2
 
+dependencies:
+  - ${vars.laktory_package}
+  - ${vars.wheel_filepath}
+
+orchestrator:
+  type: DATABRICKS_JOB
   config_file:
     access_controls:
       - group_name: account users
         permission_level: CAN_READ
-
-dependencies:
-  - ${vars.laktory_package}
-
-udfs:
-  - module_name: stock_functions
-    function_name: symbol_to_name
+      - group_name: role-engineers
+        permission_level: CAN_RUN
 
 # --------------------------------------------------------------------------- #
 # Nodes                                                                       #
@@ -32,21 +24,19 @@ nodes:
   # ------------------------------------------------------------------------- #
 
   - name: brz_stock_prices
-    timestamp_key: data.created_at
     source:
       path: /Volumes/${vars.env}/sources/landing/events/yahoo-finance/stock_price/
       as_stream: true
+      format: JSON
+      reader_kwargs:
+        cloudFiles.inferColumnTypes: true
     sinks:
     - table_name: brz_stock_prices
-      schema_name: finance
+      schema_name: yahoo
       catalog_name: ${vars.env}
       mode: APPEND
-    - path: /Volumes/${vars.env}/sinks/tables/brz_stock_prices/
-      mode: APPEND
-      is_primary: False
 
   - name: slv_stock_prices
-    timestamp_key: created_at
     expectations:
       - name: positive_price
         expr: open > 0
@@ -59,17 +49,17 @@ nodes:
       as_stream: true
     sinks:
     - table_name: slv_stock_prices
-      schema_name: finance
+      schema_name: yahoo
       catalog_name: ${vars.env}
       mode: APPEND
     - table_name: slv_stock_prices_quarantine
-      schema_name: finance
+      schema_name: yahoo
       catalog_name: ${vars.env}
       mode: APPEND
       is_quarantine: True
     transformer:
       nodes:
-        - sql_expr: |
+        - expr: |
             SELECT
               data.created_at AS created_at,
               data.symbol AS symbol,
@@ -81,6 +71,7 @@ nodes:
             FROM
               {df}
         - func_name: drop_duplicates
+          dataframe_api: NATIVE
           func_kwargs:
             subset:
               - symbol
@@ -93,9 +84,10 @@ nodes:
   - name: brz_stock_metadata
     source:
       path: /Volumes/${vars.env}/sources/landing/events/yahoo-finance/stock_metadata/
+      format: JSON
     sinks:
     - table_name: brz_stock_metadata
-      schema_name: finance
+      schema_name: yahoo
       catalog_name: ${vars.env}
       mode: OVERWRITE
 
@@ -104,49 +96,40 @@ nodes:
       node_name: brz_stock_metadata
     sinks:
     - table_name: slv_stock_metadata
-      schema_name: finance
+      schema_name: yahoo
       catalog_name: ${vars.env}
       mode: OVERWRITE
-    drop_source_columns: True
     transformer:
       nodes:
-        - with_column:
-            name: symbol
-            type: string
-            expr: F.col('data.symbol')
-
-        - with_column:
-            name: currency
-            type: string
-            expr: F.col('data.currency')
-
-        - with_column:
-            name: first_traded
-            type: timestamp
-            expr: F.col('data.firstTradeDate')
+        - func_name: select
+          func_kwargs:
+            symbol: nw.col("data.symbol").cast(nw.dtypes.String())
+            name: nw.col("data.symbol").lake.symbol_to_name().cast(nw.dtypes.String())
+            currency: nw.col("data.currency").cast(nw.dtypes.String())
+            first_traded: nw.col("data.firstTradeDate").cast(nw.dtypes.Datetime(time_zone="UTC"))
 
   # ------------------------------------------------------------------------- #
   # Silver Joins                                                              #
   # ------------------------------------------------------------------------- #
 
   - name: slv_stocks
-    drop_source_columns: False
     source:
       node_name: slv_stock_prices
       as_stream: false
     sinks:
     - table_name: slv_stocks
-      schema_name: finance
+      schema_name: market
       catalog_name: ${vars.env}
       mode: OVERWRITE
     transformer:
       nodes:
-        - func_name: laktory.smart_join
+        - func_name: join
           func_kwargs:
             other:
               node_name: slv_stock_metadata
               selects:
                 - symbol
+                - name
                 - currency
                 - first_traded
             "on":
@@ -157,12 +140,10 @@ nodes:
       node_name: slv_stocks
     sinks:
     - table_name: slv_stocks_aapl
-      schema_name: finance
+      schema_name: market
       catalog_name: ${vars.env}
       table_type: VIEW
-    transformer:
-      nodes:
-        - sql_expr: "SELECT * FROM {df} WHERE symbol = 'AAPL'"
+      view_definition: "SELECT * FROM {df} WHERE symbol = 'AAPL'"
 
   # ------------------------------------------------------------------------- #
   # Gold                                                                      #
@@ -174,26 +155,22 @@ nodes:
       as_stream: false
     sinks:
     - table_name: gld_stock_prices_by_1d
-      schema_name: finance
+      schema_name: market
       catalog_name: ${vars.env}
       mode: OVERWRITE
     transformer:
       nodes:
+        - func_name: with_columns
+          func_kwargs:
+            day_id: nw.col("created_at").dt.truncate("1d")
         - func_name: laktory.groupby_and_agg
           func_kwargs:
             groupby_columns:
               - symbol
-            groupby_window:
-              time_column: created_at
-              window_duration: 1 day
+              - day_id
             agg_expressions:
-              - name: count
-                expr: F.count('symbol')
-              - name: low
-                expr: F.min('low')
-              - name: high
-                expr: F.max('high')
-              - name: open
-                expr: F.first('open')
-              - name: close
-                expr: F.last('close')
+              - expr: nw.col('symbol').count().alias("count")
+              - expr: nw.col('low').min().alias("low")
+              - expr: nw.col('high').max().alias("high")
+              - expr: nw.col('open').min().alias("open")
+              - expr: nw.col('close').max().alias("close")

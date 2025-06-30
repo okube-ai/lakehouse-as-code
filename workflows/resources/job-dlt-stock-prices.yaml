@@ -1,34 +1,17 @@
 name: job-dlt-stock-prices
-clusters:
-  - name: main
-    autoscale:
-      min_workers: 1
-      max_workers: 2
-    spark_version: 15.4.x-scala2.12
-    node_type_id: Standard_DS3_v2
-    spark_env_vars:
-      LAKTORY_WORKSPACE_ENV: ${vars.env}
+
+parameters:
+  - name: env
+    default: ${vars.env}
 
 tasks:
   - task_key: ingest
-    job_cluster_key: main
     notebook_task:
       notebook_path: /.laktory/jobs/ingest_stock_prices.py
-    libraries:
-      - pypi:
-          package: ${vars.laktory_package}
-      - pypi:
-          package: yfinance
 
   - task_key: ingest-metadata
-    job_cluster_key: main
     notebook_task:
       notebook_path: /.laktory/jobs/ingest_stock_metadata.py
-    libraries:
-      - pypi:
-          package: ${vars.laktory_package}
-      - pypi:
-          package: yfinance
 
   - task_key: pipeline
     depends_ons:

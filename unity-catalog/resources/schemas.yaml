@@ -1,22 +1,27 @@
-- name: finance
-  grants:
-    - principal: domain-finance
-      privileges:
-        - SELECT
-- name: finance_dlt
-  grants:
-    - principal: domain-finance
-      privileges:
-        - SELECT
 - name: databricks
   grants:
     - principal: domain-chatabricks
       privileges:
         - SELECT
         - EXECUTE
-- name: engineering
+- name: market
   grants:
-    - principal: domain-engineering
+    - principal: domain-market
+      privileges:
+        - SELECT
+- name: market_dlt
+  grants:
+    - principal: domain-market
+      privileges:
+        - SELECT
+- name: yahoo
+  grants:
+    - principal: domain-yahoo
+      privileges:
+        - SELECT
+- name: yahoo_dlt
+  grants:
+    - principal: domain-yahoo
       privileges:
         - SELECT
 - name: sandbox

@@ -1,42 +1,33 @@
 name: dlt-stock-prices
 
-orchestrator: DATABRICKS_DLT
+dependencies:
+  - ${vars.laktory_package}
+  - ${vars.wheel_filepath}
 
-# --------------------------------------------------------------------------- #
-# DLT                                                                         #
-# --------------------------------------------------------------------------- #
-
-databricks_dlt:
+orchestrator:
   resource_name: dlt-stock-prices
+  type: DATABRICKS_DLT
+  serverless: true
   catalog: ${vars.env}
-  target: finance_dlt
+  schema: market_dlt
   development: ${vars.is_dev}
 
-  clusters:
-    - name : default
-      node_type_id: Standard_DS3_v2
-      autoscale:
-        min_workers: 1
-        max_workers: 2
-
+#  clusters:
+#    - name : default
+#      node_type_id: Standard_DS3_v2
+#      autoscale:
+#        min_workers: 1
+#        max_workers: 2
+#
   libraries:
     - notebook:
         path: /.laktory/dlt/dlt_laktory_pl.py
-#    - notebook:
-#        path: /.laktory/dlt/dlt_gld_stock_performances.py
 
   access_controls:
     - group_name: account users
       permission_level: CAN_VIEW
     - group_name: role-engineers
       permission_level: CAN_RUN
-
-dependencies:
-  - ${vars.laktory_package}
-
-udfs:
-  - module_name: stock_functions
-    function_name: symbol_to_name
 
 # --------------------------------------------------------------------------- #
 # Nodes                                                                       #
@@ -49,15 +40,17 @@ nodes:
   # ------------------------------------------------------------------------- #
 
   - name: brz_stock_prices
-    timestamp_key: data.created_at
     source:
       path: /Volumes/${vars.env}/sources/landing/events/yahoo-finance/stock_price/
       as_stream: true
+      format: JSON
+      reader_kwargs:
+        cloudFiles.inferColumnTypes: true
     sinks:
     - table_name: brz_stock_prices
+      schema_name: yahoo_dlt
 
   - name: slv_stock_prices
-    timestamp_key: created_at
     expectations:
       - name: positive_price
         expr: open > 0
@@ -70,11 +63,13 @@ nodes:
       as_stream: true
     sinks:
     - table_name: slv_stock_prices
+      schema_name: yahoo_dlt
     - table_name: slv_stock_prices_quarantine
+      schema_name: yahoo_dlt
       is_quarantine: True
     transformer:
       nodes:
-        - sql_expr: |
+        - expr: |
             SELECT
               data.created_at AS created_at,
               data.symbol AS symbol,
@@ -86,6 +81,7 @@ nodes:
             FROM
               {df}
         - func_name: drop_duplicates
+          dataframe_api: NATIVE
           func_kwargs:
             subset:
               - symbol
@@ -98,50 +94,45 @@ nodes:
   - name: brz_stock_metadata
     source:
       path: /Volumes/${vars.env}/sources/landing/events/yahoo-finance/stock_metadata/
+      format: JSON
     sinks:
-    - table_name: brz_stock_metadata
+    - schema_name: yahoo_dlt
+      table_name: brz_stock_metadata
 
   - name: slv_stock_metadata
     source:
       node_name: brz_stock_metadata
-    sinks: []
-    drop_source_columns: True
+    sinks:
+      - pipeline_view_name: slv_stock_metadata
     transformer:
       nodes:
-        - with_column:
-            name: symbol
-            type: string
-            expr: F.col('data.symbol')
-
-        - with_column:
-            name: currency
-            type: string
-            expr: F.col('data.currency')
-
-        - with_column:
-            name: first_traded
-            type: timestamp
-            expr: F.col('data.firstTradeDate')
+        - func_name: select
+          func_kwargs:
+            symbol: nw.col("data.symbol").cast(nw.dtypes.String())
+            name: nw.col("data.symbol").lake.symbol_to_name().cast(nw.dtypes.String())
+            currency: nw.col("data.currency").cast(nw.dtypes.String())
+            first_traded: nw.col("data.firstTradeDate").cast(nw.dtypes.Datetime(time_zone="UTC"))
 
   # ------------------------------------------------------------------------- #
   # Silver Joins                                                              #
   # ------------------------------------------------------------------------- #
 
   - name: slv_stocks
-    drop_source_columns: False
     source:
       node_name: slv_stock_prices
       as_stream: false
     sinks:
     - table_name: slv_stocks
+      schema_name: market_dlt
     transformer:
       nodes:
-        - func_name: laktory.smart_join
+        - func_name: join
           func_kwargs:
             other:
               node_name: slv_stock_metadata
               selects:
                 - symbol
+                - name
                 - currency
                 - first_traded
             "on":
@@ -159,21 +150,17 @@ nodes:
     - table_name: gld_stock_prices_by_1d
     transformer:
       nodes:
+        - func_name: with_columns
+          func_kwargs:
+            day_id: nw.col("created_at").dt.truncate("1d")
         - func_name: laktory.groupby_and_agg
           func_kwargs:
             groupby_columns:
               - symbol
-            groupby_window:
-              time_column: created_at
-              window_duration: 1 day
+              - day_id
             agg_expressions:
-              - name: count
-                expr: F.count('symbol')
-              - name: low
-                expr: F.min('low')
-              - name: high
-                expr: F.max('high')
-              - name: open
-                expr: F.first('open')
-              - name: close
-                expr: F.last('close')
+              - expr: nw.col('symbol').count().alias("count")
+              - expr: nw.col('low').min().alias("low")
+              - expr: nw.col('high').max().alias("high")
+              - expr: nw.col('open').min().alias("open")
+              - expr: nw.col('close').max().alias("close")

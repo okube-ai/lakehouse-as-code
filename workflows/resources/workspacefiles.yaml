@@ -1,6 +1,0 @@
-workspace-file-pipelines-stock-functions:
-  source: ./workspacefiles/pipelines/stock_functions.py
-  dirpath: pipelines/
-  access_controls:
-    - group_name: account users
-      permission_level: CAN_READ

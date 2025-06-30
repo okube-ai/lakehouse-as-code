@@ -10,7 +10,7 @@ cluster-policy-okube:
       hidden: True
 #  libraries:
 #  - pypi:
-#      package: laktory==0.7.2
+#      package: laktory==0.8.0
   access_controls:
     - group_name: role-engineers
       permission_level: CAN_USE

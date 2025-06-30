@@ -11,11 +11,11 @@ user-data-analyst-okube-ai:
   group_ids:
   - ${resources.group-role-analysts.id}
   - ${resources.group-domain-finance.id}
-  - ${resources.group-domain-engineering.id}
+  - ${resources.group-domain-market.id}
 
 user-data-engineer-okube-ai:
   user_name: data.engineer@okube.ai
   group_ids:
   - ${resources.group-role-engineers.id}
-  - ${resources.group-domain-engineering.id}
+  - ${resources.group-domain-market.id}
 

@@ -7,41 +7,11 @@ query-create-view-google-stocks:
       SELECT
         * 
       FROM 
-        ${vars.env}.finance_dlt.slv_stocks 
+        ${vars.env}.yahoo_dlt.slv_stocks 
       WHERE
         symbol = 'GOOGL'
   warehouse_id: ${vars.sql_tasks_warehouse_id}
   dirpath: /queries/
-  access_controls:
-    - group_name: account users
-      permission_level: CAN_VIEW
-    - group_name: role-engineers
-      permission_level: CAN_RUN
-
-query-google-stocks-positive:
-  display_name: google-close-price
-  query_text: |
-    SELECT
-      *
-    FROM
-      ${vars.env}.finance_dlt.slv_google_stocks 
-    WHERE
-      symbol = 'GOOGL'
-  warehouse_id: ${vars.sql_tasks_warehouse_id}
-  dirpath: /queries/
-  alert:
-    display_name:
-      google-close-price-positive
-    dirpath:
-      /alerts/
-    condition:
-      op: LESS_THAN_OR_EQUAL
-      operand:
-        column:
-          name: close
-      threshold:
-        value:
-          double_value: 0.0001
   access_controls:
     - group_name: account users
       permission_level: CAN_VIEW
