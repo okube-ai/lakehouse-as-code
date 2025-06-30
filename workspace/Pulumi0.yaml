@@ -1,0 +1,179 @@
+config:
+  databricks:azure_client_id: 1f8005d3-5efa-476b-9eb5-11755fea1128
+  databricks:azure_client_secret: GeP8Q~3X1Avjnb6XaxiRPjRAhtFcPzU6hUSDCbK9
+  databricks:azure_tenant_id: ab09b389-116f-42c5-9826-3505f22a906b
+  databricks:host: adb-4623853922539974.14.azuredatabricks.net
+description: Lakehouse - Workspace Configuration
+name: workspace-conf
+outputs:
+  directory-laktory-queries: folders/${directory-laktory-queries.objectId}
+  warehouse-default-data-source-id: ${warehouse-default.dataSourceId}
+  warehouse-default-id: ${warehouse-default.id}
+resources:
+  cluster-default:
+    options:
+      deleteBeforeReplace: true
+      dependsOn: []
+    properties:
+      autoscale:
+        maxWorkers: 4
+        minWorkers: 1
+      autoterminationMinutes: 30
+      clusterName: default
+      dataSecurityMode: USER_ISOLATION
+      initScripts: []
+      isPinned: true
+      libraries:
+      - pypi:
+          package: laktory==0.5.10
+      - pypi:
+          package: yfinance
+      nodeTypeId: Standard_DS3_v2
+      numWorkers: 0
+      sparkConf: {}
+      sparkEnvVars:
+        AZURE_CLIENT_ID: '{{secrets/azure/client-id}}'
+        AZURE_CLIENT_SECRET: '{{secrets/azure/client-secret}}'
+        AZURE_KEYVAULT_URL: '{{secrets/azure/keyvault-url}}'
+        AZURE_TENANT_ID: '{{secrets/azure/tenant-id}}'
+        LAKTORY_WORKSPACE_ENV: dev
+      sparkVersion: 14.0.x-scala2.12
+      sshPublicKeys: []
+    type: databricks:Cluster
+  directory-laktory-queries:
+    options:
+      deleteBeforeReplace: true
+      dependsOn: []
+    properties:
+      path: /.laktory/queries/
+    type: databricks:Directory
+  directory-laktory-queries-views:
+    options:
+      deleteBeforeReplace: true
+      dependsOn: []
+    properties:
+      path: /.laktory/queries/views/
+    type: databricks:Directory
+  permissions-cluster-default:
+    options:
+      deleteBeforeReplace: true
+      dependsOn: []
+    properties:
+      accessControls:
+      - groupName: role-engineers
+        permissionLevel: CAN_RESTART
+      - groupName: role-analysts
+        permissionLevel: CAN_RESTART
+      clusterId: ${cluster-default.id}
+    type: databricks:Permissions
+  permissions-warehouse-default:
+    options:
+      deleteBeforeReplace: true
+      dependsOn: []
+    properties:
+      accessControls:
+      - groupName: account users
+        permissionLevel: CAN_USE
+      sqlEndpointId: ${warehouse-default.id}
+    type: databricks:Permissions
+  permissions-workspace-file-init-scripts-install_laktory:
+    options:
+      deleteBeforeReplace: true
+      dependsOn:
+      - ${workspace-file-init-scripts-install_laktory}
+    properties:
+      accessControls:
+      - groupName: account users
+        permissionLevel: CAN_READ
+      workspaceFilePath: /init_scripts/install_laktory.sh
+    type: databricks:Permissions
+  secret-azure-client-id:
+    options:
+      deleteBeforeReplace: true
+      dependsOn: []
+    properties:
+      key: client-id
+      scope: ${secret-scope-azure.id}
+      stringValue: ${vars.azure_client_id}
+    type: databricks:Secret
+  secret-azure-client-secret:
+    options:
+      deleteBeforeReplace: true
+      dependsOn: []
+    properties:
+      key: client-secret
+      scope: ${secret-scope-azure.id}
+      stringValue: ${vars.azure_client_secret}
+    type: databricks:Secret
+  secret-azure-keyvault-url:
+    options:
+      deleteBeforeReplace: true
+      dependsOn: []
+    properties:
+      key: keyvault-url
+      scope: ${secret-scope-azure.id}
+      stringValue: https://o3-kv-lakehouse-dev.vault.azure.net/
+    type: databricks:Secret
+  secret-azure-tenant-id:
+    options:
+      deleteBeforeReplace: true
+      dependsOn: []
+    properties:
+      key: tenant-id
+      scope: ${secret-scope-azure.id}
+      stringValue: ${vars.azure_tenant_id}
+    type: databricks:Secret
+  secret-scope-acl-azure-role-metastore-admins:
+    options:
+      deleteBeforeReplace: true
+      dependsOn:
+      - ${secret-scope-azure}
+    properties:
+      permission: READ
+      principal: role-metastore-admins
+      scope: azure
+    type: databricks:SecretAcl
+  secret-scope-acl-azure-role-workspace-admins:
+    options:
+      deleteBeforeReplace: true
+      dependsOn:
+      - ${secret-scope-azure}
+    properties:
+      permission: READ
+      principal: role-workspace-admins
+      scope: azure
+    type: databricks:SecretAcl
+  secret-scope-azure:
+    options:
+      deleteBeforeReplace: true
+      dependsOn: []
+    properties:
+      backendType: DATABRICKS
+      name: azure
+    type: databricks:SecretScope
+  warehouse-default:
+    options:
+      deleteBeforeReplace: true
+      dependsOn: []
+    properties:
+      autoStopMins: 10
+      channel:
+        name: CHANNEL_NAME_PREVIEW
+      clusterSize: 2X-Small
+      enablePhoton: false
+      enableServerlessCompute: true
+      maxNumClusters: 2
+      minNumClusters: 1
+      name: default
+    type: databricks:SqlEndpoint
+  workspace-file-init-scripts-install_laktory:
+    options:
+      deleteBeforeReplace: true
+      dependsOn: []
+    properties:
+      path: /init_scripts/install_laktory.sh
+      source: ../unity-catalog/init_scripts/install_laktory.sh
+    type: databricks:WorkspaceFile
+runtime: yaml
+variables:
+  env: dev
