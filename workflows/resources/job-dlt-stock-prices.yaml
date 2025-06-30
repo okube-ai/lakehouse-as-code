@@ -1,5 +1,9 @@
 name: job-dlt-stock-prices
 
+parameters:
+  - name: env
+    default: ${vars.env}
+
 tasks:
   - task_key: ingest
     notebook_task:

@@ -123,7 +123,7 @@ nodes:
       as_stream: false
     sinks:
     - table_name: slv_stocks
-      schema_name: yahoo_dlt
+      schema_name: market_dlt
     transformer:
       nodes:
         - func_name: join

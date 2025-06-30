@@ -12,6 +12,7 @@ pulumi:
     databricks:azure_tenant_id: ${vars.AZURE_TENANT_ID}
     databricks:azure_client_id: ${vars.AZURE_CLIENT_ID}
     databricks:azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
+    databricks:auth_type: azure-client-secret
 
 # List of Resources to deploy
 resources:
@@ -24,6 +25,7 @@ resources:
       azure_client_id: ${vars.AZURE_CLIENT_ID}
       azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
       azure_tenant_id: ${vars.AZURE_TENANT_ID}
+      auth_type: azure-client-secret
 
     # Prod Workspace Provider
     provider-databricks-prd:
@@ -31,6 +33,7 @@ resources:
       azure_client_id: ${vars.AZURE_CLIENT_ID}
       azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
       azure_tenant_id: ${vars.AZURE_TENANT_ID}
+      auth_type: azure-client-secret
 
   # Account Groups
   databricks_groups: !use resources/groups.yaml

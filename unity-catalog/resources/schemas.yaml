@@ -1,13 +1,3 @@
-- name: finance
-  grants:
-    - principal: domain-finance
-      privileges:
-        - SELECT
-- name: finance_dlt
-  grants:
-    - principal: domain-finance
-      privileges:
-        - SELECT
 - name: databricks
   grants:
     - principal: domain-chatabricks

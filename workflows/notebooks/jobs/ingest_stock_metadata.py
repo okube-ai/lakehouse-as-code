@@ -1,16 +1,22 @@
 # COMMAND ----------
-# MAGIC %pip yfinance
+dbutils.widgets.text("env", "dev")
+
+# COMMAND ----------
+# MAGIC %pip install yfinance /Workspace/.laktory/wheels/lake-0.0.1-py3-none-any.whl
+# MAGIC %restart_python
 
 # COMMAND ----------
 import yfinance as yf
 
-from laktory.models import DataEvent
-from laktory.models import DataProducer
+from lake import DataEvent
+from lake import DataProducer
 
 
 # --------------------------------------------------------------------------- #
 # Setup                                                                       #
 # --------------------------------------------------------------------------- #
+
+env = dbutils.widgets.get("env")
 
 symbols = [
     "AAPL",
@@ -31,5 +37,6 @@ for s in symbols:
         producer=DataProducer(name="yahoo-finance"),
         data=data,
         tstamp_in_path=False,
+        events_root=f"/Volumes/{env}/sources/landing/events/",
     )
     event.to_databricks(overwrite=True, suffix=s)
