@@ -95,5 +95,5 @@ jobs:
             REFRESH_OPTION="--fr"
           fi          
           
-          laktory run -e ${{ inputs.env }} --dlt ${{ inputs.dlt_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }} $EXCEPTION_OPTION $REFRESH_OPTION
+          laktory run -e ${{ inputs.env }} --dbks-pipeline ${{ inputs.dlt_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }} $EXCEPTION_OPTION $REFRESH_OPTION
         working-directory: ${{ inputs.working-directory }}
