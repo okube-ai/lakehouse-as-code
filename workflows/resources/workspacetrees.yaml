@@ -1,0 +1,7 @@
+workspacetree-notebooks:
+  source: ./notebooks/
+  access_controls:
+    - group_name: account users
+      permission_level: CAN_READ
+    - group_name: role-engineers
+      permission_level: CAN_RUN

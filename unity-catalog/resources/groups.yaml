@@ -1,8 +1,3 @@
-group-domain-chatabricks:
-  display_name: domain-chatabricks
-  workspace_permission_assignments:
-    - workspace_id: ${vars.workspace_id_dev}
-    - workspace_id: ${vars.workspace_id_prd}
 group-domain-finance:
   display_name: domain-finance
   workspace_permission_assignments:
