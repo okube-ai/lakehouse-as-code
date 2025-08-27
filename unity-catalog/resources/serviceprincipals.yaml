@@ -18,13 +18,3 @@ service-principal-neptune-prd:
     - ${resources.group-role-metastore-admins.id}
   roles:
     - account_admin
-service-principal-intelli5-dev:
-  display_name: intelli5-dev
-  application_id: ${vars.intelli5_dev_client_id}
-  group_ids:
-    - ${resources.group-domain-chatabricks.id}
-service-principal-intelli5-prd:
-  display_name: intelli5-prd
-  application_id: ${vars.intelli5_prd_client_id}
-  group_ids:
-    - ${resources.group-domain-chatabricks.id}

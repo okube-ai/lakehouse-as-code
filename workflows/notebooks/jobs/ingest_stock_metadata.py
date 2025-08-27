@@ -1,16 +1,14 @@
+# Databricks notebook source
 # COMMAND ----------
 dbutils.widgets.text("env", "dev")
 
 # COMMAND ----------
-# MAGIC %pip install yfinance /Workspace/.laktory/wheels/lake-0.0.1-py3-none-any.whl
+# MAGIC %pip install pydantic
 # MAGIC %restart_python
 
 # COMMAND ----------
-import yfinance as yf
-
-from lake import DataEvent
-from lake import DataProducer
-
+import pydantic
+...
 
 # --------------------------------------------------------------------------- #
 # Setup                                                                       #

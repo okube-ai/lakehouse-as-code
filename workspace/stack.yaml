@@ -8,6 +8,7 @@ pulumi:
     databricks:azure_client_id: ${vars.AZURE_CLIENT_ID}
     databricks:azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
     databricks:azure_tenant_id: ${vars.AZURE_TENANT_ID}
+    databricks:auth_type: azure-client-secret
   outputs:
     directory-laktory-queries: folders/${resources.directory-laktory-queries.objectId}
     warehouse-default-data-source-id: ${resources.warehouse-default.dataSourceId}

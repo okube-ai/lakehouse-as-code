@@ -40,7 +40,7 @@ class Service:
     def run(self):
         # Service principals
         self.set_service_principal()
-        self.set_service_principal_intelli5()
+        # self.set_service_principal_intelli5()
 
         # Resources Group
         self.set_resource_group()
@@ -72,8 +72,9 @@ class Service:
 
         self.app_secret = azuread.ApplicationPassword(
             "aad-app-secret-neptune",
+            display_name="main",
             application_object_id=self.app.object_id,
-            end_date_relative=f"{24*30*12}h",
+            end_date="2027-01-01T00:00:00Z",
         )
         pulumi.export("neptune-client-secret", self.app_secret.value)
 
@@ -124,7 +125,7 @@ class Service:
         # Secrets
         for key, value in [
             ("neptune-client-secret", self.app_secret.value),
-            ("intelli5-client-secret", self.app_secret_intelli5.value),
+            # ("intelli5-client-secret", self.app_secret_intelli5.value),
         ]:
             self._set_secret(key, value)
 

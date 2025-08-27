@@ -10,7 +10,7 @@ pulumi:
     databricks:azure_tenant_id: ${vars.AZURE_TENANT_ID}
     databricks:auth_type: azure-client-secret
 resources:
-  databricks_notebooks: !use resources/notebooks.yaml
+  databricks_workspacetrees: !use resources/workspacetrees.yaml
   databricks_queries: !use resources/queries.yaml
   databricks_pythonpackages: !use resources/pythonpackages.yaml
   pipelines:
