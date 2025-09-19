@@ -19,7 +19,7 @@ resources:
   databricks_jobs:
     job-dlt-stock-prices: !use resources/job-dlt-stock-prices.yaml
 variables:
-  laktory_package: laktory==0.8.0
+  laktory_package: laktory==0.8.8
   wheel_filepath: /Workspace${vars.workspace_laktory_root}wheels/lake-0.0.1-py3-none-any.whl
 
 environments:
@@ -31,7 +31,7 @@ environments:
     variables:
       env: dev
       is_dev: true
-      sql_tasks_warehouse_id: a6bc05a0fc5e55ae
+      sql_tasks_warehouse_id: 4d0b09d503ba808f
   prd:
     variables:
       env: prd

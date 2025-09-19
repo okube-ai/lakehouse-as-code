@@ -106,7 +106,7 @@ nodes:
             symbol: nw.col("data.symbol").cast(nw.dtypes.String())
             name: nw.col("data.symbol").lake.symbol_to_name().cast(nw.dtypes.String())
             currency: nw.col("data.currency").cast(nw.dtypes.String())
-            first_traded: nw.col("data.firstTradeDate").cast(nw.dtypes.Datetime(time_zone="UTC"))
+            first_traded: nw.col("data.firstTradeDate").cast(nw.dtypes.Datetime(time_zone="Etc/UTC"))
 
   # ------------------------------------------------------------------------- #
   # Silver Joins                                                              #

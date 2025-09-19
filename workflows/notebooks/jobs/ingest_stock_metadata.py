@@ -3,12 +3,14 @@
 dbutils.widgets.text("env", "dev")
 
 # COMMAND ----------
-# MAGIC %pip install pydantic
+# MAGIC %pip install yfinance /Workspace/.laktory/wheels/lake-0.0.1-py3-none-any.whl
 # MAGIC %restart_python
 
 # COMMAND ----------
-import pydantic
-...
+import yfinance as yf
+
+from lake import DataEvent
+from lake import DataProducer
 
 # --------------------------------------------------------------------------- #
 # Setup                                                                       #
