@@ -12,6 +12,7 @@ catalog-dev:
     - principal: role-metastore-admins
       privileges:
         - ALL_PRIVILEGES
+        - MANAGE
   schemas:
     - !extend schemas.yaml
     - name: sources
@@ -57,6 +58,7 @@ catalog-prd:
     - principal: role-metastore-admins
       privileges:
         - ALL_PRIVILEGES
+        - MANAGE
   schemas:
     - !extend schemas.yaml
     - name: sources
@@ -107,6 +109,10 @@ catalog-sandbox:
         - CREATE_TABLE
         - READ_VOLUME
         - CREATE_VOLUME
+    - principal: role-metastore-admins
+      privileges:
+        - ALL_PRIVILEGES
+        - MANAGE
   schemas:
     - name: default
   options:
