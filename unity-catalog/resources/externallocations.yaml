@@ -3,6 +3,12 @@ external-location-landing-dev:
     credential_name: ${resources.metastore-data-access-lakehouse-dev.name}
     force_destroy: True
     url: ${vars.landing_storage_location_dev}
+    grants:
+      - principal: role-metastore-admins
+        privileges:
+          - ALL_PRIVILEGES
+          - MANAGE
+          - EXTERNAL_USE_LOCATION
     options:
         provider: ${resources.provider-databricks-dev}
 
@@ -11,6 +17,12 @@ external-location-landing-prd:
     credential_name: ${resources.metastore-data-access-lakehouse-prd.name}
     force_destroy: True
     url: ${vars.landing_storage_location_prd}
+    grants:
+      - principal: role-metastore-admins
+        privileges:
+          - ALL_PRIVILEGES
+          - MANAGE
+          - EXTERNAL_USE_LOCATION
     options:
         provider: ${resources.provider-databricks-prd}
 
@@ -19,6 +31,12 @@ external-location-tables-dev:
     credential_name: ${resources.metastore-data-access-lakehouse-dev.name}
     force_destroy: True
     url: ${vars.tables_storage_location_dev}
+    grants:
+      - principal: role-metastore-admins
+        privileges:
+          - ALL_PRIVILEGES
+          - MANAGE
+          - EXTERNAL_USE_LOCATION
     options:
         provider: ${resources.provider-databricks-dev}
 
@@ -27,6 +45,12 @@ external-location-tables-prd:
     credential_name: ${resources.metastore-data-access-lakehouse-prd.name}
     force_destroy: True
     url: ${vars.tables_storage_location_prd}
+    grants:
+      - principal: role-metastore-admins
+        privileges:
+          - ALL_PRIVILEGES
+          - MANAGE
+          - EXTERNAL_USE_LOCATION
     options:
         provider: ${resources.provider-databricks-prd}
 
@@ -35,5 +59,11 @@ external-location-metastore-prd:
     credential_name: ${metastore-data-access-lakehouse-prd.name}
     force_destroy: True
     url: ${vars.metastore_prd_storage_location}
+    grants:
+      - principal: role-metastore-admins
+        privileges:
+          - ALL_PRIVILEGES
+          - MANAGE
+          - EXTERNAL_USE_LOCATION
     options:
         provider: ${resources.provider-databricks-prd}

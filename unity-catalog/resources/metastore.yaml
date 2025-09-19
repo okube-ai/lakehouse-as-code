@@ -17,8 +17,11 @@ grants:
       - CREATE_CATALOG
       - CREATE_CONNECTION
       - CREATE_EXTERNAL_LOCATION
+      - CREATE_EXTERNAL_METADATA
+      - CREATE_SERVICE_CREDENTIAL
       - CREATE_STORAGE_CREDENTIAL
       - MANAGE_ALLOWLIST
+      - USE_CONNECTION
 data_accesses:
   - name: lakehouse-dev
     azure_managed_identity:
@@ -31,7 +34,8 @@ data_accesses:
     grants:
       - principal: role-metastore-admins
         privileges:
-          - CREATE_EXTERNAL_LOCATION
+          - MANAGE
+          - ALL_PRIVILEGES
   - name: lakehouse-prd
     azure_managed_identity:
       access_connector_id: /subscriptions/c8b10a15-5bb2-4c3f-988a-8ec6e60614bb/resourceGroups/o3-rg-lakehouse-prd/providers/Microsoft.Databricks/accessConnectors/o3-dbksac-lakehouse-prd
@@ -40,7 +44,8 @@ data_accesses:
     grants:
       - principal: role-metastore-admins
         privileges:
-          - CREATE_EXTERNAL_LOCATION
+          - MANAGE
+          - ALL_PRIVILEGES
 options:
   depends_on:
     - ${resources.group-role-metastore-admins}

@@ -1,9 +1,9 @@
 - name: databricks
-  grants:
-    - principal: domain-chatabricks
-      privileges:
-        - SELECT
-        - EXECUTE
+#  grants:
+#    - principal: domain-chatabricks
+#      privileges:
+#        - SELECT
+#        - EXECUTE
 - name: market
   grants:
     - principal: domain-market
