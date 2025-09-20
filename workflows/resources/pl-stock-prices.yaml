@@ -84,12 +84,27 @@ nodes:
   - name: brz_stock_metadata
     source:
       path: /Volumes/${vars.env}/sources/landing/events/yahoo-finance/stock_metadata/
+      as_stream: true
       format: JSON
+      reader_kwargs:
+        cloudFiles.inferColumnTypes: true
     sinks:
     - table_name: brz_stock_metadata
       schema_name: yahoo
       catalog_name: ${vars.env}
-      mode: OVERWRITE
+      mode: APPEND
+    transformer:
+      nodes:
+        - func_name: withColumn
+          func_args:
+            - _filepath
+            - F.expr("_metadata.file_path")
+          dataframe_api: NATIVE
+        - func_name: withColumn
+          func_args:
+            - _extracted_at
+            - F.expr("_metadata.file_modification_time")
+          dataframe_api: NATIVE
 
   - name: slv_stock_metadata
     source:
@@ -98,11 +113,17 @@ nodes:
     - table_name: slv_stock_metadata
       schema_name: yahoo
       catalog_name: ${vars.env}
-      mode: OVERWRITE
+      mode: MERGE
+      merge_cdc_options:
+        order_by: extracted_at
+        primary_keys:
+          - symbol
+        scd_type: 1
     transformer:
       nodes:
         - func_name: select
           func_kwargs:
+            extracted_at: nw.col("_extracted_at")
             symbol: nw.col("data.symbol").cast(nw.dtypes.String())
             name: nw.col("data.symbol").lake.symbol_to_name().cast(nw.dtypes.String())
             currency: nw.col("data.currency").cast(nw.dtypes.String())
