@@ -179,6 +179,16 @@ nodes:
       schema_name: market
       catalog_name: ${vars.env}
       mode: OVERWRITE
+      metadata:
+        comment: Stock prices aggregated daily
+        tags:
+          env: dev
+          pii: "false"
+        columns:
+          day_id:
+            comment: Day unique id
+            tags:
+              pii: "false"
     transformer:
       nodes:
         - func_name: with_columns

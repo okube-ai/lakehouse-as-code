@@ -171,6 +171,16 @@ nodes:
       as_stream: false
     sinks:
     - table_name: gld_stock_prices_by_1d
+      metadata:
+        comment: Stock prices aggregated daily
+        tags:
+          env: dev
+          pii: "false"
+        columns:
+          day_id:
+            comment: Day unique id
+            tags:
+              pii: "false"
     transformer:
       nodes:
         - func_name: with_columns
