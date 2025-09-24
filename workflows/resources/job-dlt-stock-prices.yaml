@@ -4,6 +4,13 @@ parameters:
   - name: env
     default: ${vars.env}
 
+environments:
+  - environment_key: laktory
+    spec:
+      client: "3"
+      dependencies:
+        - ${vars.laktory_package}
+
 tasks:
   - task_key: ingest
     notebook_task:
@@ -27,6 +34,17 @@ tasks:
       warehouse_id: ${vars.sql_tasks_warehouse_id}
     depends_ons:
       - task_key: pipeline
+
+  - task_key: meta
+    depends_ons:
+      - task_key: pipeline
+    python_wheel_task:
+      entry_point: models.pipeline._read_and_update_tables_metadata
+      package_name: laktory
+      named_parameters:
+        filepaths: /Workspace${vars.workspace_laktory_root}pipelines/dlt-stock-prices.json
+    environment_key: laktory
+
 
 access_controls:
   - group_name: account users

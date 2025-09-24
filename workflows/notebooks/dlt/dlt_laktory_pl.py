@@ -28,50 +28,36 @@ with open(config_filepath, "r") as fp:
 
 
 def define_table(node, sink):
-    # Get Expectations
-    dlt_warning_expectations = {}
-    dlt_drop_expectations = {}
-    dlt_fail_expectations = {}
-    if sink and not sink.is_quarantine:
-        dlt_warning_expectations = node.dlt_warning_expectations
-        dlt_drop_expectations = node.dlt_drop_expectations
-        dlt_fail_expectations = node.dlt_fail_expectations
-
     table_or_view = dlt.table
     if isinstance(sink, lk.models.PipelineViewDataSink):
         table_or_view = dlt.view
 
-    @table_or_view(
-        name=sink.dlt_name,
-        comment=node.comment,
-    )
-    @dlt.expect_all(dlt_warning_expectations)
-    @dlt.expect_all_or_drop(dlt_drop_expectations)
-    @dlt.expect_all_or_fail(dlt_fail_expectations)
-    def get_df():
-        # Execute node
-        node.execute()
-        if sink and sink.is_quarantine:
-            df = node.quarantine_df
-        else:
-            df = node.output_df
+    if not sink.is_cdc:
 
-        # Return
-        return df.to_native()
+        @table_or_view(**sink.dlt_table_or_view_kwargs)
+        @dlt.expect_all(sink.dlt_warning_expectations)
+        @dlt.expect_all_or_drop(sink.dlt_drop_expectations)
+        @dlt.expect_all_or_fail(sink.dlt_fail_expectations)
+        def get_df():
+            # Execute node
+            node.execute()
+            if sink.is_quarantine:
+                df = node.quarantine_df
+            else:
+                df = node.output_df
 
+            # Return
+            return df.to_native()
 
-# --------------------------------------------------------------------------- #
-# CDC tables                                                                  #
-# --------------------------------------------------------------------------- #
+    else:
 
+        @dlt.view(name=sink.dlt_pre_merge_view_name)
+        def get_df():
+            node.execute()
+            return node.output_df.to_native()
 
-def define_cdc_table(node, sink):
-    dlt.create_streaming_table(
-        name=sink.dlt_name,
-        comment=node.comment,
-    )
-
-    dlt.apply_changes(source=node.source.table_name, **sink.dlt_apply_changes_kwargs)
+        dlt.create_streaming_table(**sink.dlt_table_or_view_kwargs)
+        dlt.apply_changes(**sink.dlt_apply_changes_kwargs)
 
 
 # --------------------------------------------------------------------------- #
@@ -84,7 +70,4 @@ for node in pl.nodes:
         continue
 
     for sink in node.sinks:
-        if sink.is_cdc:
-            define_cdc_table(node, sink)
-        else:
-            define_table(node, sink)
+        define_table(node, sink)
