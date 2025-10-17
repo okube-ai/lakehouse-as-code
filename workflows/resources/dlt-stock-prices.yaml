@@ -1,5 +1,7 @@
 name: dlt-stock-prices
 
+databricks_quality_monitor_enabled: true
+
 dependencies:
   - ${vars.laktory_package}
   - ${vars.wheel_filepath}
@@ -177,10 +179,14 @@ nodes:
           env: dev
           pii: "false"
         columns:
-          day_id:
+          - name: day_id
             comment: Day unique id
             tags:
               pii: "false"
+      databricks_quality_monitor:
+        assets_dir: /Workspace${vars.workspace_laktory_root}qualitymonitors/
+        output_schema_name: "dev.market_dlt"
+        snapshot: {}
     transformer:
       nodes:
         - func_name: with_columns

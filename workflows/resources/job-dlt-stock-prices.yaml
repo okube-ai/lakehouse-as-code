@@ -39,10 +39,12 @@ tasks:
     depends_ons:
       - task_key: pipeline
     python_wheel_task:
-      entry_point: models.pipeline._read_and_update_tables_metadata
+      entry_point: models.pipeline._post_execute
       package_name: laktory
       named_parameters:
         filepaths: /Workspace${vars.workspace_laktory_root}pipelines/dlt-stock-prices.json
+        tables_metadata: "true"
+        quality_monitors: "true"
     environment_key: laktory
 
 
