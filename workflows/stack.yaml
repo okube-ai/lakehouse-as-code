@@ -19,8 +19,8 @@ resources:
   databricks_jobs:
     job-dlt-stock-prices: !use resources/job-dlt-stock-prices.yaml
 variables:
-#  laktory_package: laktory==0.8.8
-  laktory_package: git+https://github.com/okube-ai/laktory.git@main
+  laktory_package: laktory==0.8.10
+#  laktory_package: git+https://github.com/okube-ai/laktory.git@fix/qualitymonitor
   wheel_filepath: /Workspace${vars.workspace_laktory_root}wheels/lake-0.0.1-py3-none-any.whl
 
 environments:
