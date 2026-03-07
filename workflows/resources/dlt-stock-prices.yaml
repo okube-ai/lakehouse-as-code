@@ -8,7 +8,7 @@ dependencies:
 
 orchestrator:
   resource_name: dlt-stock-prices
-  type: DATABRICKS_DLT
+  type: DATABRICKS_PIPELINE
   serverless: true
   catalog: ${vars.env}
   schema: market_dlt
