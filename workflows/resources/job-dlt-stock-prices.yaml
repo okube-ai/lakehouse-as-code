@@ -7,7 +7,7 @@ parameters:
 environments:
   - environment_key: laktory
     spec:
-      client: "3"
+      environment_version: "4"
       dependencies:
         - ${vars.laktory_package}
 

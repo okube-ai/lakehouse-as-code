@@ -8,6 +8,15 @@ dependencies:
 
 orchestrator:
   type: DATABRICKS_JOB
+  serverless_environment_version: "4"
+#  job_clusters:
+#    - job_cluster_key: node-cluster
+#      new_cluster:
+#        autoscale:
+#          min_workers: 1
+#          max_workers: 2
+#        spark_version: 16.4.x-scala2.13
+#        node_type_id: Standard_DS3_v2
   config_file:
     access_controls:
       - group_name: account users
@@ -166,7 +175,9 @@ nodes:
       schema_name: market
       catalog_name: ${vars.env}
       table_type: VIEW
-      view_definition: "SELECT * FROM {df} WHERE symbol = 'AAPL'"
+    transformer:
+      nodes:
+      - expr: "SELECT * FROM {df} WHERE symbol = 'AAPL'"
 
   # ------------------------------------------------------------------------- #
   # Gold                                                                      #
