@@ -1,0 +1,12 @@
+name: stocks-dash
+description: A dashboard app for visualizing stock prices.
+resources:
+- name: sql-warehouse
+  sql_warehouse:
+    id: ${vars.sql_tasks_warehouse_id}
+    permission: CAN_USE
+access_controls:
+- group_name: account users
+  permission_level: CAN_USE
+- group_name: role-engineers
+  permission_level: CAN_MANAGE

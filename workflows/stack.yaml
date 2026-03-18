@@ -5,11 +5,13 @@ backend: pulumi
 pulumi:
   config:
     databricks:host: ${vars.DATABRICKS_HOST}
-    databricks:azure_client_id: ${vars.AZURE_CLIENT_ID}
-    databricks:azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
-    databricks:azure_tenant_id: ${vars.AZURE_TENANT_ID}
-    databricks:auth_type: azure-client-secret
+    databricks:azureClientId: ${vars.AZURE_CLIENT_ID}
+    databricks:azureClientSecret: ${vars.AZURE_CLIENT_SECRET}
+    databricks:azureTenantId: ${vars.AZURE_TENANT_ID}
+    databricks:authType: azure-client-secret
 resources:
+  databricks_apps:
+    app-stocks-dash: !use resources/app-stocks-dash.yaml
   databricks_workspacetrees: !use resources/workspacetrees.yaml
   databricks_queries: !use resources/queries.yaml
   databricks_pythonpackages: !use resources/pythonpackages.yaml
@@ -19,7 +21,7 @@ resources:
   databricks_jobs:
     job-dlt-stock-prices: !use resources/job-dlt-stock-prices.yaml
 variables:
-  laktory_package: laktory==0.9.0
+  laktory_package: laktory==0.9.1
   wheel_filepath: /Workspace${vars.workspace_laktory_root}wheels/lake-0.0.1-py3-none-any.whl
 
 environments:
