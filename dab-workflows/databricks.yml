@@ -1,0 +1,47 @@
+# This is a Databricks asset bundle definition for workflows.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: workflows
+  uuid: 612d9e03-ff62-46de-8d9c-0c966be43495
+
+include:
+  - resources/*.yml
+
+artifacts:
+  python_artifact:
+    type: whl
+    build: uv build --wheel
+
+# Variable declarations. These variables are assigned in the dev/prod targets below.
+variables:
+  catalog:
+    description: The catalog to use
+  schema:
+    description: The schema to use
+
+targets:
+  dev:
+    # The default target uses 'mode: development' to create a development copy.
+    # - Deployed resources get prefixed with '[dev my_user_name]'
+    # - Any job schedules and triggers are paused by default.
+    # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
+    mode: development
+    default: true
+    workspace:
+      host: https://adb-4623853922539974.14.azuredatabricks.net
+    variables:
+      catalog: dev
+      schema: market
+#      schema: ${workspace.current_user.short_name}
+  prod:
+    mode: production
+    workspace:
+      host: https://adb-4623853922539974.14.azuredatabricks.net
+      # We explicitly deploy to /Workspace/Users/olivier.soucy@okube.ai to make sure we only have a single copy.
+      root_path: /Workspace/Users/olivier.soucy@okube.ai/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      catalog: dev
+      schema: prod
+    permissions:
+      - user_name: olivier.soucy@okube.ai
+        level: CAN_MANAGE

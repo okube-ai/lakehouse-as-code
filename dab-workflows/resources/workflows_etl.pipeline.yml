@@ -1,0 +1,20 @@
+# The main pipeline for workflows
+
+resources:
+  pipelines:
+    workflows_etl:
+      name: workflows_etl
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      serverless: true
+      root_path: "../src/workflows_etl"
+
+      libraries:
+        - glob:
+            include: ../src/workflows_etl/transformations/**
+
+      environment:
+        dependencies:
+          # We include every dependency defined by pyproject.toml by defining an editable environment
+          # that points to the folder where pyproject.toml is deployed.
+          - --editable ${workspace.file_path}
