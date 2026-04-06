@@ -1,0 +1,48 @@
+name: pl-taxi-trips
+
+#databricks_quality_monitor_enabled: true
+
+#dependencies:
+#  - ${vars.laktory_package}
+#  - ${vars.wheel_filepath}
+
+orchestrator:
+  type: DATABRICKS_PIPELINE
+#  name: pl-taxi-trips
+  catalog: ${var.catalog}
+  schema: ${var.schema}
+  serverless: true
+  root_path: "../src/workflows_etl"
+
+#  config_file:
+#    access_controls:
+#      - group_name: account users
+#        permission_level: CAN_READ
+#      - group_name: role-engineers
+#        permission_level: CAN_RUN
+
+# --------------------------------------------------------------------------- #
+# Nodes                                                                       #
+# --------------------------------------------------------------------------- #
+
+nodes:
+
+  - name: sample_trips
+    source:
+      table_name: samples.nyctaxi.trips
+    sinks:
+    - table_name: sample_trips
+
+  - name: sample_zones
+    source:
+      node_name: sample_trips
+    sinks:
+    - table_name: sample_zones
+    transformer:
+      nodes:
+      - func_name: group_by
+        func_args:
+          - pickup_zip
+      - func_name: agg
+        func_args:
+          - F.sum("fare_amount").alias("total_fare")
