@@ -1,5 +1,7 @@
 name: workflows
 backend: dab
+settings:
+  laktory_build_root: ./laktory/.resources/  # TODO: make relative to stack.yaml
 resources:
   pipelines:
     pl-taxi-trips: !use pipelines/pl-taxi-trips.yml

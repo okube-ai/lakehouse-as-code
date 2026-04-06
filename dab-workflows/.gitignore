@@ -10,5 +10,5 @@ scratch/**
 **/explorations/**
 **/!explorations/README.md
 
-# Secret values
-secrets/*.*
+# Laktory
+laktory/.build/**
