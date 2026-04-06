@@ -6,10 +6,10 @@ bundle:
 
 include:
   - resources/*.yml
-  - laktory/.resources/*.yml
+  - laktory/.resources/**/*.yml
 
 artifacts:
-  laktory:
+  laktory_pipelines:
     build: laktory build --filepath ./laktory/stack.yml
   python_artifact:
     type: whl

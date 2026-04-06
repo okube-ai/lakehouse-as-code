@@ -12,14 +12,9 @@ orchestrator:
   catalog: ${var.catalog}
   schema: ${var.schema}
   serverless: true
-  root_path: "../src/workflows_etl"
-
-#  config_file:
-#    access_controls:
-#      - group_name: account users
-#        permission_level: CAN_READ
-#      - group_name: role-engineers
-#        permission_level: CAN_RUN
+  libraries:
+    - notebook:
+        path: ./dlt_laktory_pl.py
 
 # --------------------------------------------------------------------------- #
 # Nodes                                                                       #
