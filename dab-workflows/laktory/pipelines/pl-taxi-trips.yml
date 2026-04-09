@@ -10,11 +10,10 @@ orchestrator:
   type: DATABRICKS_PIPELINE
 #  name: pl-taxi-trips
   catalog: ${var.catalog}
-  schema: ${var.schema}
+#  schema: ${var.schema}
+  schema: schema1
   serverless: true
-  libraries:
-    - notebook:
-        path: ./dlt_laktory_pl.py
+
 
 # --------------------------------------------------------------------------- #
 # Nodes                                                                       #

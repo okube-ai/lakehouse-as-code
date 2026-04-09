@@ -6,11 +6,8 @@ bundle:
 
 include:
   - resources/*.yml
-  - laktory/.resources/**/*.yml
 
 artifacts:
-  laktory_pipelines:
-    build: laktory build --filepath ./laktory/stack.yml
   python_artifact:
     type: whl
     build: uv build --wheel
@@ -20,8 +17,15 @@ sync:
     - ./src
     - ./laktory
 
+python:
+  venv_path: .venv
+  resources:
+    - 'laktory.dabs:load_resources'
+
 # Variable declarations. These variables are assigned in the dev/prod targets below.
 variables:
+  laktory_stack_filepath:
+    description: Laktory stack filepath
   catalog:
     description: The catalog to use
   schema:
@@ -38,6 +42,7 @@ targets:
     workspace:
       host: https://adb-4623853922539974.14.azuredatabricks.net
     variables:
+      laktory_stack_filepath: "./laktory/stack.yml"
       catalog: dev
       schema: market
 #      schema: ${workspace.current_user.short_name}
