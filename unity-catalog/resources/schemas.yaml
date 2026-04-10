@@ -14,6 +14,11 @@
     - principal: domain-market
       privileges:
         - SELECT
+- name: nyctaxi
+  grants:
+    - principal: domain-nyctaxi
+      privileges:
+        - SELECT
 - name: yahoo
   grants:
     - principal: domain-yahoo
