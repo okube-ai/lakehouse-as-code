@@ -1,8 +1,8 @@
 name: pl-taxi-trips
 
 dependencies:
-  - ${vars.laktory_package}
-#  - ${vars.wheel_filepath}
+  - ${var.laktory_package}
+  - ${var.workflows_package}
 
 orchestrator:
   type: DATABRICKS_PIPELINE
