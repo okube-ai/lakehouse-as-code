@@ -21,6 +21,13 @@ nodes:
       table_name: samples.nyctaxi.trips
     sinks:
     - table_name: sample_trips
+    transformer:
+      dataframe_api: NATIVE
+      nodes:
+      - func_name: withColumn
+        func_args:
+        - duration
+        - F.col("tpep_dropoff_datetime") - F.col("tpep_pickup_datetime")
 
   - name: sample_zones
     source:
@@ -30,3 +37,12 @@ nodes:
     transformer:
       nodes:
       - func_name: workflows.get_sample_zones
+
+  - name: short_trips
+    source:
+      node_name: sample_trips
+    sinks:
+    - table_name: short_trips
+    transformer:
+      nodes:
+      - expr: SELECT * FROM {df} WHERE trip_distance < 1
