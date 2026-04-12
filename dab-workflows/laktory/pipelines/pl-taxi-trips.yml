@@ -1,19 +1,14 @@
 name: pl-taxi-trips
 
-#databricks_quality_monitor_enabled: true
-
-#dependencies:
-#  - ${vars.laktory_package}
+dependencies:
+  - ${vars.laktory_package}
 #  - ${vars.wheel_filepath}
 
 orchestrator:
   type: DATABRICKS_PIPELINE
-#  name: pl-taxi-trips
   catalog: ${var.catalog}
-#  schema: ${var.schema}
-  schema: schema1
+  schema: nyctaxi
   serverless: true
-
 
 # --------------------------------------------------------------------------- #
 # Nodes                                                                       #
@@ -34,9 +29,4 @@ nodes:
     - table_name: sample_zones
     transformer:
       nodes:
-      - func_name: group_by
-        func_args:
-          - pickup_zip
-      - func_name: agg
-        func_args:
-          - F.sum("fare_amount").alias("total_fare")
+      - func_name: workflows.get_sample_zones

@@ -24,12 +24,17 @@ python:
 
 # Variable declarations. These variables are assigned in the dev/prod targets below.
 variables:
+  dab_workspace_root:
+    default: ${workspace.root_path}
   laktory_stack_filepath:
     description: Laktory stack filepath
   catalog:
     description: The catalog to use
   schema:
     description: The schema to use
+  laktory_package:
+#    default: laktory==0.9.5
+    default: git+https://github.com/okube-ai/laktory.git@feat/dab-integration
 
 targets:
   dev:

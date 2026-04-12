@@ -1,13 +1,7 @@
 name: workflows
 backend: dab
-settings:
-  laktory_build_root: ./laktory/.src/  # TODO: make relative to stack.yaml
-#  workspace_laktory_root: /test/
-  workspace_laktory_root: /Users/olivier.soucy@okube.ai/.bundle/workflows/dev/laktory/.src/  # TODO: Get from bundle
-#  laktory_root: "/laktory/${vars.username}/"
 resources:
   pipelines:
     pl-taxi-trips: !use pipelines/pl-taxi-trips.yml
 variables:
-  laktory_package: laktory==0.9.1
   wheel_filepath: /Workspace${vars.workspace_laktory_root}wheels/lake-0.0.1-py3-none-any.whl

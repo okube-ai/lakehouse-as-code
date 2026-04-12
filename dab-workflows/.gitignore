@@ -11,4 +11,4 @@ scratch/**
 **/!explorations/README.md
 
 # Laktory
-laktory/.build/**
+#laktory/.build/**  if added to .gitignore, not sync by DABB
