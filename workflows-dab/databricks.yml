@@ -44,7 +44,7 @@ variables:
   laktory_pipelines_dir:
     default: ./laktory/pipelines
   workflows_package:
-    default: ${workspace.root_path}/artifacts/.internal/workflows-0.0.1-py3-none-any.whl  # TODO: Use pre-defined path?
+    default: ${workspace.root_path}/artifacts/.internal/lake-0.0.1-py3-none-any.whl  # TODO: Use pre-defined path?
 
 targets:
   dev:

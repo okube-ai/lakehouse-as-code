@@ -36,7 +36,7 @@ nodes:
     - table_name: sample_zones
     transformer:
       nodes:
-      - func_name: workflows.get_sample_zones
+      - func_name: lake.get_sample_zones
 
   - name: short_trips
     source:

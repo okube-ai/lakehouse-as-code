@@ -1,12 +1,10 @@
-from datetime import datetime
 import pyspark.sql.functions as F
-import narwhals as nw
 
 import laktory as lk
 
 
-@lk.api.register_anyframe_namespace("workflows")
-class WorkflowsDataFrameNamespace:
+@lk.api.register_anyframe_namespace("lake")
+class LakeDataFrameNamespace:
     def __init__(self, _df):
         self._df = _df
 
