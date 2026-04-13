@@ -16,6 +16,8 @@ sync:
   paths:
     - ./src
     - ./laktory
+  include:
+    - ./laktory/.build/**  # Auto-generated files. Needs to be included explicitly because listed in .gitignore
 
 python:
   venv_path: .venv
