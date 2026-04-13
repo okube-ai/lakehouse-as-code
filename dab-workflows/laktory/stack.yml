@@ -1,7 +1,0 @@
-name: workflows
-backend: dab
-resources:
-  pipelines:
-    pl-taxi-trips: !use pipelines/pl-taxi-trips.yml
-variables:
-  wheel_filepath: /Workspace${vars.workspace_laktory_root}wheels/lake-0.0.1-py3-none-any.whl

@@ -26,10 +26,8 @@ python:
 
 # Variable declarations. These variables are assigned in the dev/prod targets below.
 variables:
-  dab_workspace_root:
+  dab_workspace_root:  # required for Laktory
     default: ${workspace.root_path}
-  laktory_stack_filepath:
-    description: Laktory stack filepath
   catalog:
     description: The catalog to use
   schema:
@@ -37,6 +35,8 @@ variables:
   laktory_package:
 #    default: laktory==0.9.5
     default: git+https://github.com/okube-ai/laktory.git@feat/dab-integration
+  laktory_pipelines_dir:  # comma-separated for multiple directories
+    default: ./laktory/pipelines
   workflows_package:
     default: ${workspace.root_path}/artifacts/.internal/workflows-0.0.1-py3-none-any.whl  # TODO: Use pre-defined path?
 
@@ -51,7 +51,6 @@ targets:
     workspace:
       host: https://adb-4623853922539974.14.azuredatabricks.net
     variables:
-      laktory_stack_filepath: "./laktory/stack.yml"
       catalog: dev
       schema: market
 #      schema: ${workspace.current_user.short_name}
