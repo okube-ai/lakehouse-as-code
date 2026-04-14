@@ -2,14 +2,16 @@ name: pl-stock-prices
 
 dependencies:
   - ${var.laktory_package}
-  - ${var.workflows_package}
+  - ${var.lake_package}
 
 dataframe_api: NATIVE
 
 orchestrator:
-  type: DATABRICKS_JOB
-  serverless_environment_version: "4"
-
+  resource_name: pl-stock-prices
+  type: DATABRICKS_PIPELINE
+  catalog: ${var.catalog}
+  schema: market_dab
+  serverless: true
 
 # --------------------------------------------------------------------------- #
 # Nodes                                                                       #
@@ -30,9 +32,7 @@ nodes:
         cloudFiles.inferColumnTypes: true
     sinks:
     - table_name: brz_stock_prices
-      schema_name: yahoo
-      catalog_name: ${var.catalog}
-      mode: APPEND
+      schema_name: yahoo_dab
 
   - name: slv_stock_prices
     expectations:
@@ -47,13 +47,9 @@ nodes:
       as_stream: true
     sinks:
     - table_name: slv_stock_prices
-      schema_name: yahoo
-      catalog_name: ${var.catalog}
-      mode: APPEND
+      schema_name: yahoo_dab
     - table_name: slv_stock_prices_quarantine
-      schema_name: yahoo
-      catalog_name: ${var.catalog}
-      mode: APPEND
+      schema_name: yahoo_dab
       is_quarantine: True
     transformer:
       nodes:
@@ -86,10 +82,8 @@ nodes:
       reader_kwargs:
         cloudFiles.inferColumnTypes: true
     sinks:
-    - table_name: brz_stock_metadata
-      schema_name: yahoo
-      catalog_name: ${var.catalog}
-      mode: APPEND
+    - schema_name: yahoo_dab
+      table_name: brz_stock_metadata
     transformer:
       nodes:
         - func_name: withColumn
@@ -104,10 +98,9 @@ nodes:
   - name: slv_stock_metadata
     source:
       node_name: brz_stock_metadata
+      as_stream: true
     sinks:
     - table_name: slv_stock_metadata
-      schema_name: yahoo
-      catalog_name: ${var.catalog}
       mode: MERGE
       merge_cdc_options:
         order_by: extracted_at
@@ -133,9 +126,7 @@ nodes:
       as_stream: false
     sinks:
     - table_name: slv_stocks
-      schema_name: market
-      catalog_name: ${var.catalog}
-      mode: OVERWRITE
+      schema_name: market_dab
     transformer:
       nodes:
         - func_name: join
@@ -149,18 +140,6 @@ nodes:
             "on":
               - symbol
 
-  - name: slv_stocks_aapl
-    source:
-      node_name: slv_stocks
-    sinks:
-    - table_name: slv_stocks_aapl
-      schema_name: market
-      catalog_name: ${var.catalog}
-      table_type: VIEW
-    transformer:
-      nodes:
-      - expr: "SELECT * FROM {df} WHERE symbol = 'AAPL'"
-
   # ------------------------------------------------------------------------- #
   # Gold                                                                      #
   # ------------------------------------------------------------------------- #
@@ -171,9 +150,6 @@ nodes:
       as_stream: false
     sinks:
     - table_name: gld_stock_prices_by_1d
-      schema_name: market
-      catalog_name: ${var.catalog}
-      mode: OVERWRITE
       metadata:
         comment: Stock prices aggregated daily
         tags:

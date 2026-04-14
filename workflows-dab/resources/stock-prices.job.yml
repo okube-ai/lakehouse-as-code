@@ -1,7 +1,7 @@
 resources:
   jobs:
-    taxi-trip:
-      name: job-taxi-trip
+    stock-prices:
+      name: job-stock-prices
 
       trigger:
         periodic:
@@ -9,9 +9,9 @@ resources:
           unit: DAYS
 
       tasks:
-        - task_key: pl-taxi-trips
+        - task_key: pl-stock-prices
           pipeline_task:
-            pipeline_id: ${resources.pipelines.pl-taxi-trips.id}
+            pipeline_id: ${resources.pipelines.pl-stock-prices.id}
 
       environments:
         - environment_key: default

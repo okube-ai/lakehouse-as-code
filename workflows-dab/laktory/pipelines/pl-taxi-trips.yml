@@ -7,6 +7,9 @@ dependencies:
 orchestrator:
   type: DATABRICKS_JOB
   serverless_environment_version: "4"
+  schedule:
+    timezone_id: UTC
+    quartz_cron_expression: '0 0 0 ? * * *'  # daily at midnight
 
 # --------------------------------------------------------------------------- #
 # Nodes                                                                       #
