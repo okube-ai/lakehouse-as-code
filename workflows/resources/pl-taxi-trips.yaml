@@ -9,9 +9,10 @@ dependencies:
 orchestrator:
   type: DATABRICKS_JOB
   serverless_environment_version: "4"
-#  schedule:
-#    timezone_id: UTC
-#    quartz_cron_expression: '0 0 0 ? * * *'  # daily at midnight
+  schedule:
+    timezone_id: UTC
+    quartz_cron_expression: '0 0 0 ? * * *'  # daily at midnight
+    pause_status: ${vars.pause_status}
 
   access_controls:
     - group_name: account users
