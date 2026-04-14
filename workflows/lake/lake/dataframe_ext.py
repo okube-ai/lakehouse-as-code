@@ -1,6 +1,4 @@
-from datetime import datetime
-
-import narwhals as nw
+import pyspark.sql.functions as F
 
 import laktory as lk
 
@@ -10,20 +8,16 @@ class LakeDataFrameNamespace:
     def __init__(self, _df):
         self._df = _df
 
-    def with_last_modified(self):
-        return self._df.with_columns(last_modified=nw.lit(datetime.now()))
+    def get_sample_zones(self):
 
-@lk.api.register_expr_namespace("lake")
-class LakeExprNamespace:
-    def __init__(self, _expr):
-        self._expr = _expr
+        df = self._df.to_native()
 
-    def symbol_to_name(self):
-        return (
-            self._expr
-            .str.replace_all("AAPL", "Apple")
-            .str.replace_all("GOOGL", "Google")
-            .str.replace_all("MSFT", "Microsoft")
-            .str.replace_all("AMZN", "Amazon")
+        df = (
+            df
+            .groupby("pickup_zip")
+            .agg(
+                F.sum("fare_amount").alias("total_fare")
+            )
         )
 
+        return df

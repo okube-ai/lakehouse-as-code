@@ -4,25 +4,34 @@ databricks_quality_monitor_enabled: true
 
 dependencies:
   - ${vars.laktory_package}
-  - ${vars.wheel_filepath}
+  - ${vars.lake_package}
+
+dataframe_api: NATIVE
 
 orchestrator:
-  type: DATABRICKS_JOB
-  serverless_environment_version: "4"
-#  job_clusters:
-#    - job_cluster_key: node-cluster
-#      new_cluster:
-#        autoscale:
-#          min_workers: 1
-#          max_workers: 2
-#        spark_version: 16.4.x-scala2.13
-#        node_type_id: Standard_DS3_v2
-  config_file:
-    access_controls:
-      - group_name: account users
-        permission_level: CAN_READ
-      - group_name: role-engineers
-        permission_level: CAN_RUN
+  resource_name: pl-stock-prices
+  type: DATABRICKS_PIPELINE
+  serverless: true
+  catalog: ${vars.catalog}
+  schema: market
+  development: ${vars.is_dev}
+
+#  clusters:
+#    - name : default
+#      node_type_id: Standard_DS3_v2
+#      autoscale:
+#        min_workers: 1
+#        max_workers: 2
+#
+  libraries:
+    - notebook:
+        path: /.laktory/dlt/dlt_laktory_pl.py
+
+  access_controls:
+    - group_name: account users
+      permission_level: CAN_VIEW
+    - group_name: role-engineers
+      permission_level: CAN_RUN
 
 # --------------------------------------------------------------------------- #
 # Nodes                                                                       #
@@ -36,7 +45,7 @@ nodes:
 
   - name: brz_stock_prices
     source:
-      path: /Volumes/${vars.env}/sources/landing/events/yahoo-finance/stock_price/
+      path: /Volumes/${vars.catalog}/sources/landing/events/yahoo-finance/stock_price/
       as_stream: true
       format: JSON
       reader_kwargs:
@@ -44,8 +53,6 @@ nodes:
     sinks:
     - table_name: brz_stock_prices
       schema_name: yahoo
-      catalog_name: ${vars.env}
-      mode: APPEND
 
   - name: slv_stock_prices
     expectations:
@@ -61,12 +68,8 @@ nodes:
     sinks:
     - table_name: slv_stock_prices
       schema_name: yahoo
-      catalog_name: ${vars.env}
-      mode: APPEND
     - table_name: slv_stock_prices_quarantine
       schema_name: yahoo
-      catalog_name: ${vars.env}
-      mode: APPEND
       is_quarantine: True
     transformer:
       nodes:
@@ -94,16 +97,14 @@ nodes:
 
   - name: brz_stock_metadata
     source:
-      path: /Volumes/${vars.env}/sources/landing/events/yahoo-finance/stock_metadata/
+      path: /Volumes/${vars.catalog}/sources/landing/events/yahoo-finance/stock_metadata/
       as_stream: true
       format: JSON
       reader_kwargs:
         cloudFiles.inferColumnTypes: true
     sinks:
-    - table_name: brz_stock_metadata
-      schema_name: yahoo
-      catalog_name: ${vars.env}
-      mode: APPEND
+    - schema_name: yahoo
+      table_name: brz_stock_metadata
     transformer:
       nodes:
         - func_name: withColumn
@@ -120,10 +121,9 @@ nodes:
   - name: slv_stock_metadata
     source:
       node_name: brz_stock_metadata
+      as_stream: true
     sinks:
     - table_name: slv_stock_metadata
-      schema_name: yahoo
-      catalog_name: ${vars.env}
       mode: MERGE
       merge_cdc_options:
         order_by: extracted_at
@@ -133,12 +133,11 @@ nodes:
     transformer:
       nodes:
         - func_name: select
-          func_kwargs:
-            extracted_at: nw.col("_extracted_at")
-            symbol: nw.col("data.symbol").cast(nw.dtypes.String())
-            name: nw.col("data.symbol").lake.symbol_to_name().cast(nw.dtypes.String())
-            currency: nw.col("data.currency").cast(nw.dtypes.String())
-            first_traded: nw.col("data.firstTradeDate").cast(nw.dtypes.Datetime(time_zone="Etc/UTC"))
+          func_args:
+            - F.col("_extracted_at").alias("extracted_at")
+            - F.col("data.symbol").cast(T.StringType()).alias("symbol")
+            - F.col("data.currency").cast(T.StringType()).alias("currency")
+            - F.col("data.firstTradeDate").cast(T.StringType()).alias("first_traded")
 
   # ------------------------------------------------------------------------- #
   # Silver Joins                                                              #
@@ -151,8 +150,6 @@ nodes:
     sinks:
     - table_name: slv_stocks
       schema_name: market
-      catalog_name: ${vars.env}
-      mode: OVERWRITE
     transformer:
       nodes:
         - func_name: join
@@ -161,23 +158,10 @@ nodes:
               node_name: slv_stock_metadata
               selects:
                 - symbol
-                - name
                 - currency
                 - first_traded
             "on":
               - symbol
-
-  - name: slv_stocks_aapl
-    source:
-      node_name: slv_stocks
-    sinks:
-    - table_name: slv_stocks_aapl
-      schema_name: market
-      catalog_name: ${vars.env}
-      table_type: VIEW
-    transformer:
-      nodes:
-      - expr: "SELECT * FROM {df} WHERE symbol = 'AAPL'"
 
   # ------------------------------------------------------------------------- #
   # Gold                                                                      #
@@ -189,9 +173,6 @@ nodes:
       as_stream: false
     sinks:
     - table_name: gld_stock_prices_by_1d
-      schema_name: market
-      catalog_name: ${vars.env}
-      mode: OVERWRITE
       metadata:
         comment: Stock prices aggregated daily
         tags:
@@ -207,6 +188,7 @@ nodes:
         output_schema_name: "dev.market"
         snapshot: {}
     transformer:
+      dataframe_api: NARWHALS
       nodes:
         - func_name: with_columns
           func_kwargs:
