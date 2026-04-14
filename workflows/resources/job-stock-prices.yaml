@@ -1,8 +1,13 @@
-name: job-dlt-stock-prices
+name: job-stock-prices
 
 parameters:
   - name: env
-    default: ${vars.env}
+    default: ${vars.catalog}
+
+schedule:
+  timezone_id: UTC
+  quartz_cron_expression: '0 0 0 ? * * *'  # daily at midnight
+  pause_status: ${vars.pause_status}
 
 environments:
   - environment_key: laktory
@@ -25,7 +30,7 @@ tasks:
       - task_key: ingest
       - task_key: ingest-metadata
     pipeline_task:
-      pipeline_id: ${resources.dlt-stock-prices.id}
+      pipeline_id: ${resources.pl-stock-prices.id}
 
   - task_key: view
     sql_task:
@@ -42,11 +47,10 @@ tasks:
       entry_point: models.pipeline._post_execute
       package_name: laktory
       named_parameters:
-        filepaths: /Workspace${vars.workspace_laktory_root}pipelines/dlt-stock-prices.json
+        filepaths: /Workspace${vars.workspace_laktory_root}pipelines/pl-stock-prices.json
         tables_metadata: "true"
         quality_monitors: "true"
     environment_key: laktory
-
 
 access_controls:
   - group_name: account users

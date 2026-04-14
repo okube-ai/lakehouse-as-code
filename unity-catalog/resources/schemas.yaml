@@ -9,7 +9,7 @@
     - principal: domain-market
       privileges:
         - SELECT
-- name: market_dlt
+- name: market_dab
   grants:
     - principal: domain-market
       privileges:
@@ -24,7 +24,7 @@
     - principal: domain-yahoo
       privileges:
         - SELECT
-- name: yahoo_dlt
+- name: yahoo_dab
   grants:
     - principal: domain-yahoo
       privileges:
