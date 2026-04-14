@@ -1,0 +1,19 @@
+resources:
+  jobs:
+    taxi-trip:
+      name: job-taxi-trip
+
+      trigger:
+        periodic:
+          interval: 1
+          unit: DAYS
+
+      tasks:
+        - task_key: pl-taxi-trips
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.pl-taxi-trips.id}
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"

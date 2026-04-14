@@ -5,6 +5,7 @@ dependencies:
   - ${var.workflows_package}
 
 orchestrator:
+  resource_name: pl-taxi-trips
   type: DATABRICKS_PIPELINE
   catalog: ${var.catalog}
   schema: nyctaxi
