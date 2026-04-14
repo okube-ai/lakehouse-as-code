@@ -2,14 +2,11 @@ name: pl-taxi-trips
 
 dependencies:
   - ${var.laktory_package}
-  - ${var.workflows_package}
+  - ${var.lake_package}
 
 orchestrator:
-  resource_name: pl-taxi-trips
-  type: DATABRICKS_PIPELINE
-  catalog: ${var.catalog}
-  schema: nyctaxi
-  serverless: true
+  type: DATABRICKS_JOB
+  serverless_environment_version: "4"
 
 # --------------------------------------------------------------------------- #
 # Nodes                                                                       #
@@ -21,7 +18,8 @@ nodes:
     source:
       table_name: samples.nyctaxi.trips
     sinks:
-    - table_name: sample_trips
+    - table_name: ${var.catalog}.nyctaxi.sample_trips
+      mode: OVERWRITE
     transformer:
       dataframe_api: NATIVE
       nodes:
@@ -34,7 +32,8 @@ nodes:
     source:
       node_name: sample_trips
     sinks:
-    - table_name: sample_zones
+    - table_name: ${var.catalog}.nyctaxi.sample_zones
+      mode: OVERWRITE
     transformer:
       nodes:
       - func_name: lake.get_sample_zones
@@ -43,7 +42,8 @@ nodes:
     source:
       node_name: sample_trips
     sinks:
-    - table_name: short_trips
+    - table_name: ${var.catalog}.nyctaxi.short_trips
+      table_type: VIEW
     transformer:
       nodes:
       - expr: SELECT * FROM {df} WHERE trip_distance < 1
