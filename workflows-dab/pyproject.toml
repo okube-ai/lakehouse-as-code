@@ -18,7 +18,8 @@ dev = [
     "databricks-dlt",
     "databricks-connect>=15.4,<15.5",
     "ipykernel",
-    "laktory>=0.10",
+#    "laktory>=0.10",
+    "git+https://github.com/okube-ai/laktory.git@feat/dab-integration",
 ]
 
 [project.scripts]
