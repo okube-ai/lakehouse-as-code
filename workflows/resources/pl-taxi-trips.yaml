@@ -6,6 +6,8 @@ dependencies:
   - ${vars.laktory_package}
   - ${vars.lake_package}
 
+dataframe_api: NATIVE
+
 orchestrator:
   type: DATABRICKS_JOB
   serverless_environment_version: "4"
@@ -33,7 +35,6 @@ nodes:
     - table_name: ${var.catalog}.nyctaxi.sample_trips
       mode: OVERWRITE
     transformer:
-      dataframe_api: NATIVE
       nodes:
       - func_name: withColumn
         func_args:
