@@ -1,0 +1,55 @@
+name: dab deploy
+
+on:
+  workflow_call:
+    inputs:
+      target:
+        type: string
+        required: true
+      working-directory:
+        type: string
+        required: false
+        default: ./workflows-dab
+      databricks_host:
+        type: string
+        required: true
+    secrets:
+      azure_client_id:
+        required: false
+      azure_client_secret:
+        required: false
+      azure_tenant_id:
+        required: false
+      databricks_token:
+        required: false
+
+env:
+  ARM_CLIENT_ID: ${{ secrets.azure_client_id }}
+  ARM_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
+  ARM_TENANT_ID: ${{ secrets.azure_tenant_id }}
+  DATABRICKS_HOST: ${{ inputs.databricks_host }}
+  DATABRICKS_TOKEN: ${{ secrets.databricks_token }}
+
+jobs:
+  dab-deploy:
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - name: Install Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.5.14"
+          python-version: "3.12"
+
+      - name: Set up venv
+        run: uv sync --dev
+        working-directory: ${{ inputs.working-directory }}
+
+      - name: Bundle deploy
+        run: databricks bundle deploy --target ${{ inputs.target }}
+        working-directory: ${{ inputs.working-directory }}

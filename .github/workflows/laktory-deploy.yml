@@ -20,8 +20,15 @@ jobs:
       databricks_host: 'adb-4623853922539974.14.azuredatabricks.net'
     secrets: inherit
 
+  dab-deploy-dev:
+    uses: ./.github/workflows/_job_dab_deploy.yml
+    with:
+      target: dev
+      databricks_host: 'adb-4623853922539974.14.azuredatabricks.net'
+    secrets: inherit
+
   laktory-run-dev:
-    needs: laktory-deploy-dev
+    needs: [laktory-deploy-dev, dab-deploy-dev]
     uses: ./.github/workflows/_job_laktory_run_dlt.yml
     with:
       env: dev
@@ -53,6 +60,17 @@ jobs:
       databricks_host: 'adb-1985337240298151.11.azuredatabricks.net'
     secrets:
       pulumi_access_token: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+      azure_client_id: ${{ secrets.AZURE_CLIENT_ID_PRD }}
+      azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET_PRD }}
+      azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+
+  dab-deploy-prd:
+    needs: prd-deploy-approval
+    uses: ./.github/workflows/_job_dab_deploy.yml
+    with:
+      target: prd
+      databricks_host: 'adb-1985337240298151.11.azuredatabricks.net'
+    secrets:
       azure_client_id: ${{ secrets.AZURE_CLIENT_ID_PRD }}
       azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET_PRD }}
       azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}

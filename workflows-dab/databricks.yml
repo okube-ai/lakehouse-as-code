@@ -38,6 +38,8 @@ variables:
     default: ${workspace.root_path}
   catalog:
     description: The catalog to use
+  databricks_host:
+    description: Databricks Host
   laktory_package:
 #    default: laktory==0.9.5
     default: git+https://github.com/okube-ai/laktory.git@feat/dab-integration
@@ -51,13 +53,13 @@ targets:
     mode: development
     default: true
     workspace:
-      host: https://adb-4623853922539974.14.azuredatabricks.net
+      host: ${var.databricks_host}
     variables:
       catalog: dev
   prd:
     mode: production
     workspace:
-      host: https://adb-4623853922539974.14.azuredatabricks.net
+      host: ${var.databricks_host}
 #      root_path: /Workspace/Users/olivier.soucy@okube.ai/.bundle/${bundle.name}/${bundle.target}
     variables:
       catalog: prd
