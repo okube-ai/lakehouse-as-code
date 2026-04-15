@@ -25,8 +25,9 @@ nodes:
   - name: sample_trips
     source:
       table_name: samples.nyctaxi.trips
+      as_stream: False
     sinks:
-    - table_name: ${var.catalog}.nyctaxi.sample_trips
+    - table_name: ${var.catalog}.${var.schema}.sample_trips
       mode: OVERWRITE
     transformer:
       nodes:
@@ -39,7 +40,7 @@ nodes:
     source:
       node_name: sample_trips
     sinks:
-    - table_name: ${var.catalog}.nyctaxi.sample_zones
+    - table_name: ${var.catalog}.${var.schema}.sample_zones
       mode: OVERWRITE
     transformer:
       nodes:
@@ -48,8 +49,9 @@ nodes:
   - name: short_trips
     source:
       node_name: sample_trips
+      as_stream: False
     sinks:
-    - table_name: ${var.catalog}.nyctaxi.short_trips
+    - table_name: ${var.catalog}.${var.schema}.short_trips
       table_type: VIEW
     transformer:
       nodes:
