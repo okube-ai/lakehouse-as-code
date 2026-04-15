@@ -6,6 +6,9 @@ dependencies:
 
 dataframe_api: NATIVE
 
+variables:
+  schema: nyctaxi
+
 orchestrator:
   type: DATABRICKS_JOB
   serverless_environment_version: "4"
