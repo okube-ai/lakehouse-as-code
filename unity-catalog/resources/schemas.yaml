@@ -19,6 +19,11 @@
     - principal: domain-nyctaxi
       privileges:
         - SELECT
+- name: tpch
+  grants:
+    - principal: domain-tpch
+      privileges:
+        - SELECT
 - name: yahoo
   grants:
     - principal: domain-yahoo
