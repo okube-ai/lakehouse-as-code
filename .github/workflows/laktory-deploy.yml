@@ -24,7 +24,6 @@ jobs:
     uses: ./.github/workflows/_job_dab_deploy.yml
     with:
       target: dev
-      databricks_host: 'adb-4623853922539974.14.azuredatabricks.net'
     secrets: inherit
 
   laktory-run-dev:
@@ -69,7 +68,6 @@ jobs:
     uses: ./.github/workflows/_job_dab_deploy.yml
     with:
       target: prd
-      databricks_host: 'adb-1985337240298151.11.azuredatabricks.net'
     secrets:
       azure_client_id: ${{ secrets.AZURE_CLIENT_ID_PRD }}
       azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET_PRD }}

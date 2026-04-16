@@ -10,9 +10,6 @@ on:
         type: string
         required: false
         default: ./workflows-dab
-      databricks_host:
-        type: string
-        required: true
     secrets:
       azure_client_id:
         required: false
@@ -27,7 +24,6 @@ env:
   ARM_CLIENT_ID: ${{ secrets.azure_client_id }}
   ARM_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
   ARM_TENANT_ID: ${{ secrets.azure_tenant_id }}
-  DATABRICKS_HOST: ${{ inputs.databricks_host }}
   DATABRICKS_TOKEN: ${{ secrets.databricks_token }}
 
 jobs:
