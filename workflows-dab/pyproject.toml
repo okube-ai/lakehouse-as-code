@@ -19,7 +19,8 @@ dev = [
     "databricks-connect>=15.4,<15.5",
     "ipykernel",
 #    "laktory>=0.10",
-    "laktory",
+    "laktory[databricks]",
+    "databricks-bundles",  # TODO: Remove
 ]
 
 [project.scripts]
