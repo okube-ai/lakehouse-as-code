@@ -24,7 +24,8 @@ env:
   ARM_CLIENT_ID: ${{ secrets.azure_client_id }}
   ARM_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
   ARM_TENANT_ID: ${{ secrets.azure_tenant_id }}
-  DATABRICKS_TOKEN: ${{ secrets.databricks_token }}
+#  DATABRICKS_TOKEN: ${{ secrets.databricks_token }}
+  DATABRICKS_AUTH_TYPE: azure-client-secret
 
 jobs:
   dab-deploy:
