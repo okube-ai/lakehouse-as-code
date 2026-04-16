@@ -47,6 +47,11 @@ jobs:
         run: uv sync --dev
         working-directory: ${{ inputs.working-directory }}
 
+      - name: Update laktory
+        run: |
+          uv pip install "git+https://github.com/okube-ai/laktory.git@main"
+        working-directory: ${{ inputs.working-directory }}
+
       - name: Bundle deploy
         run: databricks bundle deploy --target ${{ inputs.target }}
         working-directory: ${{ inputs.working-directory }}
