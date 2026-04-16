@@ -40,7 +40,7 @@ variables:
     description: The catalog to use
   laktory_package:
 #    default: laktory==0.9.5
-    default: git+https://github.com/okube-ai/laktory.git@feat/dab-integration
+    default: git+https://github.com/okube-ai/laktory.git@main
   laktory_pipelines_dir:
     default: ./laktory/pipelines
   lake_package:
