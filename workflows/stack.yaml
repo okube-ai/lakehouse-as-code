@@ -23,7 +23,7 @@ resources:
 variables:
 #  laktory_package: laktory==0.9.1
   laktory_package: git+https://github.com/okube-ai/laktory.git@main
-  lake_package: /Workspace${vars.workspace_laktory_root}wheels/lake-0.0.1-py3-none-any.whl
+  lake_package: /Workspace${vars.workspace_root}wheels/lake-0.0.1-py3-none-any.whl
 
 environments:
   dev:

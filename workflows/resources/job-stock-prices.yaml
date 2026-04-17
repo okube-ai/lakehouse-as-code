@@ -47,7 +47,7 @@ tasks:
       entry_point: models.pipeline._post_execute
       package_name: laktory
       named_parameters:
-        filepaths: /Workspace${vars.workspace_laktory_root}pipelines/pl-stock-prices.json
+        filepaths: /Workspace${vars.workspace_root}pipelines/pl-stock-prices.json
         tables_metadata: "true"
         quality_monitors: "true"
     environment_key: laktory

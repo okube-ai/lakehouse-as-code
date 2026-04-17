@@ -184,7 +184,7 @@ nodes:
             tags:
               pii: "false"
       databricks_quality_monitor:
-        assets_dir: /Workspace${vars.workspace_laktory_root}qualitymonitors/
+        assets_dir: /Workspace${vars.workspace_root}qualitymonitors/
         output_schema_name: "dev.market"
         snapshot: {}
     transformer:
