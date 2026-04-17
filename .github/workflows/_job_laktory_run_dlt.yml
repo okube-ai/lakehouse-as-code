@@ -54,12 +54,12 @@ on:
 # TODO: Figure out a way not to have to explicitly define each possible
 # environment variable
 env:
-  AZURE_CLIENT_ID: ${{ secrets.azure_client_id }}
-  AZURE_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
-  AZURE_TENANT_ID: ${{ secrets.azure_tenant_id }}
-  DATABRICKS_ACCOUNT_ID: ${{ secrets.databricks_account_id }}
+  ARM_CLIENT_ID: ${{ secrets.azure_client_id }}
+  ARM_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
+  ARM_TENANT_ID: ${{ secrets.azure_tenant_id }}
+  DATABRICKS_AUTH_TYPE: azure-client-secret
   DATABRICKS_HOST: ${{ inputs.databricks_host }}
-  DATABRICKS_TOKEN: ${{ secrets.databricks_token }}
+#  DATABRICKS_ACCOUNT_ID: ${{ secrets.databricks_account_id }}
 
 jobs:
   laktory-run-dlt:
