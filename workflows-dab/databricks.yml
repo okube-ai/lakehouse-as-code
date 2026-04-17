@@ -1,0 +1,66 @@
+# This is a Databricks asset bundle definition for workflows.
+bundle:
+  name: workflows
+  uuid: 612d9e03-ff62-46de-8d9c-0c966be43495
+
+include:
+  - resources/*.yml
+
+artifacts:
+  python_artifact:
+    type: whl
+    build: uv build --wheel
+
+# Creates jobs and declarative pipelines required to support
+# data pipelines declared with Laktory
+python:
+  venv_path: .venv
+  resources:
+    - 'laktory.dab:build_resources'
+
+# Sync source code and laktory configuration files
+# that are auto-generated in ./laktory/.build/**
+sync:
+  paths:
+    - ./src
+    - ./laktory
+  include:
+    - ./laktory/.build/**  # Must be included explicitly because listed in .gitignore
+
+# Variable declarations, some required for Laktory
+# dab_workspace_root: bundles root path in Databricks workspace
+# laktory_package: version of laktory to use
+# laktory_pipelines_dir: local directory in which pipelines are defined. A list can also be provided using a comma
+#                        to separate each path
+
+variables:
+  dab_workspace_root:  # required for Laktory
+    default: ${workspace.root_path}
+  catalog:
+    description: The catalog to use
+  laktory_package:
+#    default: laktory==0.9.5
+    default: git+https://github.com/okube-ai/laktory.git@main
+  laktory_pipelines_dir:
+    default: ./laktory/pipelines
+  lake_package:
+    default: ${workspace.root_path}/artifacts/.internal/lake-0.0.1-py3-none-any.whl  # TODO: Use pre-defined path?
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://adb-4623853922539974.14.azuredatabricks.net
+    variables:
+      catalog: dev
+  prd:
+    mode: production
+    workspace:
+      host: https://adb-1985337240298151.11.azuredatabricks.net
+#      root_path: /Workspace/Users/olivier.soucy@okube.ai/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      catalog: prd
+    permissions:
+      - user_name: olivier.soucy@okube.ai
+        level: CAN_MANAGE

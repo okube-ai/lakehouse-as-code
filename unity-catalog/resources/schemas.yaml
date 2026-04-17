@@ -9,9 +9,19 @@
     - principal: domain-market
       privileges:
         - SELECT
-- name: market_dlt
+- name: market_dab
   grants:
     - principal: domain-market
+      privileges:
+        - SELECT
+- name: nyctaxi
+  grants:
+    - principal: domain-nyctaxi
+      privileges:
+        - SELECT
+- name: tpch
+  grants:
+    - principal: domain-tpch
       privileges:
         - SELECT
 - name: yahoo
@@ -19,7 +29,7 @@
     - principal: domain-yahoo
       privileges:
         - SELECT
-- name: yahoo_dlt
+- name: yahoo_dab
   grants:
     - principal: domain-yahoo
       privileges:

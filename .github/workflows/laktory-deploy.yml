@@ -5,14 +5,10 @@ on:
     branches:
       - main
   workflow_dispatch:
-    logLevel:
-      description: 'Log level'
-      default: 'info'
-    branches:
-      - main
 
 jobs:
-  laktory-deploy-dev:
+
+  deploy-dev:
     uses: ./.github/workflows/_job_laktory_deploy.yml
     with:
       env: dev
@@ -20,32 +16,33 @@ jobs:
       databricks_host: 'adb-4623853922539974.14.azuredatabricks.net'
     secrets: inherit
 
-  laktory-run-dev:
-    needs: laktory-deploy-dev
-    uses: ./.github/workflows/_job_laktory_run_dlt.yml
+  run-job-stock-prices:
+    needs: deploy-dev
+    uses: ./.github/workflows/_job_laktory_run_job.yml
     with:
       env: dev
       working-directory: ./workflows
       databricks_host: 'adb-4623853922539974.14.azuredatabricks.net'
-      dlt_name: dlt-stock-prices
+      job_name: job-stock-prices
     secrets: inherit
 
-  laktory-preview-prd:
-    needs: laktory-run-dev
-    uses: ./.github/workflows/_job_laktory_preview.yml
+  run-pl-taxi-trips:
+    needs: deploy-dev
+    uses: ./.github/workflows/_job_laktory_run_job.yml
     with:
-      env: prd
+      env: dev
       working-directory: ./workflows
+      databricks_host: 'adb-4623853922539974.14.azuredatabricks.net'
+      job_name: pl-taxi-trips
     secrets: inherit
 
-  prd-deploy-approval:
-    needs: laktory-preview-prd
+  prd-approval:
+    needs: [run-job-stock-prices, run-pl-taxi-trips]
     uses: ./.github/workflows/_job_release_approval.yml
-#    if: ${{ !failure() && github.event.inputs.final_release == 'true' }}
     secrets: inherit
 
-  laktory-deploy-prd:
-    needs: prd-deploy-approval
+  deploy-prd:
+    needs: prd-approval
     uses: ./.github/workflows/_job_laktory_deploy.yml
     with:
       env: prd

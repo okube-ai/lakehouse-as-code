@@ -1,0 +1,19 @@
+resources:
+  jobs:
+    stock-prices:
+      name: job-stock-prices
+
+      trigger:
+        periodic:
+          interval: 1
+          unit: DAYS
+
+      tasks:
+        - task_key: pl-stock-prices
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.pl-stock-prices.id}
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"

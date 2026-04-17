@@ -1,0 +1,63 @@
+name: pl-taxi-trips
+
+databricks_quality_monitor_enabled: true
+
+dependencies:
+  - ${vars.laktory_package}
+  - ${vars.lake_package}
+
+dataframe_api: NATIVE
+
+orchestrator:
+  type: DATABRICKS_JOB
+  serverless_environment_version: "4"
+  schedule:
+    timezone_id: UTC
+    quartz_cron_expression: '0 0 0 ? * * *'  # daily at midnight
+    pause_status: ${vars.pause_status}
+
+  access_controls:
+    - group_name: account users
+      permission_level: CAN_VIEW
+    - group_name: role-engineers
+      permission_level: CAN_MANAGE_RUN
+
+# --------------------------------------------------------------------------- #
+# Nodes                                                                       #
+# --------------------------------------------------------------------------- #
+
+nodes:
+
+  - name: sample_trips
+    source:
+      table_name: samples.nyctaxi.trips
+    sinks:
+    - table_name: ${var.catalog}.nyctaxi.sample_trips
+      mode: OVERWRITE
+    transformer:
+      nodes:
+      - func_name: withColumn
+        func_args:
+        - duration
+        - F.col("tpep_dropoff_datetime") - F.col("tpep_pickup_datetime")
+
+  - name: sample_zones
+    source:
+      node_name: sample_trips
+    sinks:
+    - table_name: ${var.catalog}.nyctaxi.sample_zones
+      mode: OVERWRITE
+    transformer:
+      dataframe_api: NARWHALS
+      nodes:
+      - func_name: lake.get_sample_zones
+
+  - name: short_trips
+    source:
+      node_name: sample_trips
+    sinks:
+    - table_name: ${var.catalog}.nyctaxi.short_trips
+      table_type: VIEW
+    transformer:
+      nodes:
+      - expr: SELECT * FROM {df} WHERE trip_distance < 1

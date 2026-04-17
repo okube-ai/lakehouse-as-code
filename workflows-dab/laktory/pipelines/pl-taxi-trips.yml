@@ -1,0 +1,59 @@
+name: pl-taxi-trips
+
+dependencies:
+  - ${var.laktory_package}
+  - ${var.lake_package}
+
+dataframe_api: NATIVE
+
+variables:
+  schema: nyctaxi
+
+orchestrator:
+  resource_name: pl-taxi-trips
+  type: DATABRICKS_JOB
+  serverless_environment_version: "4"
+  schedule:
+    timezone_id: UTC
+    quartz_cron_expression: '0 0 0 ? * * *'  # daily at midnight
+
+# --------------------------------------------------------------------------- #
+# Nodes                                                                       #
+# --------------------------------------------------------------------------- #
+
+nodes:
+
+  - name: sample_trips
+    source:
+      table_name: samples.nyctaxi.trips
+      as_stream: False
+    sinks:
+    - table_name: ${var.catalog}.${var.schema}.sample_trips
+      mode: OVERWRITE
+    transformer:
+      nodes:
+      - func_name: withColumn
+        func_args:
+        - duration
+        - F.col("tpep_dropoff_datetime") - F.col("tpep_pickup_datetime")
+
+  - name: sample_zones
+    source:
+      node_name: sample_trips
+    sinks:
+    - table_name: ${var.catalog}.${var.schema}.sample_zones
+      mode: OVERWRITE
+    transformer:
+      nodes:
+      - func_name: lake.get_sample_zones
+
+  - name: short_trips
+    source:
+      node_name: sample_trips
+      as_stream: False
+    sinks:
+    - table_name: ${var.catalog}.${var.schema}.short_trips
+      table_type: VIEW
+    transformer:
+      nodes:
+      - expr: SELECT * FROM {df} WHERE trip_distance < 1

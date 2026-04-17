@@ -2,12 +2,12 @@ query-create-view-google-stocks:
   display_name: create-view-google-stocks
   query_text: |
     CREATE OR REPLACE VIEW
-      ${vars.env}.market_dlt.slv_google_stocks 
+      ${vars.catalog}.market.slv_google_stocks 
     AS 
       SELECT
         * 
       FROM 
-        ${vars.env}.market_dlt.slv_stocks 
+        ${vars.catalog}.market.slv_stocks 
       WHERE
         symbol = 'GOOGL'
   warehouse_id: ${vars.sql_tasks_warehouse_id}

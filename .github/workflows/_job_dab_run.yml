@@ -1,0 +1,42 @@
+name: dab run
+
+on:
+  workflow_call:
+    inputs:
+      target:
+        type: string
+        required: true
+      resource:
+        type: string
+        required: true
+      working-directory:
+        type: string
+        required: false
+        default: ./workflows-dab
+    secrets:
+      azure_client_id:
+        required: false
+      azure_client_secret:
+        required: false
+      azure_tenant_id:
+        required: false
+
+env:
+  ARM_CLIENT_ID: ${{ secrets.azure_client_id }}
+  ARM_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
+  ARM_TENANT_ID: ${{ secrets.azure_tenant_id }}
+  DATABRICKS_AUTH_TYPE: azure-client-secret
+
+jobs:
+  dab-run:
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - name: Install Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Bundle run
+        run: databricks bundle run --target ${{ inputs.target }} ${{ inputs.resource }}
+        working-directory: ${{ inputs.working-directory }}

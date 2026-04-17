@@ -8,6 +8,16 @@ group-domain-market:
   workspace_permission_assignments:
     - workspace_id: ${vars.workspace_id_dev}
     - workspace_id: ${vars.workspace_id_prd}
+group-domain-nyctaxi:
+  display_name: domain-nyctaxi
+  workspace_permission_assignments:
+    - workspace_id: ${vars.workspace_id_dev}
+    - workspace_id: ${vars.workspace_id_prd}
+group-domain-tpch:
+  display_name: domain-tpch
+  workspace_permission_assignments:
+    - workspace_id: ${vars.workspace_id_dev}
+    - workspace_id: ${vars.workspace_id_prd}
 group-domain-yahoo:
   display_name: domain-yahoo
   workspace_permission_assignments:
