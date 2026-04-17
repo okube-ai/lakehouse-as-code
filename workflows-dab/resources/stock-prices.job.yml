@@ -1,12 +1,12 @@
 resources:
   jobs:
-    stock-prices:
+    job-stock-prices:
       name: job-stock-prices
 
-      trigger:
-        periodic:
-          interval: 1
-          unit: DAYS
+#      trigger:
+#        periodic:
+#          interval: 1
+#          unit: DAYS
 
       tasks:
         - task_key: pl-stock-prices

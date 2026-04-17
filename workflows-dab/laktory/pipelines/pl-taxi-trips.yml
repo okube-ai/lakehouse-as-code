@@ -13,9 +13,9 @@ orchestrator:
   resource_name: pl-taxi-trips
   type: DATABRICKS_JOB
   serverless_environment_version: "4"
-  schedule:
-    timezone_id: UTC
-    quartz_cron_expression: '0 0 0 ? * * *'  # daily at midnight
+#  schedule:
+#    timezone_id: UTC
+#    quartz_cron_expression: '0 0 0 ? * * *'  # daily at midnight
 
 # --------------------------------------------------------------------------- #
 # Nodes                                                                       #
@@ -44,6 +44,7 @@ nodes:
     - table_name: ${var.catalog}.${var.schema}.sample_zones
       mode: OVERWRITE
     transformer:
+      dataframe_api: NARWHALS
       nodes:
       - func_name: lake.get_sample_zones
 
