@@ -37,7 +37,7 @@ jobs:
     secrets: inherit
 
   laktory-preview-prd:
-    needs: [laktory-run-dev, dab-run-dev]
+    needs: [laktory-run-dev]
     uses: ./.github/workflows/_job_laktory_preview.yml
     with:
       env: prd
