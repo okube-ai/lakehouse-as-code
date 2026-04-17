@@ -28,12 +28,12 @@ jobs:
 
   run-pl-taxi-trips:
     needs: deploy-dev
-    uses: ./.github/workflows/_job_laktory_run_dlt.yml
+    uses: ./.github/workflows/_job_laktory_run_job.yml
     with:
       env: dev
       working-directory: ./workflows
       databricks_host: 'adb-4623853922539974.14.azuredatabricks.net'
-      dlt_name: pl-taxi-trips
+      job_name: pl-taxi-trips
     secrets: inherit
 
   prd-approval:
