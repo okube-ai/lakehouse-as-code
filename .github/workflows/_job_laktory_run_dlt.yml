@@ -31,6 +31,11 @@ on:
         description: Action to take for currently running job or pipline
         required: false
         default: WAIT
+      full_refresh:
+        type: boolean
+        description: Full tables refresh
+        required: false
+        default: false
     secrets:
       azure_client_id:
         required: False
@@ -90,6 +95,10 @@ jobs:
           EXCEPTION_OPTION=""
           if [ "${{ inputs.raise_exception }}" = 'true' ]; then
             EXCEPTION_OPTION="-r"
-          fi                    
-          laktory run -e ${{ inputs.env }} --dbks-pipeline ${{ inputs.dlt_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }} $EXCEPTION_OPTION
+          fi
+          REFRESH_OPTION=""
+          if [ "${{ inputs.full_refresh }}" = 'true' ]; then
+            REFRESH_OPTION="--fr"
+          fi
+          laktory run -e ${{ inputs.env }} --dbks-pipeline ${{ inputs.dlt_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }} $EXCEPTION_OPTION $REFRESH_OPTION
         working-directory: ${{ inputs.working-directory }}
