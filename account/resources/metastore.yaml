@@ -1,0 +1,50 @@
+name: metastore-lakehouse
+storage_root: ${vars.metastore_storage_location_dev}  # defaulting to dev storage account, but could be metastore-specific storage account
+region: eastus
+force_destroy: True
+owner: role-metastore-admins
+delta_sharing_scope: INTERNAL_AND_EXTERNAL
+delta_sharing_recipient_token_lifetime_in_seconds: 86400
+delta_sharing_organization_name: okube
+workspace_assignments:
+  - workspace_id: ${vars.workspace_id_dev}
+  - workspace_id: ${vars.workspace_id_prd}
+grants_provider: ${resources.databricks.workspace}
+grants:
+  - principal: role-metastore-admins
+    privileges:
+      - CREATE_CATALOG
+      - CREATE_CONNECTION
+      - CREATE_EXTERNAL_LOCATION
+      - CREATE_EXTERNAL_METADATA
+      - CREATE_SERVICE_CREDENTIAL
+      - CREATE_STORAGE_CREDENTIAL
+      - MANAGE_ALLOWLIST
+      - USE_CONNECTION
+data_accesses: []
+#  - name: lakehouse-dev
+#    azure_managed_identity:
+#      access_connector_id: /subscriptions/c8b10a15-5bb2-4c3f-988a-8ec6e60614bb/resourceGroups/o3-rg-lakehouse-dev/providers/Microsoft.Databricks/accessConnectors/o3-dbksac-lakehouse-dev
+#    force_destroy: True
+#    is_default: True
+#    options:
+#      ignore_changes:
+#        - is_default  # This is required as state default state does not get saved on Databricks/IaC side
+#    grants:
+#      - principal: role-metastore-admins
+#        privileges:
+#          - MANAGE
+#          - ALL_PRIVILEGES
+#  - name: lakehouse-prd
+#    azure_managed_identity:
+#      access_connector_id: /subscriptions/c8b10a15-5bb2-4c3f-988a-8ec6e60614bb/resourceGroups/o3-rg-lakehouse-prd/providers/Microsoft.Databricks/accessConnectors/o3-dbksac-lakehouse-prd
+#    force_destroy: False
+#    is_default: False
+#    grants:
+#      - principal: role-metastore-admins
+#        privileges:
+#          - MANAGE
+#          - ALL_PRIVILEGES
+options:
+  depends_on:
+    - ${resources.group-role-metastore-admins}
