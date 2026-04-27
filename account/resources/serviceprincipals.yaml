@@ -1,6 +1,6 @@
 service-principal-neptune-dev:
-  display_name: neptune-dev
-  application_id: ${vars.neptune_dev_client_id}
+  lookup_existing:
+    application_id: ${vars.neptune_dev_client_id}
   group_ids:
     - ${resources.group-domain-market.id}
     - ${resources.group-domain-finance.id}
@@ -9,8 +9,8 @@ service-principal-neptune-dev:
   roles:
     - account_admin
 service-principal-neptune-prd:
-  display_name: neptune-prd
-  application_id: ${vars.neptune_prd_client_id}
+  lookup_existing:
+    application_id: ${vars.neptune_prd_client_id}
   group_ids:
     - ${resources.group-domain-market.id}
     - ${resources.group-domain-finance.id}
