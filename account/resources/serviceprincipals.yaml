@@ -1,6 +1,6 @@
 service-principal-neptune-dev:
   lookup_existing:
-    application_id: ${vars.neptune_dev_client_id}
+    application_id: ${vars.neptune_client_id_dev}
   group_ids:
     - ${resources.group-domain-market.id}
     - ${resources.group-domain-finance.id}
@@ -10,7 +10,7 @@ service-principal-neptune-dev:
     - account_admin
 service-principal-neptune-prd:
   lookup_existing:
-    application_id: ${vars.neptune_prd_client_id}
+    application_id: ${vars.neptune_client_id_prd}
   group_ids:
     - ${resources.group-domain-market.id}
     - ${resources.group-domain-finance.id}
