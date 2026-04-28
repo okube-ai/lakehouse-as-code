@@ -3,19 +3,9 @@ organization: Okube
 description: Databricks Account
 backend: terraform
 terraform:
-  backend:
-    azurerm:
-      resource_group_name: o3-rg-lakehouse-prd
-      storage_account_name: o3stglakehouseprd
-      container_name: terraform
-      key: "states/account/terraform.tfstate"
-      use_azuread_auth: true
-      client_id: ${vars.AZURE_CLIENT_ID}
-      client_secret: ${vars.AZURE_CLIENT_SECRET}
-      tenant_id: ${vars.AZURE_TENANT_ID}
-      subscription_id: c8b10a15-5bb2-4c3f-988a-8ec6e60614bb
-resources:
+  backend: !use terraform-config/backend.yaml
 
+resources:
   providers:
     databricks:
       host: https://accounts.azuredatabricks.net
