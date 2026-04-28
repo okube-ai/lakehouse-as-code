@@ -1,19 +1,18 @@
 name: workspace
 organization: okube
-description: Lakehouse - Workspace
-backend: pulumi
-pulumi:
-  config:
-    databricks:host: ${vars.DATABRICKS_HOST}
-    databricks:azure_client_id: ${vars.AZURE_CLIENT_ID}
-    databricks:azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
-    databricks:azure_tenant_id: ${vars.AZURE_TENANT_ID}
-    databricks:auth_type: azure-client-secret
-  outputs:
-    directory-laktory-queries: folders/${resources.directory-laktory-queries.objectId}
-    warehouse-default-data-source-id: ${resources.warehouse-default.dataSourceId}
-    warehouse-default-id: ${resources.warehouse-default.id}
+description: Lakehouse - Workspace Configuration
+backend: terraform
+terraform:
+  backend: !use terraform-config/backend.yaml
+
 resources:
+  providers:
+    databricks:
+      host: ${vars.DATABRICKS_HOST}
+      azure_client_id: ${vars.AZURE_CLIENT_ID}
+      azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
+      azure_tenant_id: ${vars.AZURE_TENANT_ID}
+      auth_type: azure-client-secret
 
   # Secret scopes and secret values
   databricks_secretscopes: !use resources/secretscopes.yaml
