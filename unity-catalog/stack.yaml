@@ -1,5 +1,5 @@
 name: unity-catalog
-organization: Okube
+organization: okube
 description: Lakehouse - Unity Catalog Configuration
 backend: terraform
 terraform:
@@ -24,7 +24,7 @@ resources:
   # Catalogs
   databricks_catalogs: !use resources/catalogs.yaml
 
-
+# Environment Specific Settings
 environments:
   dev:
     variables:
