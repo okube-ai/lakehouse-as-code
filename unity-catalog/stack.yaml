@@ -29,8 +29,6 @@ environments:
   dev:
     variables:
       env: dev
-      catalog_storage_root: null
   prd:
     variables:
       env: prd
-      catalog_storage_root: ${resources.external-location-metastore.url}

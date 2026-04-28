@@ -1,6 +1,6 @@
 catalog-o3:
-  name: ${vars.env}  # TODO: It should have been named o3_${vars.env}
-  storage_root: ${{vars.catalog_storage_root}}  # TODO: suppress warnings
+  name: o3_${vars.env}
+  storage_root: ${resources.external-location-managed.url}
   isolation_mode: ${{'ISOLATED' if vars.env == 'prd' else 'OPEN' }}
   grants:
     - principal: account users
@@ -29,7 +29,7 @@ catalog-o3:
       volumes:
         - name: tables
           volume_type: EXTERNAL
-          storage_location: ${resources.external-location-tables.url}
+          storage_location: ${resources.external-location-external.url}
           grants:
             - principal: account users
               privileges:
@@ -66,7 +66,7 @@ catalog-sandbox:
   schemas:
     - name: default
   options:
-    is_enabled: ${{vars.env == 'dev'}}
+    is_enabled: ${{vars.env == 'prd'}}
 
 # --------------------------------------------------------------------------- #
 # libraries                                                                   #
@@ -89,4 +89,4 @@ catalog-libraries:
       volumes:
         - name: init_scripts
   options:
-    is_enabled: ${{vars.env == 'dev'}}
+    is_enabled: ${{vars.env == 'prd'}}

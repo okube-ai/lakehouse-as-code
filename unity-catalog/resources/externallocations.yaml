@@ -10,6 +10,30 @@ external-location-landing:
           - MANAGE
           - EXTERNAL_USE_LOCATION
 
+external-location-external:
+    name: external-location-external-${vars.env}
+    credential_name: ${resources.storage-credentials-lakehouse.name}
+    force_destroy: True
+    url: abfss://external@o3stglakehouse${vars.env}.dfs.core.windows.net/
+    grants:
+      - principal: role-metastore-admins
+        privileges:
+          - ALL_PRIVILEGES
+          - MANAGE
+          - EXTERNAL_USE_LOCATION
+
+external-location-managed:
+    name: external-location-managed-${vars.env}
+    credential_name: ${resources.storage-credentials-lakehouse.name}
+    force_destroy: True
+    url: abfss://managed@o3stglakehouse${vars.env}.dfs.core.windows.net/
+    grants:
+      - principal: role-metastore-admins
+        privileges:
+          - ALL_PRIVILEGES
+          - MANAGE
+          - EXTERNAL_USE_LOCATION
+
 external-location-metastore:
     name: external-location-metastore-${vars.env}
     credential_name: ${resources.storage-credentials-lakehouse.name}
@@ -22,17 +46,6 @@ external-location-metastore:
           - MANAGE
           - EXTERNAL_USE_LOCATION
 
-external-location-tables:
-    name: external-location-tables-${vars.env}
-    credential_name: ${resources.storage-credentials-lakehouse.name}
-    force_destroy: True
-    url: abfss://tables@o3stglakehouse${vars.env}.dfs.core.windows.net/
-    grants:
-      - principal: role-metastore-admins
-        privileges:
-          - ALL_PRIVILEGES
-          - MANAGE
-          - EXTERNAL_USE_LOCATION
 
 
 #
