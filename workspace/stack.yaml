@@ -1,6 +1,6 @@
 name: workspace
 organization: okube
-description: Lakehouse - Workspace Configuration
+description: Lakehouse - Workspace
 backend: terraform
 terraform:
   backend: !use terraform-config/backend.yaml
