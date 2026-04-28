@@ -1,15 +1,19 @@
 name: workflows
 organization: okube
-description: Lakehouse - Workflows
-backend: pulumi
-pulumi:
-  config:
-    databricks:host: ${vars.DATABRICKS_HOST}
-    databricks:azureClientId: ${vars.AZURE_CLIENT_ID}
-    databricks:azureClientSecret: ${vars.AZURE_CLIENT_SECRET}
-    databricks:azureTenantId: ${vars.AZURE_TENANT_ID}
-    databricks:authType: azure-client-secret
+description: Lakehouse - Workspace
+backend: terraform
+terraform:
+  backend: !use terraform-config/backend.yaml
+
 resources:
+  providers:
+    databricks:
+      host: ${vars.DATABRICKS_HOST}
+      azure_client_id: ${vars.AZURE_CLIENT_ID}
+      azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
+      azure_tenant_id: ${vars.AZURE_TENANT_ID}
+      auth_type: azure-client-secret
+
   databricks_apps:
     app-stocks-dash: !use resources/app-stocks-dash.yaml
   databricks_workspacetrees: !use resources/workspacetrees.yaml
@@ -21,20 +25,22 @@ resources:
   databricks_jobs:
     job-stock-prices: !use resources/job-stock-prices.yaml
 variables:
-#  laktory_package: laktory==0.9.1
-  laktory_package: git+https://github.com/okube-ai/laktory.git@main
+#  laktory_package: laktory==0.11.0
+  laktory_package: git+https://github.com/okube-ai/laktory.git@feat/release
   lake_package: /Workspace${vars.workspace_root}wheels/lake-0.0.1-py3-none-any.whl
 
 environments:
   dev:
     variables:
-      catalog: dev
+      env: dev
+      catalog: o3_dev
       is_dev: true
-      sql_tasks_warehouse_id: 4d0b09d503ba808f
+      sql_tasks_warehouse_id: d377b553e7fd51eb
       pause_status: PAUSED
   prd:
     variables:
-      catalog: prd
+      env: prd
+      catalog: o3_prd
       is_dev: false
-      sql_tasks_warehouse_id: 5beb0035099473f4
+      sql_tasks_warehouse_id: d52b34f891651b2f
       pause_status: PAUSED
