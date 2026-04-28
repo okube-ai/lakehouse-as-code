@@ -1,5 +1,5 @@
 name: account
-organization: Okube
+organization: okube
 description: Databricks Account
 backend: terraform
 terraform:
