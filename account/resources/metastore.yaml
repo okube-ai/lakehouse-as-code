@@ -1,5 +1,5 @@
 name: metastore-lakehouse
-storage_root: ${vars.metastore_storage_location_dev}  # defaulting to dev storage account, but could be metastore-specific storage account
+storage_root: abfss://metastore@o3stglakehouseprd.dfs.core.windows.net/
 region: eastus
 force_destroy: True
 owner: role-metastore-admins
