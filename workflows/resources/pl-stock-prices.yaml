@@ -9,12 +9,13 @@ dependencies:
 dataframe_api: NATIVE
 
 orchestrator:
-  resource_name: pl-stock-prices
   type: DATABRICKS_PIPELINE
   serverless: true
   catalog: ${vars.catalog}
   schema: market
   development: ${vars.is_dev}
+  resource_options:
+    name: pl-stock-prices
 
 #  clusters:
 #    - name : default
