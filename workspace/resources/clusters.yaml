@@ -1,5 +1,5 @@
 cluster-default:
-  name: default
+  cluster_name: default
   spark_version: 17.2.x-scala2.13
   data_security_mode: USER_ISOLATION
   node_type_id: Standard_DS3_v2

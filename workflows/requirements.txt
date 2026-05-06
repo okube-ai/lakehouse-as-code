@@ -1,1 +1,1 @@
-laktory[databricks]==0.11.1
+laktory[databricks]==0.11.3
