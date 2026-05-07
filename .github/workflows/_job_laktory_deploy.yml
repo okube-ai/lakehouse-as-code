@@ -59,7 +59,7 @@ jobs:
 
       - name: Setup python environment
         run: |
-          pip install -r requirements.txt
+          uv pip install -r requirements.txt
         working-directory: ${{ inputs.working-directory }}
 
       - name: laktory deploy
