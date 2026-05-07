@@ -8,7 +8,7 @@ terraform:
 resources:
   providers:
     databricks:
-      host: ${vars.DATABRICKS_HOST}
+      host: ${vars.databricks_host}
       azure_client_id: ${vars.AZURE_CLIENT_ID}
       azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
       azure_tenant_id: ${vars.AZURE_TENANT_ID}
@@ -32,15 +32,17 @@ variables:
 environments:
   dev:
     variables:
-      env: dev
       catalog: o3_dev
+      databricks_host: adb-4623853922539974.14.azuredatabricks.net
+      env: dev
       is_dev: true
-      sql_tasks_warehouse_id: d377b553e7fd51eb
       pause_status: PAUSED
+      sql_tasks_warehouse_id: d377b553e7fd51eb
   prd:
     variables:
-      env: prd
       catalog: o3_prd
+      databricks_host: adb-1985337240298151.11.azuredatabricks.net
+      env: prd
       is_dev: false
-      sql_tasks_warehouse_id: d52b34f891651b2f
       pause_status: PAUSED
+      sql_tasks_warehouse_id: d52b34f891651b2f
