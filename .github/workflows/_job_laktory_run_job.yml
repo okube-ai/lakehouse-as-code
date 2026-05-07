@@ -10,9 +10,6 @@ on:
         type: string
         required: false
         default: ./workspace
-      databricks_host:
-        type: string
-        required: true
       job_name:
         type: string
         required: true
@@ -40,20 +37,21 @@ on:
         required: False
       databricks_account_id:
         required: False
-      databricks_host:
-        required: False
-      databricks_token:
-        required: False
 
 # TODO: Figure out a way not to have to explicitly define each possible
 # environment variable
 env:
-  ARM_CLIENT_ID: ${{ secrets.azure_client_id }}
-  ARM_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
-  ARM_TENANT_ID: ${{ secrets.azure_tenant_id }}
-  DATABRICKS_AUTH_TYPE: azure-client-secret
-  DATABRICKS_HOST: ${{ inputs.databricks_host }}
-#  DATABRICKS_ACCOUNT_ID: ${{ secrets.databricks_account_id }}
+#  ARM_CLIENT_ID: ${{ secrets.azure_client_id }}
+#  ARM_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
+#  ARM_TENANT_ID: ${{ secrets.azure_tenant_id }}
+#  DATABRICKS_AUTH_TYPE: azure-client-secret
+#  DATABRICKS_HOST: ${{ inputs.databricks_host }}
+##  DATABRICKS_ACCOUNT_ID: ${{ secrets.databricks_account_id }}
+  AZURE_CLIENT_ID: ${{ secrets.azure_client_id }}
+  AZURE_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
+  AZURE_TENANT_ID: ${{ secrets.azure_tenant_id }}
+  DATABRICKS_ACCOUNT_ID: ${{ secrets.databricks_account_id }}
+  LAKTORY_CLI_RAISE_EXTERNAL_EXCEPTIONS: true
 
 jobs:
   laktory-run-job:
@@ -81,14 +79,19 @@ jobs:
 
       - name: Setup python environment
         run: |
-          pip install -r requirements.txt
+          uv pip install -r requirements.txt
         working-directory: ${{ inputs.working-directory }}
 
       - name: laktory run
         run: |
-          EXCEPTION_OPTION=""
-          if [ "${{ inputs.raise_exception }}" = 'true' ]; then
-            EXCEPTION_OPTION="-r"
-          fi   
-          laktory run -e ${{ inputs.env }} --dbks-job ${{ inputs.job_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }} $EXCEPTION_OPTION
+          laktory run -e ${{ inputs.env }} --dbks-job ${{ inputs.job_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }}
         working-directory: ${{ inputs.working-directory }}
+
+#      - name: laktory run
+#        run: |
+#          EXCEPTION_OPTION=""
+#          if [ "${{ inputs.raise_exception }}" = 'true' ]; then
+#            EXCEPTION_OPTION="-r"
+#          fi
+#          laktory run -e ${{ inputs.env }} --dbks-job ${{ inputs.job_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }} $EXCEPTION_OPTION
+#        working-directory: ${{ inputs.working-directory }}

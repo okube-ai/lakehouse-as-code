@@ -1,9 +1,7 @@
-# --------------------------------------------------------------------------- #
-# dev                                                                         #
-# --------------------------------------------------------------------------- #
-catalog-dev:
-  name: dev
-  isolation_mode: OPEN
+catalog-o3:
+  name: o3_${vars.env}
+  storage_root: ${resources.external-location-managed.url}
+  isolation_mode: ${{'ISOLATED' if vars.env == 'prd' else 'OPEN' }}
   grants:
     - principal: account users
       privileges:
@@ -19,9 +17,9 @@ catalog-dev:
       volumes:
         - name: landing
           volume_type: EXTERNAL
-          storage_location: ${vars.landing_storage_location_dev}
+          storage_location: ${resources.external-location-landing.url}
           grants:
-            - principal: account users # TODO: Review roles
+            - principal: account users
               privileges:
                 - READ_VOLUME
             - principal: role-metastore-admins
@@ -31,62 +29,14 @@ catalog-dev:
       volumes:
         - name: tables
           volume_type: EXTERNAL
-          storage_location: ${vars.tables_storage_location_dev}
+          storage_location: ${resources.external-location-external.url}
           grants:
-            - principal: account users # TODO: Review roles
+            - principal: account users
               privileges:
                 - READ_VOLUME
             - principal: role-metastore-admins
               privileges:
                 - WRITE_VOLUME
-  options:
-    provider: ${resources.provider-databricks-dev}
-
-# --------------------------------------------------------------------------- #
-# prod                                                                        #
-# --------------------------------------------------------------------------- #
-
-catalog-prd:
-  name: prd
-  storage_root: ${vars.metastore_prd_storage_location}
-  isolation_mode: ISOLATED
-  grants:
-    - principal: account users
-      privileges:
-        - USE_CATALOG
-        - USE_SCHEMA
-    - principal: role-metastore-admins
-      privileges:
-        - ALL_PRIVILEGES
-        - MANAGE
-  schemas:
-    - !extend schemas.yaml
-    - name: sources
-      volumes:
-        - name: landing
-          volume_type: EXTERNAL
-          storage_location: ${vars.landing_storage_location_prd}
-          grants:
-            - principal: account users # TODO: Review roles
-              privileges:
-                - READ_VOLUME
-            - principal: role-metastore-admins
-              privileges:
-                - WRITE_VOLUME
-    - name: sinks
-      volumes:
-        - name: tables
-          volume_type: EXTERNAL
-          storage_location: ${vars.tables_storage_location_prd}
-          grants:
-            - principal: account users # TODO: Review roles
-              privileges:
-                - READ_VOLUME
-            - principal: role-metastore-admins
-              privileges:
-                - WRITE_VOLUME
-  options:
-    provider: ${resources.provider-databricks-prd}
 
 # --------------------------------------------------------------------------- #
 # sandbox                                                                     #
@@ -115,8 +65,8 @@ catalog-sandbox:
         - MANAGE
   schemas:
     - name: default
-  options:
-    provider: ${resources.provider-databricks-dev}
+  resource_options:
+    is_enabled: ${{vars.env == 'prd'}}
 
 # --------------------------------------------------------------------------- #
 # libraries                                                                   #
@@ -138,5 +88,5 @@ catalog-libraries:
     - name: default
       volumes:
         - name: init_scripts
-  options:
-    provider: ${resources.provider-databricks-dev}
+  resource_options:
+    is_enabled: ${{vars.env == 'prd'}}

@@ -1,0 +1,66 @@
+name: deploy-dev
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+
+  deploy-account:
+    uses: ./.github/workflows/_job_laktory_deploy.yml
+    with:
+      working-directory: ./account
+    secrets:
+      azure_client_id: ${{ secrets.AZURE_CLIENT_ID_PRD }}
+      azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET_PRD }}
+      azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+      databricks_account_id: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
+
+  deploy-unity-catalog:
+    needs: deploy-account
+    uses: ./.github/workflows/_job_laktory_deploy.yml
+    with:
+      env: dev
+      working-directory: ./unity-catalog
+    secrets: inherit
+
+  deploy-workspace:
+    needs: deploy-unity-catalog
+    uses: ./.github/workflows/_job_laktory_deploy.yml
+    with:
+      env: dev
+      working-directory: ./workspace
+    secrets: inherit
+
+  deploy-workflows:
+    needs: deploy-workspace
+    uses: ./.github/workflows/_job_laktory_deploy.yml
+    with:
+      env: dev
+      working-directory: ./workflows
+    secrets: inherit
+
+  deploy-dab:
+    needs: deploy-workspace
+    uses: ./.github/workflows/_job_dab_deploy.yml
+    with:
+      target: dev
+    secrets: inherit
+
+  run-job-stock-prices:
+    needs: [deploy-workflows]
+    uses: ./.github/workflows/_job_laktory_run_job.yml
+    with:
+      env: dev
+      working-directory: ./workflows
+      job_name: job-stock-prices
+    secrets: inherit
+
+  run-pl-taxi-trips:
+    needs: [deploy-workflows]
+    uses: ./.github/workflows/_job_laktory_run_job.yml
+    with:
+      env: dev
+      working-directory: ./workflows
+      job_name: pl-taxi-trips
+    secrets: inherit

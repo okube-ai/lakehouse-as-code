@@ -1,0 +1,83 @@
+name: deploy-prd
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  deploy-account:
+    uses: ./.github/workflows/_job_laktory_deploy.yml
+    with:
+      working-directory: ./account
+      databricks_host: 'accounts.azuredatabricks.net'
+    secrets:
+      azure_client_id: ${{ secrets.AZURE_CLIENT_ID_PRD }}
+      azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET_PRD }}
+      azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+      databricks_account_id: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
+
+  deploy-unity-catalog:
+    needs: deploy-account
+    uses: ./.github/workflows/_job_laktory_deploy.yml
+    with:
+      env: prd
+      working-directory: ./unity-catalog
+      databricks_host: 'adb-1985337240298151.11.azuredatabricks.net'
+    secrets:
+      azure_client_id: ${{ secrets.AZURE_CLIENT_ID_PRD }}
+      azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET_PRD }}
+      azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+      databricks_account_id: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
+
+  deploy-workflows:
+    needs: deploy-unity-catalog
+    uses: ./.github/workflows/_job_laktory_deploy.yml
+    with:
+      env: prd
+      working-directory: ./workflows
+      databricks_host: 'adb-1985337240298151.11.azuredatabricks.net'
+    secrets:
+      azure_client_id: ${{ secrets.AZURE_CLIENT_ID_PRD }}
+      azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET_PRD }}
+      azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+      databricks_account_id: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
+
+  deploy-dab:
+    needs: deploy-unity-catalog
+    uses: ./.github/workflows/_job_dab_deploy.yml
+    with:
+      target: prd
+    secrets:
+      azure_client_id: ${{ secrets.AZURE_CLIENT_ID_PRD }}
+      azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET_PRD }}
+      azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+
+  run-job-stock-prices:
+    needs: [deploy-workflows, deploy-dab]
+    uses: ./.github/workflows/_job_laktory_run_job.yml
+    with:
+      env: prd
+      working-directory: ./workflows
+      databricks_host: 'adb-1985337240298151.11.azuredatabricks.net'
+      job_name: job-stock-prices
+    secrets:
+      azure_client_id: ${{ secrets.AZURE_CLIENT_ID_PRD }}
+      azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET_PRD }}
+      azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+      databricks_account_id: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
+
+  run-pl-taxi-trips:
+    needs: [deploy-workflows, deploy-dab]
+    uses: ./.github/workflows/_job_laktory_run_job.yml
+    with:
+      env: prd
+      working-directory: ./workflows
+      databricks_host: 'adb-1985337240298151.11.azuredatabricks.net'
+      job_name: pl-taxi-trips
+    secrets:
+      azure_client_id: ${{ secrets.AZURE_CLIENT_ID_PRD }}
+      azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET_PRD }}
+      azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+      databricks_account_id: ${{ secrets.DATABRICKS_ACCOUNT_ID }}

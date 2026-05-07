@@ -11,11 +11,12 @@ dependencies:
 dataframe_api: NATIVE
 
 orchestrator:
-  resource_name: pl-tpch
   type: DATABRICKS_PIPELINE
   serverless: true
   catalog: ${var.catalog}
   schema: tpch
+  resource_options:
+    name: pl-tpch
 
 # --------------------------------------------------------------------------- #
 # Nodes                                                                       #

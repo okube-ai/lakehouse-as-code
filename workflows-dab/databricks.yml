@@ -39,8 +39,8 @@ variables:
   catalog:
     description: The catalog to use
   laktory_package:
-#    default: laktory==0.9.5
-    default: git+https://github.com/okube-ai/laktory.git@main
+    default: laktory==0.11.4
+#    default: git+https://github.com/okube-ai/laktory.git@main
   laktory_pipelines_dir:
     default: ./laktory/pipelines
   lake_package:
@@ -53,14 +53,14 @@ targets:
     workspace:
       host: https://adb-4623853922539974.14.azuredatabricks.net
     variables:
-      catalog: dev
+      catalog: o3_dev
   prd:
     mode: production
     workspace:
       host: https://adb-1985337240298151.11.azuredatabricks.net
 #      root_path: /Workspace/Users/olivier.soucy@okube.ai/.bundle/${bundle.name}/${bundle.target}
     variables:
-      catalog: prd
+      catalog: o3_prd
     permissions:
       - user_name: olivier.soucy@okube.ai
         level: CAN_MANAGE

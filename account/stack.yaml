@@ -1,0 +1,43 @@
+name: account
+organization: okube
+description: Databricks Account
+backend: terraform
+terraform:
+  backend: !use terraform-config/backend.yaml
+
+resources:
+  providers:
+    databricks:
+      host: https://accounts.azuredatabricks.net
+      account_id: ${vars.DATABRICKS_ACCOUNT_ID}
+      azure_client_id: ${vars.AZURE_CLIENT_ID}
+      azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
+      azure_tenant_id: ${vars.AZURE_TENANT_ID}
+      auth_type: azure-client-secret
+    databricks.workspace:
+      alias: workspace
+      host: adb-1985337240298151.11.azuredatabricks.net
+      azure_client_id: ${vars.AZURE_CLIENT_ID}
+      azure_client_secret: ${vars.AZURE_CLIENT_SECRET}
+      azure_tenant_id: ${vars.AZURE_TENANT_ID}
+      auth_type: azure-client-secret
+
+  # Account Groups
+  databricks_groups: !use resources/groups.yaml
+
+  # Account Users
+  databricks_users: !use resources/users.yaml
+
+  # Service Principals
+  databricks_serviceprincipals: !use resources/serviceprincipals.yaml
+
+  # Metastore
+  databricks_metastores:
+    metastore-lakehouse: !use resources/metastore.yaml
+
+variables:
+  databricks_host: https://accounts.azuredatabricks.net
+  neptune_client_id_dev: 1f8005d3-5efa-476b-9eb5-11755fea1128
+  neptune_client_id_prd: 78f6cf4f-0c24-4977-92fc-562a60358466
+  workspace_id_dev: 4623853922539974
+  workspace_id_prd: 1985337240298151

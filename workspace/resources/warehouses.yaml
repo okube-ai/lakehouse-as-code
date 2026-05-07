@@ -2,7 +2,8 @@ warehouse-default:
   name: default
   cluster_size: 2X-Small
   auto_stop_mins: 10
-  channel_name: CHANNEL_NAME_PREVIEW
+  channel:
+    name: CHANNEL_NAME_PREVIEW
   enable_photon: False
   enable_serverless_compute: True
   min_num_clusters: 1

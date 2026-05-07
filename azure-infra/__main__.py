@@ -32,8 +32,9 @@ class Service:
         self.rg = None
         self.keyvault = None
         self.storage_account = None
+        self.container_external = None
         self.container_landing = None
-        self.container_tables = None
+        self.container_managed = None
         self.container_metastore = None
         self.workspace = None
 
@@ -173,17 +174,30 @@ class Service:
             self.container_landing.storage_account_name,
         )
 
-        self.container_tables = azure.storage.Container(
-            "tables",
-            name="tables",
+        self.container_external = azure.storage.Container(
+            "external",
+            name="external",
             storage_account_name=self.storage_account.name,
             container_access_type="private",
         )
-        pulumi.export("container-tables-id", self.container_tables.id)
-        pulumi.export("container-tables-name", self.container_tables.name)
+        pulumi.export("container-external-id", self.container_external.id)
+        pulumi.export("container-external-name", self.container_external.name)
         pulumi.export(
-            "container-tables-account-name",
-            self.container_tables.storage_account_name,
+            "container-external-account-name",
+            self.container_external.storage_account_name,
+        )
+
+        self.container_managed = azure.storage.Container(
+            "managed",
+            name="managed",
+            storage_account_name=self.storage_account.name,
+            container_access_type="private",
+        )
+        pulumi.export("container-managed-id", self.container_managed.id)
+        pulumi.export("container-managed-name", self.container_managed.name)
+        pulumi.export(
+            "container-managed-account-name",
+            self.container_managed.storage_account_name,
         )
 
         self.container_metastore = azure.storage.Container(
