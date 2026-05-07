@@ -7,7 +7,6 @@ dependencies:
 dataframe_api: NATIVE
 
 orchestrator:
-  resource_name: pl-stock-prices
   type: DATABRICKS_PIPELINE
   serverless: true
   catalog: ${var.catalog}
