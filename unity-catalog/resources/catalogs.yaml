@@ -65,7 +65,7 @@ catalog-sandbox:
         - MANAGE
   schemas:
     - name: default
-  options:
+  resource_options:
     is_enabled: ${{vars.env == 'prd'}}
 
 # --------------------------------------------------------------------------- #
@@ -88,5 +88,5 @@ catalog-libraries:
     - name: default
       volumes:
         - name: init_scripts
-  options:
+  resource_options:
     is_enabled: ${{vars.env == 'prd'}}
