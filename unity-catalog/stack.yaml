@@ -28,7 +28,9 @@ resources:
 environments:
   dev:
     variables:
+      databricks_host: adb-4623853922539974.14.azuredatabricks.net
       env: dev
   prd:
     variables:
+      databricks_host: adb-1985337240298151.11.azuredatabricks.net
       env: prd
