@@ -29,8 +29,8 @@ env:
   AZURE_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
   AZURE_TENANT_ID: ${{ secrets.azure_tenant_id }}
   DATABRICKS_ACCOUNT_ID: ${{ secrets.databricks_account_id }}
+  DATABRICKS_TOKEN_OSOUCY: token_osoucy  # required to test deployment of databricks secret in workspace stack
   LAKTORY_CLI_RAISE_EXTERNAL_EXCEPTIONS: true
-
 
 jobs:
   laktory-deploy:
