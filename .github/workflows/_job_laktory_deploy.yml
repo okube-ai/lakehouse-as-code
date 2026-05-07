@@ -40,10 +40,13 @@ env:
   DATABRICKS_HOST: ${{ inputs.databricks_host }}
   DATABRICKS_TOKEN: ${{ secrets.databricks_token }}
   PULUMI_ACCESS_TOKEN: ${{ secrets.pulumi_access_token }}
+  LAKTORY_CLI_RAISE_EXTERNAL_EXCEPTIONS: true
+
 
 jobs:
   laktory-deploy:
-    runs-on: ubuntu-latest
+#    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04  # ubuntu-latest does not seem to have terraform available anymore
     steps:
 
       - uses: actions/checkout@v4

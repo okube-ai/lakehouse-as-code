@@ -17,7 +17,7 @@ env:
 
 jobs:
   laktory-preview:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04  # ubuntu-latest does not seem to have terraform available anymore
     steps:
 
       - uses: actions/checkout@v4
