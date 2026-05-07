@@ -16,10 +16,10 @@ Defined in [`stack.yaml`](stack.yaml):
 
 ### Secrets
 
-| Resource | Description |
-|---|---|
+| Resource | Description                                                                                                                            |
+|---|----------------------------------------------------------------------------------------------------------------------------------------|
 | `secret-scope-azure` | Azure credentials (key vault URL, tenant ID, client ID/secret) — used by clusters and pipelines to authenticate against Azure services |
-| `secret-scope-databricks` | Databricks PATs for service accounts; read access limited to metastore-admins and workspace-admins |
+| `secret-scope-databricks` | Databricks PAT for service accounts; read access limited to metastore-admins and workspace-admins                                      |
 
 ### Workspace structure
 
