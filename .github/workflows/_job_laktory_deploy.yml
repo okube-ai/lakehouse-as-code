@@ -5,7 +5,8 @@ on:
     inputs:
       env:
         type: string
-        required: true
+        required: false
+        default: ''
       working-directory:
         type: string
         required: false
@@ -26,8 +27,6 @@ on:
         required: False
       databricks_token:
         required: False
-      pulumi_access_token:
-        required: False
 
 
 # TODO: Figure out a way not to have to explicitly define each possible
@@ -39,7 +38,6 @@ env:
   DATABRICKS_ACCOUNT_ID: ${{ secrets.databricks_account_id }}
   DATABRICKS_HOST: ${{ inputs.databricks_host }}
   DATABRICKS_TOKEN: ${{ secrets.databricks_token }}
-  PULUMI_ACCESS_TOKEN: ${{ secrets.pulumi_access_token }}
   LAKTORY_CLI_RAISE_EXTERNAL_EXCEPTIONS: true
 
 
@@ -75,6 +73,8 @@ jobs:
 
       - name: laktory deploy
         run: |
-          laktory init -e ${{ inputs.env }} --options -reconfigure
-          laktory deploy -e ${{ inputs.env }} --yes
+          ENV_FLAG=""
+          if [[ -n "${{ inputs.env }}" ]]; then ENV_FLAG="-e ${{ inputs.env }}"; fi
+          laktory init $ENV_FLAG --options -reconfigure
+          laktory deploy $ENV_FLAG --yes
         working-directory: ${{ inputs.working-directory }}

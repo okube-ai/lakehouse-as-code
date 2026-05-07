@@ -1,0 +1,59 @@
+name: deploy-dev
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+
+  deploy-account:
+    uses: ./.github/workflows/_job_laktory_deploy.yml
+    with:
+      working-directory: ./account
+      databricks_host: 'accounts.azuredatabricks.net'
+    secrets: inherit
+
+  deploy-unity-catalog:
+    needs: deploy-account
+    uses: ./.github/workflows/_job_laktory_deploy.yml
+    with:
+      env: dev
+      working-directory: ./unity-catalog
+      databricks_host: 'adb-4623853922539974.14.azuredatabricks.net'
+    secrets: inherit
+
+  deploy-workflows:
+    needs: deploy-unity-catalog
+    uses: ./.github/workflows/_job_laktory_deploy.yml
+    with:
+      env: dev
+      working-directory: ./workflows
+      databricks_host: 'adb-4623853922539974.14.azuredatabricks.net'
+    secrets: inherit
+
+  deploy-dab:
+    needs: deploy-unity-catalog
+    uses: ./.github/workflows/_job_dab_deploy.yml
+    with:
+      target: dev
+    secrets: inherit
+
+  run-job-stock-prices:
+    needs: [deploy-workflows, deploy-dab]
+    uses: ./.github/workflows/_job_laktory_run_job.yml
+    with:
+      env: dev
+      working-directory: ./workflows
+      databricks_host: 'adb-4623853922539974.14.azuredatabricks.net'
+      job_name: job-stock-prices
+    secrets: inherit
+
+  run-pl-taxi-trips:
+    needs: [deploy-workflows, deploy-dab]
+    uses: ./.github/workflows/_job_laktory_run_job.yml
+    with:
+      env: dev
+      working-directory: ./workflows
+      databricks_host: 'adb-4623853922539974.14.azuredatabricks.net'
+      job_name: pl-taxi-trips
+    secrets: inherit
