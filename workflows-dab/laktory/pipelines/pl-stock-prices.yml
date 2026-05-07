@@ -11,6 +11,8 @@ orchestrator:
   serverless: true
   catalog: ${var.catalog}
   schema: market_dab
+  resource_options:
+    name: pl-stock-prices
 
 # --------------------------------------------------------------------------- #
 # Nodes                                                                       #
