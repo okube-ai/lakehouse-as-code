@@ -56,6 +56,8 @@ targets:
       catalog: o3_dev
   prd:
     mode: production
+    presets:
+      name_prefix: "dab"
     workspace:
       host: https://adb-1985337240298151.11.azuredatabricks.net
 #      root_path: /Workspace/Users/olivier.soucy@okube.ai/.bundle/${bundle.name}/${bundle.target}
