@@ -40,10 +40,6 @@ on:
         required: False
       databricks_account_id:
         required: False
-      databricks_host:
-        required: False
-      databricks_token:
-        required: False
 
 # TODO: Figure out a way not to have to explicitly define each possible
 # environment variable

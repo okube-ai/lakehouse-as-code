@@ -17,8 +17,6 @@ on:
         required: false
       azure_tenant_id:
         required: false
-      databricks_token:
-        required: false
 
 env:
   ARM_CLIENT_ID: ${{ secrets.azure_client_id }}

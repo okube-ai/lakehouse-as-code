@@ -11,9 +11,6 @@ on:
         type: string
         required: false
         default: ./workspace
-      databricks_host:
-        type: string
-        required: true
     secrets:
       azure_client_id:
         required: False
@@ -22,10 +19,6 @@ on:
       azure_tenant_id:
         required: False
       databricks_account_id:
-        required: False
-      databricks_host:
-        required: False
-      databricks_token:
         required: False
 
 
@@ -36,8 +29,6 @@ env:
   AZURE_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
   AZURE_TENANT_ID: ${{ secrets.azure_tenant_id }}
   DATABRICKS_ACCOUNT_ID: ${{ secrets.databricks_account_id }}
-  DATABRICKS_HOST: ${{ inputs.databricks_host }}
-  DATABRICKS_TOKEN: ${{ secrets.databricks_token }}
   LAKTORY_CLI_RAISE_EXTERNAL_EXCEPTIONS: true
 
 
