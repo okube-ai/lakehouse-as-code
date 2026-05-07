@@ -75,5 +75,6 @@ jobs:
 
       - name: laktory deploy
         run: |
+          laktory init -e ${{ inputs.env }} --options -reconfigure
           laktory deploy -e ${{ inputs.env }} --yes
         working-directory: ${{ inputs.working-directory }}

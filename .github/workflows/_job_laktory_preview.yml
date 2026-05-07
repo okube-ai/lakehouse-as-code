@@ -46,5 +46,6 @@ jobs:
 
       - name: laktory preview
         run: |
+          laktory init -e ${{ inputs.env }} --options -reconfigure
           laktory preview -e ${{ inputs.env }}
         working-directory: ${{ inputs.working-directory }}
