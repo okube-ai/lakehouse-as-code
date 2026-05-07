@@ -33,7 +33,7 @@ jobs:
     needs: deploy-unity-catalog
     uses: ./.github/workflows/_job_laktory_deploy.yml
     with:
-      env: dev
+      env: prd
       working-directory: ./workspace
     secrets:
       azure_client_id: ${{ secrets.AZURE_CLIENT_ID_PRD }}
