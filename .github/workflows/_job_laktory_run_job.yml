@@ -10,9 +10,6 @@ on:
         type: string
         required: false
         default: ./workspace
-      databricks_host:
-        type: string
-        required: true
       job_name:
         type: string
         required: true
