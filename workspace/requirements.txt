@@ -1,1 +1,1 @@
-laktory==0.11.4
+laktory==0.11.5
