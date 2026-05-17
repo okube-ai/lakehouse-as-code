@@ -39,8 +39,8 @@ variables:
   catalog:
     description: The catalog to use
   laktory_package:
-#    default: laktory==0.11.8
-    default: git+https://github.com/okube-ai/laktory.git@main
+    default: laktory==0.11.9
+#    default: git+https://github.com/okube-ai/laktory.git@main
   laktory_pipelines_dir:
     default: ./laktory/pipelines
   lake_package:
