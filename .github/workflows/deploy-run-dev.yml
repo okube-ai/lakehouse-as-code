@@ -1,4 +1,4 @@
-name: deploy-dev
+name: deploy-run-dev
 
 on:
   pull_request:
