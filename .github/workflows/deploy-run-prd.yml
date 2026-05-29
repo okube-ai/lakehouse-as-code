@@ -1,4 +1,4 @@
-name: deploy-prd
+name: deploy-run-prd
 
 on:
   push:

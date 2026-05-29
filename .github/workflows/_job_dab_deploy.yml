@@ -10,6 +10,10 @@ on:
         type: string
         required: false
         default: ./workflows-dab
+      laktory_branch:
+        type: string
+        required: false
+        default: ''
     secrets:
       azure_client_id:
         required: false
@@ -45,11 +49,22 @@ jobs:
         run: uv sync --dev
         working-directory: ${{ inputs.working-directory }}
 
+      - name: Override laktory version
+        if: ${{ inputs.laktory_branch != '' }}
+        run: |
+          uv pip install "git+https://github.com/okube-ai/laktory.git@${{ inputs.laktory_branch }}"
+        working-directory: ${{ inputs.working-directory }}
+
       - name: Update laktory
         run: |
           uv run laktory version
         working-directory: ${{ inputs.working-directory }}
 
       - name: Bundle deploy
-        run: databricks bundle deploy --target ${{ inputs.target }}
+        run: |
+          BUNDLE_VARS=""
+          if [[ -n "${{ inputs.laktory_branch }}" ]]; then
+            BUNDLE_VARS="--var laktory_package=git+https://github.com/okube-ai/laktory.git@${{ inputs.laktory_branch }}"
+          fi
+          databricks bundle deploy --target ${{ inputs.target }} $BUNDLE_VARS
         working-directory: ${{ inputs.working-directory }}

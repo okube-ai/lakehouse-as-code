@@ -11,6 +11,10 @@ on:
         type: string
         required: false
         default: ./workspace
+      laktory_branch:
+        type: string
+        required: false
+        default: ''
     secrets:
       azure_client_id:
         required: False
@@ -57,9 +61,23 @@ jobs:
             print(k, "|", v)
         shell: python
 
+      - name: Override laktory version
+        if: ${{ inputs.laktory_branch != '' }}
+        run: |
+          sed -i "s|^laktory.*|git+https://github.com/okube-ai/laktory.git@${{ inputs.laktory_branch }}|" requirements.txt
+        working-directory: ${{ inputs.working-directory }}
+
       - name: Setup python environment
         run: |
           uv pip install -r requirements.txt
+        working-directory: ${{ inputs.working-directory }}
+
+      - name: Override laktory_package variable
+        if: ${{ inputs.laktory_branch != '' }}
+        run: |
+          if grep -q "laktory_package:" stack.yaml 2>/dev/null; then
+            sed -i "s|^\([[:space:]]*laktory_package:\).*|\1 git+https://github.com/okube-ai/laktory.git@${{ inputs.laktory_branch }}|" stack.yaml
+          fi
         working-directory: ${{ inputs.working-directory }}
 
       - name: laktory deploy

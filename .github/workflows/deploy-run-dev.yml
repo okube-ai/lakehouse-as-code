@@ -1,8 +1,14 @@
-name: deploy-dev
+name: deploy-run-dev
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      laktory_branch:
+        description: 'Laktory git branch to test (leave empty to use pinned version)'
+        required: false
+        default: ''
 
 jobs:
 
@@ -10,6 +16,7 @@ jobs:
     uses: ./.github/workflows/_job_laktory_deploy.yml
     with:
       working-directory: ./account
+      laktory_branch: ${{ inputs.laktory_branch || '' }}
     secrets:
       azure_client_id: ${{ secrets.AZURE_CLIENT_ID_PRD }}
       azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET_PRD }}
@@ -22,6 +29,7 @@ jobs:
     with:
       env: dev
       working-directory: ./unity-catalog
+      laktory_branch: ${{ inputs.laktory_branch || '' }}
     secrets: inherit
 
   deploy-workspace:
@@ -30,6 +38,7 @@ jobs:
     with:
       env: dev
       working-directory: ./workspace
+      laktory_branch: ${{ inputs.laktory_branch || '' }}
     secrets: inherit
 
   deploy-workflows:
@@ -38,6 +47,7 @@ jobs:
     with:
       env: dev
       working-directory: ./workflows
+      laktory_branch: ${{ inputs.laktory_branch || '' }}
     secrets: inherit
 
   deploy-dab:
@@ -45,6 +55,7 @@ jobs:
     uses: ./.github/workflows/_job_dab_deploy.yml
     with:
       target: dev
+      laktory_branch: ${{ inputs.laktory_branch || '' }}
     secrets: inherit
 
   run-job-stock-prices:
