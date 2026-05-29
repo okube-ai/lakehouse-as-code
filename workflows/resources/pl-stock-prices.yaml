@@ -9,7 +9,7 @@ dependencies:
 dataframe_api: NATIVE
 
 orchestrator:
-  type: DATABRICKS_PIPELINE
+  type: LAKEFLOW_DECLARATIVE_PIPELINE
   serverless: true
   catalog: ${vars.catalog}
   schema: market
@@ -26,7 +26,7 @@ orchestrator:
 #
   libraries:
     - notebook:
-        path: /.laktory/dlt/dlt_laktory_pl.py
+        path: /.laktory/pipelines/laktory_ldp.py
 
   access_controls:
     - group_name: account users
