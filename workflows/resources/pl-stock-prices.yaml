@@ -106,6 +106,9 @@ nodes:
     sinks:
     - schema_name: yahoo
       table_name: brz_stock_metadata
+      metadata:
+        properties:
+          "delta.columnMapping.mode": "name"
     transformer:
       nodes:
         - func_name: withColumn
