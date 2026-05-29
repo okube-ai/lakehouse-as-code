@@ -94,7 +94,7 @@ jobs:
 
       - name: laktory run
         run: |
-          laktory run -e ${{ inputs.env }} --dbks-job ${{ inputs.job_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }}
+          laktory run -e ${{ inputs.env }} --databricks-job ${{ inputs.job_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }}
         working-directory: ${{ inputs.working-directory }}
 
 #      - name: laktory run
@@ -103,5 +103,5 @@ jobs:
 #          if [ "${{ inputs.raise_exception }}" = 'true' ]; then
 #            EXCEPTION_OPTION="-r"
 #          fi
-#          laktory run -e ${{ inputs.env }} --dbks-job ${{ inputs.job_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }} $EXCEPTION_OPTION
+#          laktory run -e ${{ inputs.env }} --databricks-job ${{ inputs.job_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }} $EXCEPTION_OPTION
 #        working-directory: ${{ inputs.working-directory }}
