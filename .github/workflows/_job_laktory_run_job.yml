@@ -28,6 +28,10 @@ on:
         description: Action to take for currently running job or pipline
         required: false
         default: WAIT
+      laktory_branch:
+        type: string
+        required: false
+        default: ''
     secrets:
       azure_client_id:
         required: False
@@ -76,6 +80,12 @@ jobs:
           for k, v in os.environ.items():
             print(k, "|", v)
         shell: python
+
+      - name: Override laktory version
+        if: ${{ inputs.laktory_branch != '' }}
+        run: |
+          sed -i "s|^laktory.*|git+https://github.com/okube-ai/laktory.git@${{ inputs.laktory_branch }}|" requirements.txt
+        working-directory: ${{ inputs.working-directory }}
 
       - name: Setup python environment
         run: |

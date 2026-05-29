@@ -65,6 +65,7 @@ jobs:
       env: dev
       working-directory: ./workflows
       job_name: job-stock-prices
+      laktory_branch: ${{ inputs.laktory_branch || '' }}
     secrets: inherit
 
   run-pl-taxi-trips:
@@ -74,4 +75,5 @@ jobs:
       env: dev
       working-directory: ./workflows
       job_name: pl-taxi-trips
+      laktory_branch: ${{ inputs.laktory_branch || '' }}
     secrets: inherit
