@@ -7,7 +7,7 @@ dependencies:
 dataframe_api: NATIVE
 
 orchestrator:
-  type: DATABRICKS_PIPELINE
+  type: LAKEFLOW_DECLARATIVE_PIPELINE
   serverless: true
   catalog: ${var.catalog}
   schema: market_dab
@@ -25,8 +25,8 @@ nodes:
   # ------------------------------------------------------------------------- #
 
   - name: brz_stock_prices
-    source:
-      path: /Volumes/${var.catalog}/sources/landing/events/yahoo-finance/stock_price/
+    sources:
+    - path: /Volumes/${var.catalog}/sources/landing/events/yahoo-finance/stock_price/
       as_stream: true
       format: JSON
       reader_kwargs:
@@ -43,8 +43,8 @@ nodes:
       - name: recent_price
         expr: created_at > '2023-01-01'
         action: DROP
-    source:
-      node_name: brz_stock_prices
+    sources:
+    - node_name: brz_stock_prices
       as_stream: true
     sinks:
     - table_name: slv_stock_prices
@@ -76,8 +76,8 @@ nodes:
   # ------------------------------------------------------------------------- #
 
   - name: brz_stock_metadata
-    source:
-      path: /Volumes/${var.catalog}/sources/landing/events/yahoo-finance/stock_metadata/
+    sources:
+    - path: /Volumes/${var.catalog}/sources/landing/events/yahoo-finance/stock_metadata/
       as_stream: true
       format: JSON
       reader_kwargs:
@@ -97,8 +97,8 @@ nodes:
             - F.expr("_metadata.file_modification_time")
 
   - name: slv_stock_metadata
-    source:
-      node_name: brz_stock_metadata
+    sources:
+    - node_name: brz_stock_metadata
       as_stream: true
     sinks:
     - table_name: slv_stock_metadata
@@ -122,9 +122,15 @@ nodes:
   # ------------------------------------------------------------------------- #
 
   - name: slv_stocks
-    source:
-      node_name: slv_stock_prices
+    sources:
+    - node_name: slv_stock_prices
       as_stream: false
+    - name: metadata
+      node_name: slv_stock_metadata
+      selects:
+        - symbol
+        - currency
+        - first_traded
     sinks:
     - table_name: slv_stocks
       schema_name: market_dab
@@ -132,12 +138,7 @@ nodes:
       nodes:
         - func_name: join
           func_kwargs:
-            other:
-              node_name: slv_stock_metadata
-              selects:
-                - symbol
-                - currency
-                - first_traded
+            other: "{sources.metadata}"
             "on":
               - symbol
 
@@ -146,8 +147,8 @@ nodes:
   # ------------------------------------------------------------------------- #
 
   - name: gld_stock_prices_by_1d
-    source:
-      node_name: slv_stocks
+    sources:
+    - node_name: slv_stocks
       as_stream: false
     sinks:
     - table_name: gld_stock_prices_by_1d

@@ -28,6 +28,10 @@ on:
         description: Action to take for currently running job or pipline
         required: false
         default: WAIT
+      laktory_branch:
+        type: string
+        required: false
+        default: ''
     secrets:
       azure_client_id:
         required: False
@@ -77,6 +81,12 @@ jobs:
             print(k, "|", v)
         shell: python
 
+      - name: Override laktory version
+        if: ${{ inputs.laktory_branch != '' }}
+        run: |
+          sed -i "s|^laktory.*|git+https://github.com/okube-ai/laktory.git@${{ inputs.laktory_branch }}|" requirements.txt
+        working-directory: ${{ inputs.working-directory }}
+
       - name: Setup python environment
         run: |
           uv pip install -r requirements.txt
@@ -84,7 +94,7 @@ jobs:
 
       - name: laktory run
         run: |
-          laktory run -e ${{ inputs.env }} --dbks-job ${{ inputs.job_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }}
+          laktory run -e ${{ inputs.env }} --databricks-job ${{ inputs.job_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }}
         working-directory: ${{ inputs.working-directory }}
 
 #      - name: laktory run
@@ -93,5 +103,5 @@ jobs:
 #          if [ "${{ inputs.raise_exception }}" = 'true' ]; then
 #            EXCEPTION_OPTION="-r"
 #          fi
-#          laktory run -e ${{ inputs.env }} --dbks-job ${{ inputs.job_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }} $EXCEPTION_OPTION
+#          laktory run -e ${{ inputs.env }} --databricks-job ${{ inputs.job_name }} -a ${{ inputs.current_run_action }} -t ${{ inputs.timeout }} $EXCEPTION_OPTION
 #        working-directory: ${{ inputs.working-directory }}

@@ -1,1 +1,2 @@
-laktory[databricks]==0.11.8
+laktory[databricks]==0.12.0
+databricks-sdk
