@@ -52,7 +52,7 @@ jobs:
       - name: Override laktory version
         if: ${{ inputs.laktory_branch != '' }}
         run: |
-          uv pip install "git+https://github.com/okube-ai/laktory.git@${{ inputs.laktory_branch }}"
+          uv run pip install "git+https://github.com/okube-ai/laktory.git@${{ inputs.laktory_branch }}"
         working-directory: ${{ inputs.working-directory }}
 
       - name: Update laktory
