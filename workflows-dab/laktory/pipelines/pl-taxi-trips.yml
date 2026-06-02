@@ -25,8 +25,8 @@ orchestrator:
 nodes:
 
   - name: sample_trips
-    source:
-      table_name: samples.nyctaxi.trips
+    sources:
+    - table_name: samples.nyctaxi.trips
       as_stream: False
     sinks:
     - table_name: ${var.catalog}.${var.schema}.sample_trips
@@ -39,8 +39,8 @@ nodes:
         - F.col("tpep_dropoff_datetime") - F.col("tpep_pickup_datetime")
 
   - name: sample_zones
-    source:
-      node_name: sample_trips
+    sources:
+    - node_name: sample_trips
     sinks:
     - table_name: ${var.catalog}.${var.schema}.sample_zones
       mode: OVERWRITE
@@ -50,8 +50,8 @@ nodes:
       - func_name: lake.get_sample_zones
 
   - name: short_trips
-    source:
-      node_name: sample_trips
+    sources:
+    - node_name: sample_trips
       as_stream: False
     sinks:
     - table_name: ${var.catalog}.${var.schema}.short_trips
