@@ -7,7 +7,7 @@ dependencies:
 dataframe_api: NATIVE
 
 orchestrator:
-  type: DATABRICKS_PIPELINE
+  type: LAKEFLOW_DECLARATIVE_PIPELINE
   serverless: true
   catalog: ${var.catalog}
   schema: market_dab
