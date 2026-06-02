@@ -51,7 +51,7 @@ jobs:
 
       - name: Override laktory version
         if: ${{ inputs.laktory_branch != '' }}
-        run: uv pip install "git+https://github.com/okube-ai/laktory.git@${{ inputs.laktory_branch }}"
+        run: VIRTUAL_ENV=$(pwd)/.venv uv pip install "git+https://github.com/okube-ai/laktory.git@${{ inputs.laktory_branch }}"
         working-directory: ${{ inputs.working-directory }}
 
       - name: Show laktory version
