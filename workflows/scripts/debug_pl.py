@@ -11,7 +11,7 @@ import laktory as lk
 stack_filepath = "../stack.yaml"
 
 # Laktory root on DBFS, required to read checkpoints
-lk.settings.laktory_root = "/laktory/"
+lk.settings.runtime_root = "/laktory/"
 
 # Get Remote Spark Session
 # TODO: use your own profile
@@ -28,7 +28,7 @@ node_name = "brz_stock_prices"
 with open(stack_filepath, "r") as fp:
     stack = lk.models.Stack.model_validate_yaml(fp)
 
-pl = stack.get_env("dev").resources.pipelines["pl-stock-prices"]
+pl = stack.get_env("dev").inject_vars().resources.pipelines["pl-stock-prices"]
 
 # --------------------------------------------------------------------------- #
 # Execute Pipeline                                                            #
