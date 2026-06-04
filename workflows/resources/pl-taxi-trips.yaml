@@ -46,6 +46,10 @@ nodes:
     sinks:
     - table_name: ${var.catalog}.nyctaxi.sample_zones
       mode: OVERWRITE
+#      databricks_data_profiling_config:
+#        assets_dir: /Workspace${vars.workspace_root}qualitymonitors/
+#        output_schema_id: ${vars.catalog}.nyctaxi
+#        snapshot: {}
     transformer:
       dataframe_api: NARWHALS
       nodes:
