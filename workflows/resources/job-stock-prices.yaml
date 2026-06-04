@@ -40,16 +40,24 @@ tasks:
     depends_ons:
       - task_key: pipeline
 
-  - task_key: meta
+  - task_key: metadata
     depends_ons:
       - task_key: pipeline
     python_wheel_task:
-      entry_point: models.pipeline._post_execute
+      entry_point: models.pipeline._update_tables_metadata
       package_name: laktory
       named_parameters:
         filepaths: /Workspace${vars.workspace_root}pipelines/pl-stock-prices.json
-        tables_metadata: "true"
-        quality_monitors: "true"
+    environment_key: laktory
+
+  - task_key: data_profiling_config
+    depends_ons:
+      - task_key: pipeline
+    python_wheel_task:
+      entry_point: models.pipeline._update_data_profiling_configs
+      package_name: laktory
+      named_parameters:
+        filepaths: /Workspace${vars.workspace_root}pipelines/pl-stock-prices.json
     environment_key: laktory
 
 access_controls:

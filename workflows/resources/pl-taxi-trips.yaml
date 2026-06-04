@@ -1,7 +1,5 @@
 name: pl-taxi-trips
 
-databricks_quality_monitor_enabled: true
-
 dependencies:
   - ${vars.laktory_package}
   - ${vars.lake_package}
@@ -15,6 +13,7 @@ orchestrator:
     timezone_id: UTC
     quartz_cron_expression: '0 0 0 ? * * *'  # daily at midnight
     pause_status: ${vars.pause_status}
+  data_profiling_config_task: true
 
   access_controls:
     - group_name: account users

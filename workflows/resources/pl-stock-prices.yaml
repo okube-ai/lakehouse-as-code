@@ -1,7 +1,5 @@
 name: pl-stock-prices
 
-databricks_quality_monitor_enabled: true
-
 dependencies:
   - ${vars.laktory_package}
   - ${vars.lake_package}
@@ -188,9 +186,9 @@ nodes:
             comment: Day unique id
             tags:
               pii: "false"
-      databricks_quality_monitor:
+      databricks_data_profiling_config:
         assets_dir: /Workspace${vars.workspace_root}qualitymonitors/
-        output_schema_name: ${vars.catalog}.market
+        output_schema_id: ${vars.catalog}.market
         snapshot: {}
     transformer:
       dataframe_api: NARWHALS
