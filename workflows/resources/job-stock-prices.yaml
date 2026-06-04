@@ -50,7 +50,7 @@ tasks:
         filepaths: /Workspace${vars.workspace_root}pipelines/pl-stock-prices.json
     environment_key: laktory
 
-  - task_key: data_profiling_config
+  - task_key: data-profiling-config
     depends_ons:
       - task_key: pipeline
     python_wheel_task:
