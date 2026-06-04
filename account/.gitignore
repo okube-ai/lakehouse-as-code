@@ -12,4 +12,4 @@ stack.tf.json
 secrets/*.*
 
 # Virtual Environment
-venv/
+.venv/
