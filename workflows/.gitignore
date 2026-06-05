@@ -1,8 +1,15 @@
+# Compiled files
 *.pyc
-venv/
+**pytest_cache**
+**__pycache__**
+**/**.pyc
+
+# Outputs
+stack.tf.json
+*terraform*
 
 # Secret values
 secrets/*.*
 
-# Outputs
-Pulumi.yaml
+# Virtual Environment
+.venv/
