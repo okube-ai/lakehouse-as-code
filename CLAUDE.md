@@ -62,3 +62,8 @@ Each stack defines `dev` and `prd` environments. Variables like `${vars.catalog}
 ## Additional Documentation
 
 - [Architectural Patterns](.claude/docs/architectural_patterns.md) — stack YAML conventions, medallion pipeline structure, Pydantic models, DAB resource patterns; check when modifying pipelines, adding resources, or extending the `lake` package.
+
+---
+<!-- laktory -->
+
+@.claude/docs/laktory.md
