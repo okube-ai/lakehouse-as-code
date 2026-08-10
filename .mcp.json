@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "laktory": {
+      "command": "python",
+      "args": [
+        "-m",
+        "laktory.mcp.server"
+      ]
+    }
+  }
+}
