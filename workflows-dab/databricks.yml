@@ -32,6 +32,8 @@ sync:
 # laktory_package: version of laktory to use
 # laktory_pipelines_dir: local directory in which pipelines are defined. A list can also be provided using a comma
 #                        to separate each path
+# laktory_settings_<field>: sets a Laktory setting (laktory/_settings.py's `Settings`) for the whole
+#                           deployment - requires laktory>=0.12.6
 
 variables:
   dab_workspace_root:  # required for Laktory
@@ -43,6 +45,8 @@ variables:
 #    default: git+https://github.com/okube-ai/laktory.git@feat/sources-refactoring
   laktory_pipelines_dir:
     default: ./laktory/pipelines
+  laktory_settings_log_level:
+    default: INFO
   lake_package:
     default: ${workspace.root_path}/artifacts/.internal/lake-0.0.1-py3-none-any.whl  # TODO: Use pre-defined path?
 
